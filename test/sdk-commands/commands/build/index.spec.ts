@@ -301,7 +301,25 @@ describe('bundle script utilities', () => {
       })
 
       expect(result.contents).toContain("import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'")
-      expect(result.contents).toContain('initAssetPacks(engine, { syncEntity }, players)')
+      expect(result.contents).toMatch(
+        /export function _initializeAssetPacks\(\) \{\s*initAssetPacks\(engine, \{ syncEntity \}, players\)\s*\}/
+      )
+      expect(result.contents).not.toMatch(/^initAssetPacks\(/m)
+    })
+
+    it('should export a no-op asset-packs boot in scenes that are not editor scenes', async () => {
+      const compositeData = {
+        scripts: new Map([['src/scripts/test.ts', [{ entity: 512, path: 'src/scripts/test.ts', priority: 0 }]]]),
+        compositeLines: [],
+        watchFiles: [],
+        withErrors: false
+      }
+
+      const withScripts = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData)
+      const stub = await generateInitializeScriptsModule(mockComponents, '/test/project', null)
+
+      expect(withScripts.contents).toContain('export function _initializeAssetPacks() {}')
+      expect(stub.contents).toContain('export function _initializeAssetPacks() {}')
     })
 
     it('should not boot asset-packs in scenes with scripts that are not editor scenes', async () => {
@@ -358,7 +376,8 @@ describe('bundle script utilities', () => {
         logLevel: 'silent',
         plugins: [compositeLoader(components as any, { workingDirectory, ignoreComposite: false } as any)],
         stdin: {
-          contents: "import { _initializeScripts } from '~sdk/script-utils'\n_initializeScripts(undefined)",
+          contents:
+            "import { _initializeScripts, _initializeAssetPacks } from '~sdk/script-utils'\n_initializeAssetPacks()\n_initializeScripts(undefined)",
           resolveDir: workingDirectory,
           loader: 'ts'
         }

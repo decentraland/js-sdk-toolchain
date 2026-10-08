@@ -76,7 +76,9 @@ import { engine, NetworkEntity } from '@dcl/sdk/ecs'
 import * as sdk from '@dcl/sdk'
 import { compositeProvider } from '@dcl/sdk/composite-provider'
 import { compositeFromLoader } from '~sdk/all-composites'
-import { _initializeScripts } from '~sdk/script-utils'
+import { _initializeScripts, _initializeAssetPacks } from '~sdk/script-utils'
+
+_initializeAssetPacks()
 
 if ((entrypoint as any).main !== undefined) {
   function _INTERNAL_startup_system() {
@@ -620,6 +622,7 @@ async function updateSdkTypeDeclarations(
  */
 function generateScriptStubModuleContent(): string {
   return `
+${ASSET_PACKS_NOOP}
 export function _initializeScripts(_engine) {}
 
 export function getScriptInstance(_entity, _scriptPath) {
@@ -646,8 +649,12 @@ import { engine } from '@dcl/sdk/ecs'
 import { syncEntity } from '@dcl/sdk/network'
 import players from '@dcl/sdk/players'
 import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
-initAssetPacks(engine, { syncEntity }, players)
+export function _initializeAssetPacks() {
+  initAssetPacks(engine, { syncEntity }, players)
+}
 `
+
+const ASSET_PACKS_NOOP = 'export function _initializeAssetPacks() {}'
 
 /**
  * Generates the virtual module content with script initialization and helper functions
@@ -659,7 +666,7 @@ function generateVirtualModuleContent(
   editorScene: boolean
 ): string {
   return `
-${editorScene ? ASSET_PACKS_BOOT : ''}
+${editorScene ? ASSET_PACKS_BOOT : ASSET_PACKS_NOOP}
 ${runtimeImports}
 
 ${runtimeCode}
