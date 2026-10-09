@@ -79,6 +79,10 @@
       "build_failed": "构建场景失败：{{error}}",
       "bundle_not_found": "在 {{bundlePath}} 找不到打包的场景",
       "execution_failed": "执行场景代码失败：{{error}}"
+    },
+    "pack_smart_wearable": {
+      "zip_failed": "无法创建智能可穿戴设备的 zip 文件：{{error}}",
+      "escapes_project": "拒绝打包智能可穿戴设备：这些文件解析到项目文件夹之外，打包它们会包含本机其他位置的内容：{{files}}"
     }
   }
 }
