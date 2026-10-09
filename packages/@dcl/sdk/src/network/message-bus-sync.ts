@@ -13,6 +13,7 @@ import { serializeCrdtMessages } from '../internal/transports/logger'
 import { IsServerRequest, IsServerResponse } from '~system/EngineApi'
 import { Atom } from '../atom'
 import { setGlobalRoom, Room } from './events/implementation'
+import { installInternalMessages } from './internal-messages'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
@@ -109,6 +110,7 @@ export function addSyncTransport(
 
   // Set global eventBus instance
   setGlobalRoom(eventBus)
+  installInternalMessages(binaryMessageBus, isServerAtom, AUTH_SERVER_PEER_ID)
 
   engine.addTransport(transport)
   // End add sync transport
