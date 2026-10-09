@@ -31,7 +31,23 @@ const {
 } = addSyncTransport(engine, sendBinary, getUserData, isServerApi, 'network')
 
 // Re-export the room messaging system
-export { registerMessages, getRoom } from './events'
+export {
+  registerMessages,
+  getRoom,
+  registerRequests,
+  createRequests,
+  RequestError,
+  RequestTimeoutError
+} from './events'
+export type {
+  EventContext,
+  RequestDefinition,
+  RequestSchemaRegistry,
+  RequestHandler,
+  RequestOptions,
+  RequestsOptions,
+  Requests
+} from './events'
 
 export {
   getFirstChild,
