@@ -746,6 +746,7 @@ export const componentDefinitionByName: {
     "core::PhysicsCombinedForce": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedForce>>;
     "core::PhysicsCombinedImpulse": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPhysicsCombinedImpulse>>;
     "core::PlayerIdentityData": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>>;
+    "core::PlayerVoiceState": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPlayerVoiceState>>;
     "core::PointerEvents": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerEvents>>;
     "core::PointerEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBPointerEventsResult>>;
     "core::PointerLock": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBPointerLock>>;
@@ -774,6 +775,7 @@ export const componentDefinitionByName: {
     "core::VideoPlayer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVideoPlayer>>;
     "core::VirtualCamera": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVirtualCamera>>;
     "core::VisibilityComponent": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>>;
+    "core::VoiceChatModifierArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBVoiceChatModifierArea>>;
 };
 
 // @public
@@ -3547,6 +3549,19 @@ export namespace PBPlayerIdentityData {
 }
 
 // @public (undocumented)
+export interface PBPlayerVoiceState {
+    isSpeaking: boolean;
+}
+
+// @public (undocumented)
+export namespace PBPlayerVoiceState {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBPlayerVoiceState;
+    // (undocumented)
+    export function encode(message: PBPlayerVoiceState, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBPointerEvents {
     pointerEvents: PBPointerEvents_Entry[];
 }
@@ -3769,6 +3784,7 @@ export interface PBTextShape {
     font?: Font | undefined;
     fontAutoSize?: boolean | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     height?: number | undefined;
     lineCount?: number | undefined;
     lineSpacing?: number | undefined;
@@ -4000,6 +4016,7 @@ export interface PBUiDropdown {
     emptyLabel?: string | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     // (undocumented)
     options: string[];
     selectedIndex?: number | undefined;
@@ -4035,6 +4052,7 @@ export interface PBUiInput {
     disabled: boolean;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     // (undocumented)
     placeholder: string;
     placeholderColor?: PBColor4 | undefined;
@@ -4084,6 +4102,7 @@ export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     textAlign?: TextAlignMode | undefined;
     textWrap?: TextWrap | undefined;
     value: string;
@@ -4322,6 +4341,24 @@ export namespace PBVisibilityComponent {
     export function encode(message: PBVisibilityComponent, writer?: _m0.Writer): _m0.Writer;
 }
 
+// @public (undocumented)
+export interface PBVoiceChatModifierArea {
+    area: PBVector3 | undefined;
+    excludeIds: string[];
+    isolate?: boolean | undefined;
+    maxDistance?: number | undefined;
+    mute?: boolean | undefined;
+    volumeScale?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBVoiceChatModifierArea {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBVoiceChatModifierArea;
+    // (undocumented)
+    export function encode(message: PBVoiceChatModifierArea, writer?: _m0.Writer): _m0.Writer;
+}
+
 // @public
 export const Physics: PhysicsSystem;
 
@@ -4383,6 +4420,9 @@ export namespace Plane {
 
 // @public (undocumented)
 export const PlayerIdentityData: LastWriteWinElementSetComponentDefinition<PBPlayerIdentityData>;
+
+// @public (undocumented)
+export const PlayerVoiceState: LastWriteWinElementSetComponentDefinition<PBPlayerVoiceState>;
 
 // @public (undocumented)
 export const PointerEvents: LastWriteWinElementSetComponentDefinition<PBPointerEvents>;
@@ -5863,6 +5903,9 @@ export interface VirtualCameraComponentDefinitionExtended extends LastWriteWinEl
 
 // @public (undocumented)
 export const VisibilityComponent: LastWriteWinElementSetComponentDefinition<PBVisibilityComponent>;
+
+// @public (undocumented)
+export const VoiceChatModifierArea: LastWriteWinElementSetComponentDefinition<PBVoiceChatModifierArea>;
 
 // @public
 export type WorldTransformEngine = Pick<IEngine, 'getEntitiesWith' | 'defineComponentFromSchema' | 'PlayerEntity'>;
