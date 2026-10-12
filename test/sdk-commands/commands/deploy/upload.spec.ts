@@ -1,6 +1,7 @@
 import type { ContentClient } from 'dcl-catalyst-client'
 import {
   MAX_SINGLE_REQUEST_BYTES,
+  MIN_PARTIAL_DEPLOYMENT_BYTES,
   UploadResult,
   uploadDeployment
 } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/upload'
@@ -18,11 +19,13 @@ function createLogger() {
   return { log: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() }
 }
 
+const ENTITY_FILE_BYTES = 10
+
 function createDeployData(contentSize: number): DeploymentData {
   return {
     entityId: 'bafkreientity',
     files: new Map([
-      ['bafkreientity', new Uint8Array(10)],
+      ['bafkreientity', new Uint8Array(ENTITY_FILE_BYTES)],
       ['bafkreicontent', { byteLength: contentSize } as Uint8Array]
     ]),
     authChain: []
@@ -51,6 +54,29 @@ describe('when uploading a deployment', () => {
     beforeEach(() => {
       deployPartial = jest.fn()
       client = { deploy, deployPartial } as unknown as ContentClient
+      deployData = createDeployData(MIN_PARTIAL_DEPLOYMENT_BYTES - ENTITY_FILE_BYTES)
+    })
+
+    describe('and the deployment is smaller than the batching threshold', () => {
+      let result: UploadResult
+
+      beforeEach(async () => {
+        deployData = createDeployData(MIN_PARTIAL_DEPLOYMENT_BYTES - ENTITY_FILE_BYTES - 1)
+        deploy.mockResolvedValueOnce({ status: 200, json: async () => ({ message: 'Deployed' }) })
+        result = await uploadDeployment({ logger }, client, deployData)
+      })
+
+      it('should upload the deployment in a single request', () => {
+        expect(deploy).toHaveBeenCalledWith(deployData, { timeout: 600000 })
+      })
+
+      it('should not upload the deployment in batches', () => {
+        expect(deployPartial).not.toHaveBeenCalled()
+      })
+
+      it('should resolve with the message of the single request', () => {
+        expect(result).toEqual({ message: 'Deployed' })
+      })
     })
 
     describe('and the server publishes the entity', () => {

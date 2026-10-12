@@ -29,6 +29,9 @@ const REQUEST_TIMEOUT_MS = 600000
 // The infrastructure in front of the content servers times out requests larger than ~200MB.
 export const MAX_SINGLE_REQUEST_BYTES = 200 * 1000 * 1000
 
+// Smaller scenes upload faster in one request than in batches.
+export const MIN_PARTIAL_DEPLOYMENT_BYTES = 50 * 1024 * 1024
+
 function formatMegabytes(bytes: number): string {
   return `${(bytes / 1e6).toFixed(1)} MB`
 }
@@ -50,8 +53,9 @@ async function uploadInSingleRequest(client: ContentClient, deployData: Deployme
 }
 
 /**
- * Uploads a deployment in size-bounded batches when the client supports partial deployments,
- * falling back to a single request for servers that don't support them.
+ * Uploads a deployment of at least {@link MIN_PARTIAL_DEPLOYMENT_BYTES} in size-bounded batches when the
+ * client supports partial deployments, falling back to a single request for servers that don't support them.
+ * Smaller deployments always use a single request.
  */
 export async function uploadDeployment(
   components: Pick<CliComponents, 'logger'>,
@@ -59,7 +63,8 @@ export async function uploadDeployment(
   deployData: DeploymentData
 ): Promise<UploadResult> {
   const partialClient = client as ContentClient & PartialDeploymentClient
-  if (typeof partialClient.deployPartial !== 'function') {
+  const size = deploymentSize(deployData)
+  if (size < MIN_PARTIAL_DEPLOYMENT_BYTES || typeof partialClient.deployPartial !== 'function') {
     return uploadInSingleRequest(client, deployData)
   }
 
@@ -78,7 +83,6 @@ export async function uploadDeployment(
     if (error?.name !== 'PartialDeploymentNotSupportedError') {
       throw error
     }
-    const size = deploymentSize(deployData)
     if (size > MAX_SINGLE_REQUEST_BYTES) {
       throw new CliError(
         'DEPLOY_PARTIAL_NOT_SUPPORTED',
