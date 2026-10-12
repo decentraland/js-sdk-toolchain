@@ -204,14 +204,15 @@ export function createInsightsClient(
     const seen = createRecentIds(TAIL_SEEN_IDS)
     let lastEventId: string | undefined
     let reconnectMs = TAIL_RECONNECT_MIN_MS
-    let first = true
 
     while (!signal?.aborted) {
       let serverRetryMs: number | undefined
       let streamError: string | undefined
 
       try {
-        const response = await fetch.fetch(urlFor(pathname, first && lines ? { lines } : {}), {
+        // Replayed lines carry no resume id: until a live line gives one, a
+        // reconnect asks for the history again and `seen` drops what was shown.
+        const response = await fetch.fetch(urlFor(pathname, !lastEventId && lines ? { lines } : {}), {
           headers: {
             ...session.sign('GET', pathname, metadata),
             Accept: 'text/event-stream',
@@ -227,7 +228,6 @@ export function createInsightsClient(
           serverRetryMs = retryAfterMs(response)
           logger.log(`The insights service is busy (${response.status}); reconnecting`)
         } else if (response.body) {
-          first = false
           reconnectMs = TAIL_RECONNECT_MIN_MS
           const decoder = new TextDecoder()
           const parser = createSseParser((event) => {
@@ -241,7 +241,8 @@ export function createInsightsClient(
             } else if (event.event === 'log') {
               const entry = JSON.parse(event.data) as LogEntry
               if (event.id) lastEventId = event.id
-              if (seen.add(entry.id)) onLog(entry)
+              // an empty id means the line has none: never treat it as a repeat
+              if (!entry.id || seen.add(entry.id)) onLog(entry)
             }
           })
           for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {

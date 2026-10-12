@@ -244,7 +244,7 @@ describe('when using the insights client', () => {
         expect(received).toEqual(['one', 'two'])
       })
 
-      it('should ask for the replay only on the first connection', () => {
+      it('should stop asking for the replay once a live line gave a resume id', () => {
         expect(fetchMock.mock.calls.map((call) => call[0])).toEqual([
           `${BASE_URL}/v1/logs/tail?lines=20`,
           `${BASE_URL}/v1/logs/tail`
@@ -260,6 +260,54 @@ describe('when using the insights client', () => {
           name: 'SCENE_INSIGHTS_STREAM_ENDED',
           message: 'The insights service ended the tail: access revoked'
         })
+      })
+    })
+
+    describe('and the stream drops during the replay, before any live line', () => {
+      beforeEach(async () => {
+        fetchMock
+          .mockResolvedValueOnce(sse(logFrame(logEntry('e1', 'one')), 'retry: 1\n\n'))
+          .mockResolvedValueOnce(
+            sse(
+              logFrame(logEntry('e1', 'one')),
+              logFrame(logEntry('e2', 'two')),
+              logFrame(logEntry('e3', 'three'), 'c3'),
+              'event: error\ndata: {"error":"access revoked"}\n\n'
+            )
+          )
+        await client.tail({ lines: 20, onLog: (entry) => received.push(entry.message) }).catch(() => undefined)
+      })
+
+      it('should ask for the replay again', () => {
+        expect(fetchMock.mock.calls.map((call) => call[0])).toEqual([
+          `${BASE_URL}/v1/logs/tail?lines=20`,
+          `${BASE_URL}/v1/logs/tail?lines=20`
+        ])
+      })
+
+      it('should not send a resume id it never received', () => {
+        expect(fetchMock.mock.calls[1][1].headers['Last-Event-ID']).toBeUndefined()
+      })
+
+      it('should show the replayed history once, then the live line', () => {
+        expect(received).toEqual(['one', 'two', 'three'])
+      })
+    })
+
+    describe('and several lines arrive without an event id', () => {
+      beforeEach(async () => {
+        fetchMock.mockResolvedValueOnce(
+          sse(
+            logFrame(logEntry('', 'first without id'), 'c1'),
+            logFrame(logEntry('', 'second without id'), 'c2'),
+            'event: error\ndata: {"error":"access revoked"}\n\n'
+          )
+        )
+        await client.tail({ onLog: (entry) => received.push(entry.message) }).catch(() => undefined)
+      })
+
+      it('should show every one of them instead of treating them as repeats', () => {
+        expect(received).toEqual(['first without id', 'second without id'])
       })
     })
 
