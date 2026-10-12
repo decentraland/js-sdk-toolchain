@@ -165,9 +165,21 @@ describe('when parsing a time', () => {
     })
   })
 
-  describe('and it is a duration in days', () => {
+  describe('and it is a duration in days within the retention', () => {
     it('should return that many days before now', () => {
-      expect(parseTime('7d', '--from', now)).toBe('2026-10-05T14:00:00.000Z')
+      expect(parseTime('6d', '--from', now)).toBe('2026-10-06T14:00:00.000Z')
+    })
+  })
+
+  describe('and it is the whole 7-day retention', () => {
+    it('should stop a minute short, so the range still fits when it reaches the service', () => {
+      expect(parseTime('7d', '--from', now)).toBe('2026-10-05T14:01:00.000Z')
+    })
+  })
+
+  describe('and it is longer than the retention', () => {
+    it('should be clamped to the retention window', () => {
+      expect(parseTime('30d', '--from', now)).toBe('2026-10-05T14:01:00.000Z')
     })
   })
 

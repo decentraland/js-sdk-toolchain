@@ -15,6 +15,14 @@ export interface SceneTarget {
 export const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const
 export type LogLevel = (typeof LOG_LEVELS)[number]
 
+/** The service refuses ranges longer than its 7-day retention. */
+const MAX_RANGE_MS = 7 * 24 * 60 * 60 * 1000
+/**
+ * Room for the time between computing `from` here and the service resolving its own "now": a
+ * duration of exactly 7 days would otherwise always arrive a few milliseconds over the limit.
+ */
+const RANGE_SLACK_MS = 60 * 1000
+
 const DURATION_UNITS_MS: Record<string, number> = {
   s: 1000,
   m: 60 * 1000,
@@ -75,7 +83,8 @@ export function buildSceneTarget(world: string | undefined, parcel: string | und
 /**
  * Parses a `--from`/`--to` value into the ISO-8601 form the service expects. Accepts `now`, a
  * duration back from now (`30s`, `15m`, `2h`, `7d`), epoch milliseconds (13 digits) or ISO-8601
- * with an explicit offset (`2026-10-01T12:00:00Z`, `2026-10-01T09:00:00-03:00`).
+ * with an explicit offset (`2026-10-01T12:00:00Z`, `2026-10-01T09:00:00-03:00`). A duration of 7
+ * days or more means the whole retention window, ending a minute short of it.
  */
 export function parseTime(raw: string, flag: string, now: number = Date.now()): string {
   const value = raw.trim()
@@ -85,7 +94,8 @@ export function parseTime(raw: string, flag: string, now: number = Date.now()): 
 
   const duration = value.match(/^(\d+)([smhd])$/)
   if (duration) {
-    return new Date(now - parseInt(duration[1], 10) * DURATION_UNITS_MS[duration[2]]).toISOString()
+    const ms = parseInt(duration[1], 10) * DURATION_UNITS_MS[duration[2]]
+    return new Date(now - Math.min(ms, MAX_RANGE_MS - RANGE_SLACK_MS)).toISOString()
   }
 
   if (/^\d{13}$/.test(value)) {
