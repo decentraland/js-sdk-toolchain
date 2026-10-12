@@ -181,10 +181,36 @@ describe('when using the insights client', () => {
 
     it('should throw a request error with the reason and what to check', async () => {
       await expect(client.listMetricNames({})).rejects.toMatchObject({
-        name: 'SCENE_INSIGHTS_REQUEST_FAILED',
+        name: 'SCENE_INSIGHTS_FORBIDDEN',
         message: expect.stringMatching(
-          /403: No access to this scene \(your address is not in the scene's logsPermissions/
+          /403: No access to this scene \(the signed-in address is not in the scene's logsPermissions/
         )
+      })
+    })
+  })
+
+  describe('and the session is refused', () => {
+    beforeEach(() => {
+      fetchMock.mockResolvedValueOnce(new Response('{"error":"Invalid signature"}', { status: 401 }))
+    })
+
+    it('should throw an unauthorized error telling to sign in again', async () => {
+      await expect(client.listExecutions({})).rejects.toMatchObject({
+        name: 'SCENE_INSIGHTS_UNAUTHORIZED',
+        message: expect.stringContaining('run "sdk-commands scene-insights login"')
+      })
+    })
+  })
+
+  describe('and the service cannot be reached', () => {
+    beforeEach(() => {
+      fetchMock.mockRejectedValueOnce(Object.assign(new TypeError('fetch failed'), { cause: { code: 'ENOTFOUND' } }))
+    })
+
+    it('should throw an unavailable error naming the service and the cause', async () => {
+      await expect(client.listExecutions({})).rejects.toMatchObject({
+        name: 'SCENE_INSIGHTS_UNAVAILABLE',
+        message: `Could not reach ${BASE_URL} (ENOTFOUND)`
       })
     })
   })
@@ -261,7 +287,7 @@ describe('when using the insights client', () => {
 
       it('should throw instead of reconnecting', async () => {
         await expect(client.tail({ onLog: (entry) => received.push(entry.message) })).rejects.toMatchObject({
-          name: 'SCENE_INSIGHTS_REQUEST_FAILED',
+          name: 'SCENE_INSIGHTS_NOT_FOUND',
           message: expect.stringContaining('404: Unknown world')
         })
       })

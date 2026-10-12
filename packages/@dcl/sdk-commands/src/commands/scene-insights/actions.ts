@@ -1,15 +1,27 @@
 import { InsightsClient } from './client'
 import { formatExecutions, formatLogEntry, formatMetricNames, formatMetricSeries } from './format'
 import { LOG_LEVELS, LogLevel } from './inputs'
-import { LogEntry } from './types'
+import { ExecutionsResult, LogEntry, MetricNamesResult, MetricSeries } from './types'
 
-/** Where results go: data to `write` (stdout), notes about it to `note` (stderr). */
+/**
+ * Where results go: text to `write` (stdout), notes about it to `note` (stderr). With `json`, a
+ * subcommand prints no text and returns its result instead, which the CLI prints as JSON (the
+ * `--json` convention of every sdk-commands command); only the tail, a stream, writes its own
+ * JSON, one entry per line.
+ */
 export interface Output {
   write(line: string): void
   note(message: string): void
-  /** Print JSON (one object per line for logs) instead of text */
   json: boolean
   color: boolean
+}
+
+export interface LogsResult {
+  sceneKey: string
+  /** Oldest first */
+  logs: LogEntry[]
+  /** Whether more lines matched than were returned */
+  more: boolean
 }
 
 /** The service's page size cap. */
@@ -31,10 +43,11 @@ export interface LogsParams {
 /**
  * Searches the persisted logs, paging until `limit` lines, and prints them oldest first.
  */
-export async function runLogs(client: InsightsClient, params: LogsParams, output: Output): Promise<void> {
+export async function runLogs(client: InsightsClient, params: LogsParams, output: Output): Promise<LogsResult> {
   const entries: LogEntry[] = []
   let cursor: string | undefined
   let more = false
+  let sceneKey = ''
 
   do {
     const page = await client.searchLogs({
@@ -48,16 +61,18 @@ export async function runLogs(client: InsightsClient, params: LogsParams, output
       limit: Math.min(MAX_PAGE, params.limit - entries.length),
       cursor
     })
+    sceneKey = page.sceneKey
     entries.push(...page.logs)
     cursor = page.nextCursor ?? undefined
     more = !!cursor
   } while (cursor && entries.length < params.limit)
 
-  const chronological = params.order === 'desc' ? entries.reverse() : entries
-  for (const entry of chronological) {
-    output.write(output.json ? JSON.stringify(entry) : formatLogEntry(entry, output.color))
-  }
+  const result = { sceneKey, logs: params.order === 'desc' ? entries.reverse() : entries, more }
+  if (output.json) return result
 
+  for (const entry of result.logs) {
+    output.write(formatLogEntry(entry, output.color))
+  }
   if (entries.length === 0) {
     output.note('No log lines match')
   } else if (more) {
@@ -65,6 +80,7 @@ export async function runLogs(client: InsightsClient, params: LogsParams, output
       `Printed ${entries.length} lines; more match. Raise --limit or narrow --from/--to, --level or --query to see them.`
     )
   }
+  return result
 }
 
 export interface TailParams {
@@ -88,9 +104,9 @@ export function matchesTailFilters(entry: LogEntry, params: Pick<TailParams, 'le
   return true
 }
 
-/** Follows the live tail until interrupted. */
+/** Follows the live tail until interrupted or `signal` aborts. */
 export async function runTail(client: InsightsClient, params: TailParams, output: Output): Promise<void> {
-  output.note('Following the scene logs (press CTRL+C to stop)')
+  output.note('Following the scene logs')
   await client.tail({
     lines: params.lines,
     signal: params.signal,
@@ -112,15 +128,19 @@ export interface MetricsParams {
 }
 
 /** Lists the scene's metrics, or prints one metric's series. */
-export async function runMetrics(client: InsightsClient, params: MetricsParams, output: Output): Promise<void> {
+export async function runMetrics(
+  client: InsightsClient,
+  params: MetricsParams,
+  output: Output
+): Promise<MetricNamesResult | MetricSeries> {
   if (!params.metric) {
     const names = await client.listMetricNames({ from: params.from, to: params.to })
-    if (output.json) return output.write(JSON.stringify(names))
+    if (output.json) return names
     formatMetricNames(names).forEach((line) => output.write(line))
     if (names.metrics.length > 0) {
       output.note('Chart one with: scene-insights metrics <name>')
     }
-    return
+    return names
   }
 
   const series = await client.getMetricSeries({
@@ -130,8 +150,9 @@ export async function runMetrics(client: InsightsClient, params: MetricsParams, 
     step: params.step,
     execution: params.execution
   })
-  if (output.json) return output.write(JSON.stringify(series))
+  if (output.json) return series
   formatMetricSeries(series).forEach((line) => output.write(line))
+  return series
 }
 
 /** Lists the scene's executions (deployments × process restarts). */
@@ -139,8 +160,9 @@ export async function runExecutions(
   client: InsightsClient,
   params: Pick<MetricsParams, 'from' | 'to'>,
   output: Output
-): Promise<void> {
+): Promise<ExecutionsResult> {
   const result = await client.listExecutions({ from: params.from, to: params.to })
-  if (output.json) return output.write(JSON.stringify(result))
+  if (output.json) return result
   formatExecutions(result).forEach((line) => output.write(line))
+  return result
 }

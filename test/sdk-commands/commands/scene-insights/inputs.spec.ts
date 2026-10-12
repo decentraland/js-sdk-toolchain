@@ -3,6 +3,7 @@ import {
   normalizeMetricName,
   normalizeParcel,
   normalizeWorldName,
+  parseDuration,
   parseInteger,
   parseLevel,
   parseTime
@@ -239,6 +240,26 @@ describe('when normalizing a metric name', () => {
   describe('and it is the full name', () => {
     it('should keep it', () => {
       expect(normalizeMetricName('dcl.scene.mem.heap_used')).toBe('dcl.scene.mem.heap_used')
+    })
+  })
+})
+
+describe('when parsing a duration', () => {
+  describe('and it has a unit', () => {
+    it('should return it in milliseconds', () => {
+      expect(parseDuration('2m', '--for')).toBe(120_000)
+    })
+  })
+
+  describe('and it is zero', () => {
+    it('should throw an invalid argument error naming the flag', () => {
+      expect(() => parseDuration('0s', '--for')).toThrow(/Invalid --for "0s"/)
+    })
+  })
+
+  describe('and it has no unit', () => {
+    it('should throw an invalid argument error naming the flag', () => {
+      expect(() => parseDuration('30', '--for')).toThrow(/Invalid --for "30"/)
     })
   })
 })

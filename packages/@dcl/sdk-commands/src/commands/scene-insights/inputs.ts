@@ -103,6 +103,19 @@ export function parseTime(raw: string, flag: string, now: number = Date.now()): 
   return new Date(parsed).toISOString()
 }
 
+/** Parses a duration (`30s`, `5m`, `2h`, `1d`) into milliseconds. */
+export function parseDuration(raw: string, flag: string): number {
+  const duration = raw.trim().match(/^(\d+)([smhd])$/)
+  const ms = duration ? parseInt(duration[1], 10) * DURATION_UNITS_MS[duration[2]] : 0
+  if (!(ms > 0)) {
+    throw new CliError(
+      'SCENE_INSIGHTS_INVALID_ARGUMENT',
+      `Invalid ${flag} "${raw}"; use a duration such as 30s, 5m or 2h`
+    )
+  }
+  return ms
+}
+
 /** Validates a `--level` value. */
 export function parseLevel(raw: string): LogLevel {
   const level = raw.trim().toLowerCase()

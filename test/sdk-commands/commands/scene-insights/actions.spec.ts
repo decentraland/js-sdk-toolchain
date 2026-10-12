@@ -43,7 +43,7 @@ describe('when running the logs subcommand', () => {
     client = { searchLogs } as unknown as InsightsClient
     written = []
     notes = []
-    output = { write: (line) => written.push(line), note: (message) => notes.push(message), json: true, color: false }
+    output = { write: (line) => written.push(line), note: (message) => notes.push(message), json: false, color: false }
   })
 
   afterEach(() => {
@@ -59,7 +59,7 @@ describe('when running the logs subcommand', () => {
     })
 
     it('should print them oldest first', () => {
-      expect(written.map((line) => JSON.parse(line).message)).toEqual(['two', 'three', 'four'])
+      expect(written.map((line) => line.split(' INFO  ')[1])).toEqual(['two', 'three', 'four'])
     })
 
     it('should request the second page with the cursor, the same filters and only the remaining lines', () => {
@@ -89,7 +89,29 @@ describe('when running the logs subcommand', () => {
     })
 
     it('should print them in the order they came', () => {
-      expect(written.map((line) => JSON.parse(line).message)).toEqual(['one', 'two'])
+      expect(written.map((line) => line.split(' INFO  ')[1])).toEqual(['one', 'two'])
+    })
+  })
+
+  describe('and the output is JSON', () => {
+    let result: Awaited<ReturnType<typeof runLogs>>
+
+    beforeEach(async () => {
+      output.json = true
+      searchLogs.mockResolvedValueOnce(page([logEntry('2', 'two'), logEntry('1', 'one')], 'cursor-2'))
+      result = await runLogs(client, { limit: 2, order: 'desc' }, output)
+    })
+
+    it('should return the lines oldest first, and whether more match, for the CLI to print', () => {
+      expect({
+        messages: result.logs.map((entry) => entry.message),
+        more: result.more,
+        sceneKey: result.sceneKey
+      }).toEqual({ messages: ['one', 'two'], more: true, sceneKey: 'world:example.dcl.eth:0,0' })
+    })
+
+    it('should print no text', () => {
+      expect({ written, notes }).toEqual({ written: [], notes: [] })
     })
   })
 
@@ -210,21 +232,26 @@ describe('when running the metrics subcommand', () => {
 describe('when running the executions subcommand with --json', () => {
   let client: InsightsClient
   let written: string[]
-  let result: object
+  let response: object
+  let result: unknown
 
   beforeEach(async () => {
     written = []
-    result = { sceneKey: 'k', executions: [], retentionStart: 'x' }
-    client = { listExecutions: jest.fn().mockResolvedValueOnce(result) } as unknown as InsightsClient
-    await runExecutions(client, {}, { write: (line) => written.push(line), note: jest.fn(), json: true, color: false })
+    response = { sceneKey: 'k', executions: [], retentionStart: 'x' }
+    client = { listExecutions: jest.fn().mockResolvedValueOnce(response) } as unknown as InsightsClient
+    result = await runExecutions(
+      client,
+      {},
+      { write: (line) => written.push(line), note: jest.fn(), json: true, color: false }
+    )
   })
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('should print the response as one JSON line', () => {
-    expect(written).toEqual([JSON.stringify(result)])
+  it('should return the response for the CLI to print as JSON, printing no text', () => {
+    expect({ result, written }).toEqual({ result: response, written: [] })
   })
 })
 

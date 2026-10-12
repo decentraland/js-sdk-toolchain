@@ -1,28 +1,22 @@
 import { randomBytes } from 'crypto'
-import future from 'fp-future'
 import { AuthChain, AuthIdentity, AuthLinkType, Authenticator } from '@dcl/crypto'
 import { ethSign } from '@dcl/crypto/dist/crypto'
 import { hexToBytes } from 'eth-connect'
-import { Router } from '@well-known-components/http-server'
 
-import { CliComponents } from '../../components'
 import { CliError } from '../../logic/error'
 import { createWallet } from '../../logic/account'
 import { createAuthChainHeaders } from '../../logic/auth-chain-headers'
-import { setRoutes, LinkerResponse } from '../../linker-dapp/routes'
-import { dAppOptions, runDapp } from '../../run-dapp'
-import { SceneTarget } from './inputs'
 
-/** How long one signature lasts. A command that runs longer (a long tail) has to be started again. */
+/** How long one signature lasts; after that, `scene-insights login` signs a new session. */
 export const SESSION_MINUTES = 12 * 60
 
 /**
- * Signs requests for the whole run of a command after a single wallet signature.
+ * Signs any number of requests after a single wallet signature.
  *
- * Every insights request is a signed fetch over `method:path:timestamp:metadata`, so a command that
- * pages through results or reconnects a tail needs many signatures. Instead of asking the wallet for
- * each one, the wallet signs once to delegate to an ephemeral key that only lives in this process,
- * and that key signs each request.
+ * Every insights request is a signed fetch over `method:path:timestamp:metadata`, so paging, tail
+ * reconnects and repeated commands need many signatures. Instead of asking the wallet for each one,
+ * the wallet signs once to delegate to an ephemeral key held by the CLI, and that key signs each
+ * request (session-store.ts keeps it between commands).
  */
 export interface InsightsSession {
   /** The wallet address the requests are made as */
@@ -126,70 +120,4 @@ export async function delegationFromLinkerChain(
     )
   }
   return delegation
-}
-
-/**
- * Opens a session: with `DCL_PRIVATE_KEY` it signs locally, otherwise it opens the linker dApp for
- * the wallet to sign the delegation once.
- */
-export async function openSession(
-  components: CliComponents,
-  target: SceneTarget,
-  targetUrl: string,
-  linkOptions: Omit<dAppOptions, 'uri'>
-): Promise<InsightsSession> {
-  if (process.env.DCL_PRIVATE_KEY) {
-    return createSessionFromPrivateKey(process.env.DCL_PRIVATE_KEY)
-  }
-
-  const ephemeralIdentity = createEphemeralIdentity()
-  const expiration = new Date(Date.now() + SESSION_MINUTES * 60 * 1000)
-  const message = Authenticator.getEphemeralMessage(ephemeralIdentity.address, expiration)
-
-  const signed = future<AuthChain>()
-  const { router: commonRouter } = setRoutes(components, {
-    rootCID: message,
-    baseParcel: target.parcel ?? '0,0',
-    parcels: [target.parcel ?? '0,0'],
-    skipValidations: true,
-    debug: !!process.env.DEBUG,
-    isWorld: !!target.world,
-    world: target.label,
-    targetUrl,
-    action: 'view-logs'
-  })
-  const router = setSessionRoutes(commonRouter, ephemeralIdentity.address, message, (chain) => signed.resolve(chain))
-
-  components.logger.info(`Sign once to read the insights of ${target.label} for the next ${SESSION_MINUTES / 60} hours`)
-  const { program } = await runDapp(components, router, { ...linkOptions, uri: '/' })
-
-  try {
-    return createSessionFromChain(ephemeralIdentity, expiration, await signed)
-  } finally {
-    void program.stop()
-  }
-}
-
-/** The linker dApp posts `view-logs` signatures to `/api/logs`. */
-function setSessionRoutes(
-  router: Router<object>,
-  ephemeralAddress: string,
-  message: string,
-  onSigned: (delegation: AuthChain) => void
-): Router<object> {
-  router.post('/api/logs', async (ctx) => {
-    const value = (await ctx.request.json()) as LinkerResponse
-    try {
-      if (!value.address || !Array.isArray(value.authChain)) {
-        throw new CliError('SCENE_INSIGHTS_INVALID_SIGNATURE', 'The wallet did not sign the insights session')
-      }
-      const delegation = await delegationFromLinkerChain(value.authChain, ephemeralAddress, message)
-      // answer the dApp before the server is stopped
-      setTimeout(() => onSigned(delegation), 100)
-      return { body: { success: true } }
-    } catch (e) {
-      return { status: 400, body: { success: false, error: (e as Error).message } }
-    }
-  })
-  return router
 }

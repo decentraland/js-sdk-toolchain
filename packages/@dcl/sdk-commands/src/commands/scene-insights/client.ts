@@ -1,5 +1,5 @@
 import { CliComponents } from '../../components'
-import { CliError } from '../../logic/error'
+import { CliError, CliErrorName } from '../../logic/error'
 import { InsightsSession } from './session'
 import { ExecutionsResult, LogEntry, LogSearchResult, MetricNamesResult, MetricSeries } from './types'
 
@@ -102,8 +102,25 @@ export function retryAfterMs(response: Response): number {
   return Math.min(Number.isFinite(seconds) && seconds > 0 ? seconds * 1000 : 1000, MAX_RETRY_AFTER_MS)
 }
 
-/** Turns an error response into a CliError that says what to do about it. */
-export async function errorFromResponse(response: Response): Promise<CliError<'SCENE_INSIGHTS_REQUEST_FAILED'>> {
+/** The error name of each status a caller can act on; anything else is a plain request failure. */
+const ERRORS_BY_STATUS: Record<number, { name: CliErrorName; hint?: string }> = {
+  400: { name: 'SCENE_INSIGHTS_INVALID_ARGUMENT' },
+  401: {
+    name: 'SCENE_INSIGHTS_UNAUTHORIZED',
+    hint: 'the session was refused; run "sdk-commands scene-insights login" to sign a new one'
+  },
+  403: {
+    name: 'SCENE_INSIGHTS_FORBIDDEN',
+    hint: "the signed-in address is not in the scene's logsPermissions, and is not the World's owner or a deployer"
+  },
+  404: { name: 'SCENE_INSIGHTS_NOT_FOUND', hint: 'no deployed scene matches the World or parcel' },
+  429: { name: 'SCENE_INSIGHTS_UNAVAILABLE', hint: 'too many requests; try again shortly' },
+  503: { name: 'SCENE_INSIGHTS_UNAVAILABLE', hint: 'try again shortly' },
+  504: { name: 'SCENE_INSIGHTS_UNAVAILABLE', hint: 'the query timed out; narrow --from/--to or the filters' }
+}
+
+/** Turns an error response into a CliError named after what went wrong, saying what to do about it. */
+export async function errorFromResponse(response: Response): Promise<CliError<CliErrorName>> {
   let reason = ''
   try {
     const text = await response.text()
@@ -116,14 +133,15 @@ export async function errorFromResponse(response: Response): Promise<CliError<'S
     // keep the status alone
   }
 
-  const hints: Record<number, string> = {
-    401: 'the signature was refused; run the command again to sign a new session',
-    403: "your address is not in the scene's logsPermissions, and is not the World's owner or a deployer",
-    404: 'no deployed scene matches the World or parcel'
-  }
-  const hint = hints[response.status]
+  const { name, hint } = ERRORS_BY_STATUS[response.status] ?? { name: 'SCENE_INSIGHTS_REQUEST_FAILED' }
   const message = `The insights service answered ${response.status}${reason ? `: ${reason}` : ''}${hint ? ` (${hint})` : ''}`
-  return new CliError('SCENE_INSIGHTS_REQUEST_FAILED', message)
+  return new CliError(name, message)
+}
+
+/** A request that never got an answer (DNS, connection refused, reset). */
+function unreachable(baseUrl: string, error: unknown): CliError<'SCENE_INSIGHTS_UNAVAILABLE'> {
+  const cause = (error as { cause?: { code?: string } })?.cause?.code ?? (error as Error)?.message
+  return new CliError('SCENE_INSIGHTS_UNAVAILABLE', `Could not reach ${baseUrl}${cause ? ` (${cause})` : ''}`)
 }
 
 const sleep = (ms: number, signal?: AbortSignal) =>
@@ -160,9 +178,14 @@ export function createInsightsClient(
 
   async function get<T>(pathname: string, query: Query): Promise<T> {
     for (let attempt = 0; ; attempt++) {
-      const response = await fetch.fetch(urlFor(pathname, query), {
-        headers: { ...session.sign('GET', pathname, metadata), Accept: 'application/json' }
-      })
+      let response: Response
+      try {
+        response = await fetch.fetch(urlFor(pathname, query), {
+          headers: { ...session.sign('GET', pathname, metadata), Accept: 'application/json' }
+        })
+      } catch (error) {
+        throw unreachable(base, error)
+      }
       if (response.ok) {
         return (await response.json()) as T
       }
