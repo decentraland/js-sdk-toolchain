@@ -16,7 +16,12 @@ type PartialDeploymentProgress = {
 type PartialDeploymentClient = {
   deployPartial?: (
     deployData: DeploymentData,
-    options?: { timeout?: number; onProgress?: (progress: PartialDeploymentProgress) => void }
+    options?: {
+      timeout?: number
+      maxBatchSizeBytes?: number
+      concurrency?: number
+      onProgress?: (progress: PartialDeploymentProgress) => void
+    }
   ) => Promise<{ creationTimestamp: number; message?: string }>
 }
 
@@ -32,8 +37,21 @@ export const MAX_SINGLE_REQUEST_BYTES = 200 * 1000 * 1000
 // Smaller scenes upload faster in one request than in batches.
 export const MIN_PARTIAL_DEPLOYMENT_BYTES = 50 * 1024 * 1024
 
+// Batches small enough that the server stores one while the next is still uploading.
+export const PARTIAL_BATCH_BYTES = 32 * 1024 * 1024
+export const PARTIAL_BATCH_CONCURRENCY = 3
+
 function formatMegabytes(bytes: number): string {
   return `${(bytes / 1e6).toFixed(1)} MB`
+}
+
+// Files are never split across batches, so a file above the batch size gets a batch of its own size.
+function batchSize(deployData: DeploymentData): number {
+  let largest = 0
+  for (const file of deployData.files.values()) {
+    largest = Math.max(largest, file.byteLength)
+  }
+  return Math.max(PARTIAL_BATCH_BYTES, largest)
 }
 
 function deploymentSize(deployData: DeploymentData): number {
@@ -71,6 +89,8 @@ export async function uploadDeployment(
   try {
     const result = await partialClient.deployPartial(deployData, {
       timeout: REQUEST_TIMEOUT_MS,
+      maxBatchSizeBytes: batchSize(deployData),
+      concurrency: PARTIAL_BATCH_CONCURRENCY,
       onProgress: ({ uploadedBytes, totalBytes, completedBatches, totalBatches }) =>
         printProgressInfo(
           components.logger,

@@ -2,6 +2,8 @@ import type { ContentClient } from 'dcl-catalyst-client'
 import {
   MAX_SINGLE_REQUEST_BYTES,
   MIN_PARTIAL_DEPLOYMENT_BYTES,
+  PARTIAL_BATCH_BYTES,
+  PARTIAL_BATCH_CONCURRENCY,
   UploadResult,
   uploadDeployment
 } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/upload'
@@ -21,15 +23,12 @@ function createLogger() {
 
 const ENTITY_FILE_BYTES = 10
 
-function createDeployData(contentSize: number): DeploymentData {
-  return {
-    entityId: 'bafkreientity',
-    files: new Map([
-      ['bafkreientity', new Uint8Array(ENTITY_FILE_BYTES)],
-      ['bafkreicontent', { byteLength: contentSize } as Uint8Array]
-    ]),
-    authChain: []
+function createDeployData(contentSize: number, fileCount = 1): DeploymentData {
+  const files = new Map([['bafkreientity', new Uint8Array(ENTITY_FILE_BYTES)]])
+  for (let i = 0; i < fileCount; i++) {
+    files.set(`bafkreicontent${i}`, { byteLength: contentSize / fileCount } as Uint8Array)
   }
+  return { entityId: 'bafkreientity', files, authChain: [] }
 }
 
 describe('when uploading a deployment', () => {
@@ -83,6 +82,7 @@ describe('when uploading a deployment', () => {
       let result: UploadResult
 
       beforeEach(async () => {
+        deployData = createDeployData(4 * PARTIAL_BATCH_BYTES, 4)
         deployPartial.mockImplementationOnce(async (_data, options) => {
           options.onProgress({ uploadedBytes: 2e6, totalBytes: 4e6, completedBatches: 1, totalBatches: 2 })
           return { creationTimestamp: 1, message: 'Your scene is live' }
@@ -94,12 +94,34 @@ describe('when uploading a deployment', () => {
         expect(result).toEqual({ message: 'Your scene is live' })
       })
 
+      it('should upload in batches small enough to overlap with each other', () => {
+        expect(deployPartial).toHaveBeenCalledWith(
+          deployData,
+          expect.objectContaining({ maxBatchSizeBytes: PARTIAL_BATCH_BYTES, concurrency: PARTIAL_BATCH_CONCURRENCY })
+        )
+      })
+
       it('should report the upload progress of each batch', () => {
         expect(logger.log).toHaveBeenCalledWith(expect.stringContaining('Uploaded 2.0 MB of 4.0 MB (batch 1/2)'))
       })
 
       it('should not upload the deployment in a single request', () => {
         expect(deploy).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('and a file is larger than the batch size', () => {
+      beforeEach(async () => {
+        deployData = createDeployData(MIN_PARTIAL_DEPLOYMENT_BYTES)
+        deployPartial.mockResolvedValueOnce({ creationTimestamp: 1 })
+        await uploadDeployment({ logger }, client, deployData)
+      })
+
+      it('should size the batches to fit that file', () => {
+        expect(deployPartial).toHaveBeenCalledWith(
+          deployData,
+          expect.objectContaining({ maxBatchSizeBytes: MIN_PARTIAL_DEPLOYMENT_BYTES })
+        )
       })
     })
 
