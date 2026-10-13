@@ -80,6 +80,19 @@ export type CliErrorName =
   // Server logs errors
   | 'SERVER_LOGS_MISSING_WORLD'
   | 'SERVER_LOGS_INVALID_POSITION'
+  // Scene insights errors
+  | 'SCENE_INSIGHTS_MISSING_SCENE'
+  | 'SCENE_INSIGHTS_INVALID_ARGUMENT'
+  | 'SCENE_INSIGHTS_UNSUPPORTED_WALLET'
+  | 'SCENE_INSIGHTS_INVALID_SIGNATURE'
+  | 'SCENE_INSIGHTS_SESSION_REQUIRED'
+  | 'SCENE_INSIGHTS_UNSAFE_SESSION_FILE'
+  | 'SCENE_INSIGHTS_UNAUTHORIZED'
+  | 'SCENE_INSIGHTS_FORBIDDEN'
+  | 'SCENE_INSIGHTS_NOT_FOUND'
+  | 'SCENE_INSIGHTS_UNAVAILABLE'
+  | 'SCENE_INSIGHTS_REQUEST_FAILED'
+  | 'SCENE_INSIGHTS_STREAM_ENDED'
 
 export class CliError<T extends CliErrorName> extends Error {
   constructor(public name: T = 'CliError' as T, public message: string = '', public stack?: string) {
