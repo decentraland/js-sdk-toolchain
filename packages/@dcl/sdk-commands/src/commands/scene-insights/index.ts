@@ -71,6 +71,7 @@ const SESSION_SUBCOMMANDS = ['login', 'logout', 'session']
 export const EXIT_CODES: Partial<Record<CliErrorName, number>> = {
   SCENE_INSIGHTS_INVALID_ARGUMENT: 2,
   SCENE_INSIGHTS_MISSING_SCENE: 2,
+  SCENE_INSIGHTS_UNSAFE_SESSION_FILE: 2,
   SCENE_INSIGHTS_SESSION_REQUIRED: 3,
   SCENE_INSIGHTS_UNAUTHORIZED: 3,
   SCENE_INSIGHTS_INVALID_SIGNATURE: 3,
@@ -90,6 +91,8 @@ export function help(options: Options) {
     Sign in once with "login": it opens the browser for your wallet to sign, and the session is
     saved for 12 hours (${getSessionFilePath()}, or ${SESSION_FILE_ENV}).
     Until it expires it can sign Decentraland requests as your address; "logout" removes it.
+    Keep it out of scene projects: a session file that a deploy would upload is refused, and its
+    folder's .gitignore lists it so it is never committed.
     With DCL_PRIVATE_KEY set, requests are signed with that key and nothing is saved.
     Without a terminal (scripts, AI agents) a missing session is an error, never a browser prompt.
 

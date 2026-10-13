@@ -1,4 +1,5 @@
-import { mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'fs'
+import { execFileSync } from 'child_process'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import path from 'path'
 import { AuthChain, Authenticator } from '../../../../packages/@dcl/sdk-commands/node_modules/@dcl/crypto'
@@ -123,6 +124,121 @@ describe('when saving and loading the session', () => {
   })
 })
 
+describe('when saving the session in a folder', () => {
+  let directory: string
+  let file: string
+  let fs: IFileSystemComponent
+  let ephemeral: EphemeralIdentity
+  let expiration: Date
+  let delegation: AuthChain
+
+  beforeEach(async () => {
+    directory = mkdtempSync(path.join(tmpdir(), 'scene-insights-'))
+    file = path.join(directory, 'session.json')
+    fs = createFsComponent()
+    ephemeral = createEphemeralIdentity()
+    expiration = new Date(Date.now() + 60 * 60 * 1000)
+    delegation = await createDelegation(ephemeral, expiration)
+  })
+
+  afterEach(() => {
+    rmSync(directory, { recursive: true, force: true })
+  })
+
+  describe('and the folder has no .gitignore', () => {
+    beforeEach(async () => {
+      await saveSession({ fs }, file, ephemeral, expiration, delegation)
+    })
+
+    it('should create one listing the session file and its temporary copies', () => {
+      expect(readFileSync(path.join(directory, '.gitignore'), 'utf8')).toBe('/session.json\n/session.json.*.tmp\n')
+    })
+  })
+
+  describe('and the folder has a .gitignore that does not list it', () => {
+    beforeEach(async () => {
+      writeFileSync(path.join(directory, '.gitignore'), 'node_modules')
+      await saveSession({ fs }, file, ephemeral, expiration, delegation)
+    })
+
+    it('should add the session file to it, keeping its entries', () => {
+      expect(readFileSync(path.join(directory, '.gitignore'), 'utf8')).toBe(
+        'node_modules\n/session.json\n/session.json.*.tmp\n'
+      )
+    })
+  })
+
+  describe('and it is saved again', () => {
+    beforeEach(async () => {
+      await saveSession({ fs }, file, ephemeral, expiration, delegation)
+      await saveSession({ fs }, file, ephemeral, expiration, delegation)
+    })
+
+    it('should list the session file only once', () => {
+      expect(readFileSync(path.join(directory, '.gitignore'), 'utf8')).toBe('/session.json\n/session.json.*.tmp\n')
+    })
+  })
+
+  describe('and the folder is in a git repository', () => {
+    beforeEach(async () => {
+      execFileSync('git', ['init', '-q'], { cwd: directory })
+      await saveSession({ fs }, file, ephemeral, expiration, delegation)
+    })
+
+    it('should leave only the .gitignore for git to commit', () => {
+      expect(
+        execFileSync('git', ['status', '--porcelain', '--untracked-files=all'], { cwd: directory, encoding: 'utf8' })
+      ).toBe('?? .gitignore\n')
+    })
+  })
+
+  describe('and the folder is inside a scene project', () => {
+    beforeEach(() => {
+      writeFileSync(path.join(directory, 'scene.json'), '{}')
+    })
+
+    describe('and a deploy would upload the file', () => {
+      beforeEach(() => {
+        file = path.join(directory, 'creds', 'session.json')
+      })
+
+      it('should refuse to save it', async () => {
+        await expect(saveSession({ fs }, file, ephemeral, expiration, delegation)).rejects.toMatchObject({
+          name: 'SCENE_INSIGHTS_UNSAFE_SESSION_FILE'
+        })
+      })
+
+      it('should not write it', async () => {
+        await saveSession({ fs }, file, ephemeral, expiration, delegation).catch(() => undefined)
+        expect(existsSync(file)).toBe(false)
+      })
+    })
+
+    describe('and the file is in a dot folder', () => {
+      beforeEach(async () => {
+        file = path.join(directory, '.dcl', 'session.json')
+        await saveSession({ fs }, file, ephemeral, expiration, delegation)
+      })
+
+      it('should save it', () => {
+        expect(existsSync(file)).toBe(true)
+      })
+    })
+
+    describe("and the project's .dclignore lists its folder", () => {
+      beforeEach(async () => {
+        writeFileSync(path.join(directory, '.dclignore'), 'creds\n')
+        file = path.join(directory, 'creds', 'session.json')
+        await saveSession({ fs }, file, ephemeral, expiration, delegation)
+      })
+
+      it('should save it', () => {
+        expect(existsSync(file)).toBe(true)
+      })
+    })
+  })
+})
+
 describe('when getting a session to sign with', () => {
   let directory: string
   let file: string
@@ -160,6 +276,20 @@ describe('when getting a session to sign with', () => {
       await expect(getSession(components, { label: 'example' }, options)).rejects.toMatchObject({
         name: 'SCENE_INSIGHTS_SESSION_REQUIRED',
         message: expect.stringContaining('sdk-commands scene-insights login')
+      })
+    })
+  })
+
+  describe('and a new signature is needed but a deploy would upload the session file', () => {
+    beforeEach(() => {
+      writeFileSync(path.join(directory, 'scene.json'), '{}')
+      mkdirSync(path.join(directory, 'creds'))
+      options = { ...options, file: path.join(directory, 'creds', 'session.json'), interactive: true }
+    })
+
+    it('should fail before opening the browser', async () => {
+      await expect(getSession(components, { label: 'example' }, options)).rejects.toMatchObject({
+        name: 'SCENE_INSIGHTS_UNSAFE_SESSION_FILE'
       })
     })
   })
