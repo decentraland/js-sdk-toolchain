@@ -46,11 +46,13 @@ describe('when uploading a deployment', () => {
 
   describe('and the client supports partial deployments', () => {
     let deployPartial: jest.Mock
+    let isContentAvailable: jest.Mock
     let client: ContentClient
 
     beforeEach(() => {
       deployPartial = jest.fn()
-      client = { deploy, deployPartial } as unknown as ContentClient
+      isContentAvailable = jest.fn()
+      client = { deploy, deployPartial, isContentAvailable } as unknown as ContentClient
       deployData = createDeployData(MIN_PARTIAL_DEPLOYMENT_BYTES - ENTITY_FILE_BYTES)
     })
 
@@ -165,31 +167,93 @@ describe('when uploading a deployment', () => {
           expect(result).toEqual({ message: 'Deployed' })
         })
 
-        it('should warn that the server does not support batched uploads', () => {
-          expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('does not support batched uploads'))
+        it('should not check which content the server already has', () => {
+          expect(isContentAvailable).not.toHaveBeenCalled()
         })
       })
 
-      describe('and the deployment is too large for a single request', () => {
-        let error: unknown
-
-        beforeEach(async () => {
-          deployData = createDeployData(MAX_SINGLE_REQUEST_BYTES)
-          error = await uploadDeployment({ logger }, client, deployData).catch((e) => e)
+      describe('and the deployment is larger than a single request allows', () => {
+        beforeEach(() => {
+          deployData = createDeployData(MAX_SINGLE_REQUEST_BYTES, 4)
         })
 
-        it('should reject with an error explaining the scene is too large for the server', () => {
-          expect(error).toEqual(
-            expect.objectContaining({
-              constructor: CliError,
-              name: 'DEPLOY_PARTIAL_NOT_SUPPORTED',
-              message: expect.stringContaining('too large to upload in a single request')
-            })
-          )
+        describe('and the server is missing too much of its content', () => {
+          let error: unknown
+
+          beforeEach(async () => {
+            isContentAvailable.mockResolvedValueOnce([
+              { cid: 'bafkreicontent0', available: true },
+              { cid: 'bafkreicontent1', available: false },
+              { cid: 'bafkreicontent2', available: false },
+              { cid: 'bafkreicontent3', available: false },
+              { cid: 'bafkreientity', available: true }
+            ])
+            deployData.files.set('bafkreicontent1', { byteLength: MAX_SINGLE_REQUEST_BYTES } as Uint8Array)
+            error = await uploadDeployment({ logger }, client, deployData).catch((e) => e)
+          })
+
+          it('should check the availability of the content files only', () => {
+            expect(isContentAvailable).toHaveBeenCalledWith(
+              ['bafkreicontent0', 'bafkreicontent1', 'bafkreicontent2', 'bafkreicontent3'],
+              expect.objectContaining({ timeout: 600000 })
+            )
+          })
+
+          it('should reject with an error explaining the scene is too large for the server', () => {
+            expect(error).toEqual(
+              expect.objectContaining({
+                constructor: CliError,
+                name: 'DEPLOY_PARTIAL_NOT_SUPPORTED',
+                message: expect.stringContaining('too large to upload in a single request')
+              })
+            )
+          })
+
+          it('should not upload the deployment in a single request', () => {
+            expect(deploy).not.toHaveBeenCalled()
+          })
         })
 
-        it('should not upload the deployment in a single request', () => {
-          expect(deploy).not.toHaveBeenCalled()
+        describe('and the server already has most of its content', () => {
+          let result: UploadResult
+
+          beforeEach(async () => {
+            isContentAvailable.mockResolvedValueOnce([
+              { cid: 'bafkreicontent0', available: true },
+              { cid: 'bafkreicontent1', available: true },
+              { cid: 'bafkreicontent2', available: true },
+              { cid: 'bafkreicontent3', available: false }
+            ])
+            deploy.mockResolvedValueOnce({ status: 200, json: async () => ({ message: 'Deployed' }) })
+            result = await uploadDeployment({ logger }, client, deployData)
+          })
+
+          it('should upload the deployment in a single request', () => {
+            expect(deploy).toHaveBeenCalledWith(deployData, { timeout: 600000 })
+          })
+
+          it('should resolve with the message of the single request', () => {
+            expect(result).toEqual({ message: 'Deployed' })
+          })
+        })
+
+        describe('and the server has all the content but the entity file does not fit', () => {
+          let error: unknown
+
+          beforeEach(async () => {
+            deployData.files.set('bafkreientity', { byteLength: MAX_SINGLE_REQUEST_BYTES + 1 } as Uint8Array)
+            isContentAvailable.mockResolvedValueOnce([
+              { cid: 'bafkreicontent0', available: true },
+              { cid: 'bafkreicontent1', available: true },
+              { cid: 'bafkreicontent2', available: true },
+              { cid: 'bafkreicontent3', available: true }
+            ])
+            error = await uploadDeployment({ logger }, client, deployData).catch((e) => e)
+          })
+
+          it('should reject with a DEPLOY_PARTIAL_NOT_SUPPORTED error', () => {
+            expect(error).toEqual(expect.objectContaining({ name: 'DEPLOY_PARTIAL_NOT_SUPPORTED' }))
+          })
         })
       })
     })

@@ -56,6 +56,20 @@ function deploymentSize(deployData: DeploymentData): number {
   return total
 }
 
+// A single request only uploads the files missing on the server, plus the entity file.
+async function missingBytes(client: ContentClient, deployData: DeploymentData, signal?: AbortSignal): Promise<number> {
+  const contentHashes = Array.from(deployData.files.keys()).filter((hash) => hash !== deployData.entityId)
+  const availability = contentHashes.length
+    ? await client.isContentAvailable(contentHashes, { timeout: REQUEST_TIMEOUT_MS, signal })
+    : []
+  const available = new Set(availability.filter(({ available }) => available).map(({ cid }) => cid))
+  let total = 0
+  for (const [hash, file] of deployData.files) {
+    if (!available.has(hash)) total += file.byteLength
+  }
+  return total
+}
+
 function uploadProgressReporter(progress: UploadOptions['progress']) {
   return (
     progress &&
@@ -120,11 +134,13 @@ export async function uploadDeployment(
     if (!(error instanceof PartialDeploymentNotSupportedError) || signal?.aborted) {
       throw error
     }
-    if (size > MAX_SINGLE_REQUEST_BYTES) {
+    const missing = size > MAX_SINGLE_REQUEST_BYTES ? await missingBytes(client, deployData, signal) : size
+    if (missing > MAX_SINGLE_REQUEST_BYTES) {
       throw new CliError(
         'DEPLOY_PARTIAL_NOT_SUPPORTED',
-        `The target server does not support batched uploads, and this scene (${formatMegabytes(size)}) ` +
-          `is too large to upload in a single request (max ${formatMegabytes(MAX_SINGLE_REQUEST_BYTES)}).`
+        `The target server does not support batched uploads, and the content of this scene missing on it ` +
+          `(${formatMegabytes(missing)}) is too large to upload in a single request ` +
+          `(max ${formatMegabytes(MAX_SINGLE_REQUEST_BYTES)}).`
       )
     }
     components.logger.warn('The target server does not support batched uploads, uploading in a single request.')
