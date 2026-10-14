@@ -1,5 +1,5 @@
 /** @alpha THIS FILE INITIALIZES THE DECENTRALAND RUNTIME. WILL CHANGE SOON */
-import { Composite, engine, setCompositeProvider } from '@dcl/ecs'
+import { Composite, engine, setCompositeProvider, TouchScreenControls } from '@dcl/ecs'
 import { crdtGetState, crdtSendToRenderer, sendBatch } from '~system/EngineApi'
 import { createRendererTransport } from './internal/transports/rendererTransport'
 import { pollEvents } from './observables'
@@ -45,5 +45,12 @@ export async function onStart() {
         rendererTransport.onmessage(byteArray)
       }
     }
+  }
+
+  // Scenes start with the default on-screen button set. This must stay after the composite is
+  // instanced and before the first update: a value authored in main.composite is already set
+  // here, and one preloaded through the transport replaces this still-unsent write.
+  if (TouchScreenControls.getOrNull(engine.RootEntity) === null) {
+    TouchScreenControls.showDefault()
   }
 }

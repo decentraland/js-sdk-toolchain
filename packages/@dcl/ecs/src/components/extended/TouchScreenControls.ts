@@ -16,6 +16,15 @@ const ALL_BUTTONS: InputAction[] = [
   InputAction.IA_ACTION_6
 ]
 
+// Buttons hidden in the default set; the rest of ALL_BUTTONS stay visible.
+const DEFAULT_HIDDEN_BUTTONS: InputAction[] = [
+  InputAction.IA_SECONDARY,
+  InputAction.IA_ACTION_3,
+  InputAction.IA_ACTION_4,
+  InputAction.IA_ACTION_5,
+  InputAction.IA_ACTION_6
+]
+
 /**
  * @public
  * TouchScreenControls with convenience helpers. All helpers write the component onto the
@@ -30,6 +39,12 @@ export interface TouchScreenControlsComponentDefinitionExtended
    * Does NOT change the joystick/crosshair — use `showJoystick()` / `showCrosshair()` for those.
    */
   showAll(): void
+  /**
+   * Show the default button set: jump, pointer and primary visible, secondary and
+   * actions 3-6 hidden. This is the state every scene starts in.
+   * Does NOT change the joystick/crosshair, the main action or custom icons.
+   */
+  showDefault(): void
   /** Hide the given on-screen buttons (merged into the current config). */
   hide(actions: InputAction[]): void
   /** Set which action the large central button triggers. */
@@ -80,6 +95,12 @@ export function defineTouchScreenControlsComponent(
       const value = current()
       value.touchInputs = []
       theComponent.createOrReplace(ROOT_ENTITY, value)
+    },
+    showDefault(): void {
+      const value = current()
+      for (const input of value.touchInputs) input.hide = false
+      theComponent.createOrReplace(ROOT_ENTITY, value)
+      setHidden(DEFAULT_HIDDEN_BUTTONS)
     },
     hide(actions: InputAction[]): void {
       setHidden(actions)

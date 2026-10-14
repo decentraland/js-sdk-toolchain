@@ -31,6 +31,73 @@ describe('TouchScreenControls convenience helpers', () => {
     expect(value?.hideCrosshair).toBe(true)
   })
 
+  it('showDefault() hides secondary and actions 3-6 and leaves the rest visible', () => {
+    const engine = Engine()
+    const TouchScreenControls = components.TouchScreenControls(engine)
+
+    TouchScreenControls.showDefault()
+
+    const value = TouchScreenControls.getOrNull(ROOT_ENTITY)
+    expect(value?.touchInputs).toEqual([
+      { inputAction: InputAction.IA_SECONDARY, hide: true },
+      { inputAction: InputAction.IA_ACTION_3, hide: true },
+      { inputAction: InputAction.IA_ACTION_4, hide: true },
+      { inputAction: InputAction.IA_ACTION_5, hide: true },
+      { inputAction: InputAction.IA_ACTION_6, hide: true }
+    ])
+  })
+
+  it('showDefault() restores the default set after hideAll() and after showAll()', () => {
+    const engine = Engine()
+    const TouchScreenControls = components.TouchScreenControls(engine)
+    const hidden = () =>
+      (TouchScreenControls.getOrNull(ROOT_ENTITY)?.touchInputs ?? [])
+        .filter((t) => t.hide)
+        .map((t) => t.inputAction)
+        .sort()
+    const defaultHidden = [
+      InputAction.IA_SECONDARY,
+      InputAction.IA_ACTION_3,
+      InputAction.IA_ACTION_4,
+      InputAction.IA_ACTION_5,
+      InputAction.IA_ACTION_6
+    ].sort()
+
+    TouchScreenControls.hideAll()
+    TouchScreenControls.showDefault()
+    expect(hidden()).toEqual(defaultHidden)
+
+    TouchScreenControls.showAll()
+    TouchScreenControls.showDefault()
+    expect(hidden()).toEqual(defaultHidden)
+  })
+
+  it('showDefault() preserves icons, the main action and the joystick/crosshair state', () => {
+    const engine = Engine()
+    const TouchScreenControls = components.TouchScreenControls(engine)
+
+    const icon = { tex: { $case: 'texture' as const, texture: { src: 'custom-action' } } }
+    TouchScreenControls.createOrReplace(ROOT_ENTITY, {
+      touchInputs: [
+        { inputAction: InputAction.IA_JUMP, hide: true, icon },
+        { inputAction: InputAction.IA_ACTION_3, hide: false, icon }
+      ],
+      mainAction: InputAction.IA_PRIMARY,
+      hideJoystick: true,
+      hideCrosshair: true
+    })
+
+    TouchScreenControls.showDefault()
+
+    const value = TouchScreenControls.getOrNull(ROOT_ENTITY)
+    const entry = (action: InputAction) => value?.touchInputs.find((t) => t.inputAction === action)
+    expect(entry(InputAction.IA_JUMP)).toEqual({ inputAction: InputAction.IA_JUMP, hide: false, icon })
+    expect(entry(InputAction.IA_ACTION_3)).toEqual({ inputAction: InputAction.IA_ACTION_3, hide: true, icon })
+    expect(value?.mainAction).toBe(InputAction.IA_PRIMARY)
+    expect(value?.hideJoystick).toBe(true)
+    expect(value?.hideCrosshair).toBe(true)
+  })
+
   it('hide() merges the given actions into the current config', () => {
     const engine = Engine()
     const TouchScreenControls = components.TouchScreenControls(engine)
