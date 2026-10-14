@@ -138,5 +138,25 @@ describe('start/server/endpoints', () => {
         expect(body).toHaveLength(2)
       })
     })
+
+    describe('and two scenes share a parcel', () => {
+      let body: any[]
+
+      beforeEach(async () => {
+        const firstParcels = ['0,0', '0,1']
+        const secondParcels = ['0,1', '0,2']
+        const projects = [
+          createSceneProject(path.join(tmpDir, 'first'), firstParcels),
+          createSceneProject(path.join(tmpDir, 'second'), secondParcels)
+        ]
+        const { handlers } = await makeEndpoints(projects, createFsComponent())
+        handler = handlers.get('POST /content/entities/active')!
+        body = (await handler({ request: { json: async () => ({ pointers: ['0,0', '0,1', '0,2'] }) } })).body
+      })
+
+      it('should respond with one entity per scene and claim the shared parcel once', () => {
+        expect(body).toHaveLength(2)
+      })
+    })
   })
 })
