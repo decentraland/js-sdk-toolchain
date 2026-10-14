@@ -139,23 +139,23 @@ describe('start/server/endpoints', () => {
       })
     })
 
-    describe('and two scenes share a parcel', () => {
+    describe('and two scenes overlap on a parcel', () => {
       let body: any[]
 
       beforeEach(async () => {
-        const firstParcels = ['0,0', '0,1']
-        const secondParcels = ['0,1', '0,2']
+        const first = ['0,0']
+        const second = ['1,0', '0,0']
         const projects = [
-          createSceneProject(path.join(tmpDir, 'first'), firstParcels),
-          createSceneProject(path.join(tmpDir, 'second'), secondParcels)
+          createSceneProject(path.join(tmpDir, 'first'), first),
+          createSceneProject(path.join(tmpDir, 'second'), second)
         ]
         const { handlers } = await makeEndpoints(projects, createFsComponent())
         handler = handlers.get('POST /content/entities/active')!
-        body = (await handler({ request: { json: async () => ({ pointers: ['0,0', '0,1', '0,2'] }) } })).body
+        body = (await handler({ request: { json: async () => ({ pointers: ['1,0', '0,0'] }) } })).body
       })
 
-      it('should respond with one entity per scene and claim the shared parcel once', () => {
-        expect(body).toHaveLength(2)
+      it('should emit both scenes in workspace order, letting the first project claim the shared parcel', () => {
+        expect(body.map(entity => entity.metadata.scene.base)).toEqual(['0,0', '1,0'])
       })
     })
   })
