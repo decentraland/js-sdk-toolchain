@@ -1,12 +1,15 @@
+import * as fs from 'fs'
+import * as os from 'os'
 import * as path from 'path'
 
+import { createFsComponent } from '../../../../packages/@dcl/sdk-commands/src/components/fs'
 import { setupEcs6Endpoints } from '../../../../packages/@dcl/sdk-commands/src/commands/start/server/endpoints'
 
 // a real package dir where @dcl/sdk and @dcl/explorer resolve, so the static-file
 // routes in setupEcs6Endpoints can register without touching the network
 const sdkCommandsDir = path.resolve(__dirname, '../../../../packages/@dcl/sdk-commands')
 
-async function makeEndpoints() {
+async function makeEndpoints(projects: any[] = [], componentsFs: any = {}) {
   const fetch = jest.fn()
   const handlers = new Map<string, (ctx: any) => Promise<any>>()
   const capture = (method: string) => (route: string, handler: any) => handlers.set(`${method} ${route}`, handler)
@@ -14,12 +17,30 @@ async function makeEndpoints() {
   const components = {
     fetch: { fetch },
     config: { getString: jest.fn().mockResolvedValue(undefined) },
-    fs: {},
+    fs: componentsFs,
     logger: { log: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn() }
   }
-  const workspace = { rootWorkingDirectory: sdkCommandsDir, projects: [] }
+  const workspace = { rootWorkingDirectory: sdkCommandsDir, projects }
   await setupEcs6Endpoints(components as any, router as any, workspace as any)
   return { fetch, handlers }
+}
+
+function parcelGrid(width: number, height: number, offsetX = 0): string[] {
+  const parcels: string[] = []
+  for (let x = 0; x < width; x++) {
+    for (let y = 0; y < height; y++) {
+      parcels.push(`${x + offsetX},${y}`)
+    }
+  }
+  return parcels
+}
+
+function createSceneProject(workingDirectory: string, parcels: string[]) {
+  const scene = { main: 'bin/index.js', scene: { base: parcels[0], parcels } }
+  fs.mkdirSync(path.join(workingDirectory, 'bin'), { recursive: true })
+  fs.writeFileSync(path.join(workingDirectory, 'scene.json'), JSON.stringify(scene))
+  fs.writeFileSync(path.join(workingDirectory, 'bin', 'index.js'), '')
+  return { kind: 'scene', workingDirectory, scene }
 }
 
 async function readBody(stream: AsyncIterable<Buffer | string>): Promise<string> {
@@ -63,5 +84,59 @@ describe('start/server/endpoints', () => {
     expect(response.headers['content-encoding']).toBeUndefined()
     expect(response.headers['content-length']).toBeUndefined()
     await expect(readBody(response.body)).resolves.toBe('{"creationTimestamp":1}')
+  })
+
+  describe('when the preview server is asked for the entities of the requested pointers', () => {
+    let tmpDir: string
+    let handler: (ctx: any) => Promise<any>
+
+    beforeEach(() => {
+      tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'sdk-commands-endpoints-'))
+    })
+
+    afterEach(() => {
+      fs.rmSync(tmpDir, { recursive: true, force: true })
+    })
+
+    describe('and a single scene covers every requested parcel', () => {
+      let parcels: string[]
+      let body: any[]
+
+      beforeEach(async () => {
+        parcels = parcelGrid(30, 30)
+        const { handlers } = await makeEndpoints([createSceneProject(tmpDir, parcels)], createFsComponent())
+        handler = handlers.get('POST /content/entities/active')!
+        body = (await handler({ request: { json: async () => ({ pointers: parcels }) } })).body
+      })
+
+      it('should respond with the scene entity once', () => {
+        expect(body).toHaveLength(1)
+      })
+
+      it('should respond with an entity that holds every parcel of the scene', () => {
+        expect(body[0].pointers).toHaveLength(parcels.length)
+      })
+    })
+
+    describe('and two scenes with different parcels are requested together', () => {
+      let body: any[]
+
+      beforeEach(async () => {
+        const firstParcels = parcelGrid(5, 5)
+        const secondParcels = parcelGrid(5, 5, 10)
+        const projects = [
+          createSceneProject(path.join(tmpDir, 'first'), firstParcels),
+          createSceneProject(path.join(tmpDir, 'second'), secondParcels)
+        ]
+        const { handlers } = await makeEndpoints(projects, createFsComponent())
+        handler = handlers.get('POST /content/entities/active')!
+        body = (await handler({ request: { json: async () => ({ pointers: [...firstParcels, ...secondParcels] }) } }))
+          .body
+      })
+
+      it('should respond with one entity per scene', () => {
+        expect(body).toHaveLength(2)
+      })
+    })
   })
 })

@@ -419,7 +419,7 @@ async function getSceneJson(
   )
 
   for (const pointer of Array.from(requestedPointers)) {
-    // get deployment by pointer
+    if (!requestedPointers.has(pointer)) continue
     const theDeployment = allDeployments.find(($) => $ && $.pointers.includes(pointer))
 
     if (theDeployment) {
