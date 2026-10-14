@@ -418,6 +418,8 @@ async function getSceneJson(
     )
   )
 
+  // Walk projects in workspace order; when parcels overlap, the first project wins.
+  // Claimed pointers are removed so later projects are only emitted for parcels they still own.
   for (const deployment of allDeployments) {
     if (deployment && deployment.pointers.some((p) => requestedPointers.has(p))) {
       deployment.pointers.forEach((p) => requestedPointers.delete(p))
