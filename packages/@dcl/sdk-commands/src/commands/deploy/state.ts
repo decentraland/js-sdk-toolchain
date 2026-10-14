@@ -19,6 +19,7 @@ export type DeploymentState = {
   upload: DeploymentUpload | null
   result: DeploymentResult | null
   error: DeploymentError | null
+  cancelRequested: boolean
 }
 
 export type UploadProgressUpdate = { stage: UploadStage; sentBytes: number; totalBytes: number }
@@ -39,7 +40,10 @@ export interface IDeploymentStateComponent {
   reportBatches(progress: BatchProgressUpdate | null): void
   deployed(result: DeploymentResult): void
   failed(error: DeploymentError): void
-  cancelled(): void
+  /** Records that a cancellation was accepted while the outcome is still pending. Ignored once final. */
+  requestCancel(): void
+  /** Ends as `cancelled`; `error` carries a caveat about the outcome, e.g. the world was already undeployed. */
+  cancelled(error?: DeploymentError): void
   /** Calls `listener` on every change until the returned function is called. */
   subscribe(listener: DeploymentStateListener): () => void
   subscriberCount(): number
@@ -56,7 +60,13 @@ export function createDeploymentState(
   const now = options.now ?? Date.now
   const listeners = new Set<DeploymentStateListener>()
 
-  let state: DeploymentState = { phase: 'awaiting-signature', upload: null, result: null, error: null }
+  let state: DeploymentState = {
+    phase: 'awaiting-signature',
+    upload: null,
+    result: null,
+    error: null,
+    cancelRequested: false
+  }
   let batches: { completedBatches: number | null; totalBatches: number | null } = {
     completedBatches: null,
     totalBatches: null
@@ -159,8 +169,13 @@ export function createDeploymentState(
     failed(error) {
       finish({ phase: 'failed', error: { ...error } })
     },
-    cancelled() {
-      finish({ phase: 'cancelled' })
+    requestCancel() {
+      if (isFinal() || state.cancelRequested) return
+      state = { ...state, cancelRequested: true }
+      notify()
+    },
+    cancelled(error) {
+      finish({ phase: 'cancelled', ...(error ? { error: { ...error } } : {}) })
     },
     subscribe(listener) {
       if (isFinal()) return () => {}

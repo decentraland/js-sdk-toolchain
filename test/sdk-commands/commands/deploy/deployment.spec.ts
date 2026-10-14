@@ -2,7 +2,8 @@ import {
   CancelOutcome,
   createDeployment,
   DeployContext,
-  IDeploymentComponent
+  IDeploymentComponent,
+  settleCancelledUpload
 } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/deployment'
 import { DeploymentResult } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/state'
 import { LinkerResponse } from '../../../../packages/@dcl/sdk-commands/src/linker-dapp/routes'
@@ -161,8 +162,41 @@ describe('when running a deployment', () => {
         expect(error).toEqual(expect.objectContaining({ constructor: CliError, name: 'DEPLOY_CANCELLED' }))
       })
 
-      it('should end as cancelled', () => {
-        expect(deployment.state.get().phase).toBe('cancelled')
+      it('should end as cancelled without an error', () => {
+        expect(deployment.state.get()).toEqual(
+          expect.objectContaining({ phase: 'cancelled', error: null, cancelRequested: true })
+        )
+      })
+    })
+
+    describe('and it cannot be told whether the entity got published', () => {
+      let error: unknown
+
+      beforeEach(async () => {
+        deploy.mockImplementationOnce(
+          (_response, context) =>
+            new Promise((_resolve, reject) => {
+              context.signal.addEventListener('abort', () =>
+                reject(new CliError('DEPLOY_CANCEL_OUTCOME_UNCERTAIN', 'Could not confirm'))
+              )
+            })
+        )
+        running = deployment.run(linkerResponse)
+        deployment.cancel()
+        error = await running.catch((e) => e)
+      })
+
+      it('should reject with the uncertain outcome error', () => {
+        expect(error).toEqual(expect.objectContaining({ name: 'DEPLOY_CANCEL_OUTCOME_UNCERTAIN' }))
+      })
+
+      it('should end as cancelled carrying the uncertain outcome', () => {
+        expect(deployment.state.get()).toEqual(
+          expect.objectContaining({
+            phase: 'cancelled',
+            error: { code: 'DEPLOY_CANCEL_OUTCOME_UNCERTAIN', message: 'Could not confirm' }
+          })
+        )
       })
     })
 
@@ -191,6 +225,80 @@ describe('when running a deployment', () => {
     })
   })
 
+  describe('and it is cancelled while undeploying the world scenes', () => {
+    let outcome: CancelOutcome
+    let signal: AbortSignal
+    let finish: (result: DeploymentResult) => void
+
+    beforeEach(() => {
+      deploy.mockImplementationOnce(
+        (_response, context) =>
+          new Promise((resolve) => {
+            signal = context.signal
+            finish = resolve
+          })
+      )
+      deployment = createDeployment({ needsUndeploy: true, deploy })
+      void deployment.run(linkerResponse)
+      outcome = deployment.cancel()
+    })
+
+    afterEach(() => {
+      finish({ entityId: 'bafkreientity' })
+    })
+
+    it('should refuse the cancellation', () => {
+      expect(outcome).toBe('refused')
+    })
+
+    it('should not abort the deployment', () => {
+      expect(signal.aborted).toBe(false)
+    })
+
+    it('should keep undeploying without a requested cancellation', () => {
+      expect(deployment.state.get()).toEqual(expect.objectContaining({ phase: 'undeploying', cancelRequested: false }))
+    })
+  })
+
+  describe('and it is cancelled while uploading after undeploying the world scenes', () => {
+    let outcome: CancelOutcome
+    let error: unknown
+
+    beforeEach(async () => {
+      deploy.mockImplementationOnce(
+        (_response, context) =>
+          new Promise((_resolve, reject) => {
+            context.state.setPhase('uploading')
+            context.signal.addEventListener('abort', () => reject(new Error('This operation was aborted')))
+          })
+      )
+      deployment = createDeployment({ needsUndeploy: true, deploy })
+      const running = deployment.run(linkerResponse)
+      outcome = deployment.cancel()
+      error = await running.catch((e) => e)
+    })
+
+    it('should accept the cancellation', () => {
+      expect(outcome).toBe('cancelling')
+    })
+
+    it('should reject with a DEPLOY_CANCELLED_AFTER_UNDEPLOY error', () => {
+      expect(error).toEqual(expect.objectContaining({ constructor: CliError, name: 'DEPLOY_CANCELLED_AFTER_UNDEPLOY' }))
+    })
+
+    it('should end as cancelled carrying the undeploy caveat', () => {
+      expect(deployment.state.get()).toEqual(
+        expect.objectContaining({
+          phase: 'cancelled',
+          error: expect.objectContaining({
+            code: 'DEPLOY_CANCELLED_AFTER_UNDEPLOY',
+            message: expect.stringContaining("world's previous scenes were removed")
+          })
+        })
+      )
+    })
+  })
+
   describe('and it is cancelled after it ended', () => {
     let outcome: CancelOutcome
 
@@ -207,6 +315,133 @@ describe('when running a deployment', () => {
 
     it('should stay deployed', () => {
       expect(deployment.state.get().phase).toBe('deployed')
+    })
+  })
+})
+
+describe('when settling an upload that failed after a cancellation', () => {
+  let logger: { log: jest.Mock; info: jest.Mock; warn: jest.Mock; error: jest.Mock; debug: jest.Mock }
+  let isPublished: jest.Mock<Promise<boolean>, []>
+  let fullySent: boolean
+  let outcome: unknown
+
+  beforeEach(() => {
+    logger = { log: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() }
+    isPublished = jest.fn()
+    fullySent = false
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  async function settle() {
+    outcome = await settleCancelledUpload({ logger } as any, new Error('socket hang up'), {
+      fullySent,
+      isPublished,
+      delaysMs: [0, 0, 0]
+    }).then(
+      () => 'published',
+      (e) => e
+    )
+  }
+
+  describe('and the server published the entity', () => {
+    beforeEach(async () => {
+      isPublished.mockResolvedValueOnce(true)
+      await settle()
+    })
+
+    it('should resolve', () => {
+      expect(outcome).toBe('published')
+    })
+
+    it('should log the error that interrupted the upload', () => {
+      expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('socket hang up'))
+    })
+  })
+
+  describe('and the upload was not fully sent and the entity is not published', () => {
+    beforeEach(async () => {
+      isPublished.mockResolvedValue(false)
+      await settle()
+    })
+
+    it('should reject with a DEPLOY_CANCELLED error', () => {
+      expect(outcome).toEqual(expect.objectContaining({ constructor: CliError, name: 'DEPLOY_CANCELLED' }))
+    })
+
+    it('should check only once', () => {
+      expect(isPublished).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('and the upload was fully sent and the server publishes it a bit later', () => {
+    beforeEach(async () => {
+      fullySent = true
+      isPublished.mockResolvedValueOnce(false).mockResolvedValueOnce(false).mockResolvedValueOnce(true)
+      await settle()
+    })
+
+    it('should resolve', () => {
+      expect(outcome).toBe('published')
+    })
+
+    it('should keep checking until it is published', () => {
+      expect(isPublished).toHaveBeenCalledTimes(3)
+    })
+  })
+
+  describe('and the upload was fully sent and the entity never gets published', () => {
+    beforeEach(async () => {
+      fullySent = true
+      isPublished.mockResolvedValue(false)
+      await settle()
+    })
+
+    it('should reject with a DEPLOY_CANCELLED error', () => {
+      expect(outcome).toEqual(expect.objectContaining({ name: 'DEPLOY_CANCELLED' }))
+    })
+
+    it('should check once per delay plus the first check', () => {
+      expect(isPublished).toHaveBeenCalledTimes(4)
+    })
+  })
+
+  describe('and the first check fails but a later one answers', () => {
+    beforeEach(async () => {
+      isPublished.mockRejectedValueOnce(new Error('The operation was aborted due to timeout'))
+      isPublished.mockResolvedValueOnce(false)
+      await settle()
+    })
+
+    it('should reject with a DEPLOY_CANCELLED error', () => {
+      expect(outcome).toEqual(expect.objectContaining({ name: 'DEPLOY_CANCELLED' }))
+    })
+
+    it('should retry the check', () => {
+      expect(isPublished).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  describe('and no check can tell whether it got published', () => {
+    beforeEach(async () => {
+      isPublished.mockRejectedValue(new Error('The operation was aborted due to timeout'))
+      await settle()
+    })
+
+    it('should reject with a DEPLOY_CANCEL_OUTCOME_UNCERTAIN error', () => {
+      expect(outcome).toEqual(
+        expect.objectContaining({ constructor: CliError, name: 'DEPLOY_CANCEL_OUTCOME_UNCERTAIN' })
+      )
+    })
+
+    it('should warn that the outcome is uncertain', () => {
+      expect(logger.warn).toHaveBeenCalledWith(expect.stringContaining('could not be confirmed'))
+    })
+
+    it('should give up after the last delay', () => {
+      expect(isPublished).toHaveBeenCalledTimes(4)
     })
   })
 })

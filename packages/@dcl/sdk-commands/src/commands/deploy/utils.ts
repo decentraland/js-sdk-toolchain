@@ -1,4 +1,5 @@
 import * as readline from 'readline'
+import { randomBytes } from 'crypto'
 import { ChainId, Scene } from '@dcl/schemas'
 import { AuthChain } from '@dcl/crypto'
 import { Lifecycle } from '@well-known-components/interfaces'
@@ -31,7 +32,7 @@ import { setDeployResourceRoutes } from './routes'
  * options via an AbortController; all other init fields (including `duplex` for
  * streamed uploads) pass straight through to undici.fetch.
  */
-function createFetchComponent() {
+export function createFetchComponent() {
   return {
     async fetch(
       url: string,
@@ -167,6 +168,7 @@ export async function getAddressAndSignature(
   skipValidations: boolean,
   linkOptions: Omit<dAppOptions, 'uri'>,
   deployment: IDeploymentComponent,
+  deployToken: string,
   deleteScenesFromWorldPayload?: string,
   targetContent?: string,
   multiScene?: boolean
@@ -203,10 +205,10 @@ export async function getAddressAndSignature(
     multiScene
   )
   const { router: commonRouter } = setRoutes(components, sceneInfo)
-  const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployment)
+  const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployment, deployToken)
 
   components.logger.info('You need to sign the content before the deployment:')
-  const { program } = await runDapp(components, router, { ...linkOptions, uri: `/` })
+  const { program } = await runDapp(components, router, { ...linkOptions, uri: deployLinkerUri(deployToken) })
   return { program }
 }
 
@@ -216,7 +218,8 @@ function setDeployRoutes(
   awaitResponse: IFuture<void>,
   sceneInfo: SceneInfo,
   files: IFile[],
-  deployment: IDeploymentComponent
+  deployment: IDeploymentComponent,
+  deployToken: string
 ): Router<object> {
   const { logger } = components
 
@@ -291,6 +294,7 @@ function setDeployRoutes(
 
   setDeployResourceRoutes(router, components, {
     deployment,
+    deployToken,
     isWorld: sceneInfo.isWorld,
     resolve: () => awaitResponse.resolve(),
     reject: (e) => awaitResponse.reject(e),
@@ -300,6 +304,16 @@ function setDeployRoutes(
   })
 
   return router
+}
+
+/** The `--deploy-token` given to the CLI, or a random one for this run. */
+export function resolveDeployToken(deployTokenArg?: string): string {
+  return deployTokenArg || randomBytes(16).toString('hex')
+}
+
+/** The linker dapp reads the token that authorizes cancelling the deployment from its URL. */
+export function deployLinkerUri(deployToken: string): string {
+  return `/?token=${encodeURIComponent(deployToken)}`
 }
 
 export function sceneHasWorldCfg(scene: Scene) {
@@ -402,12 +416,14 @@ export async function fetchWorldScenes(
 export async function isEntityPublished(
   client: Pick<ContentClient, 'fetchEntitiesByIds'>,
   entityId: string,
-  world?: { name: string; targetContent: string }
+  options: { world?: { name: string; targetContent: string }; timeoutMs: number }
 ): Promise<boolean> {
+  const { world, timeoutMs } = options
   if (world) {
     const encodedName = encodeURIComponent(world.name)
     const response = await fetch(
-      `${world.targetContent}/world/${encodedName}/scenes?entity_id=${encodeURIComponent(entityId)}`
+      `${world.targetContent}/world/${encodedName}/scenes?entity_id=${encodeURIComponent(entityId)}`,
+      { signal: AbortSignal.timeout(timeoutMs) }
     )
     if (!response.ok) {
       await drainResponse(response)
@@ -416,7 +432,7 @@ export async function isEntityPublished(
     const data = (await response.json()) as Partial<WorldScenesResponse>
     return (data.scenes ?? []).some((scene) => scene.entityId === entityId)
   }
-  const entities = await client.fetchEntitiesByIds([entityId])
+  const entities = await client.fetchEntitiesByIds([entityId], { timeout: timeoutMs })
   return entities.some((entity) => entity.id === entityId)
 }
 

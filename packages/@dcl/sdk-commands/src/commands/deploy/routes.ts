@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'crypto'
 import { PassThrough } from 'stream'
 import { Router } from '@well-known-components/http-server'
 import { IHttpServerComponent } from '@well-known-components/interfaces'
@@ -12,9 +13,12 @@ export const SSE_HEARTBEAT_INTERVAL_MS = 15000
 // Keeps the final state readable for clients following the deployment before the CLI exits.
 export const FOLLOWED_SETTLE_DELAY_MS = 2000
 export const SETTLE_DELAY_MS = 100
+export const DEPLOY_TOKEN_HEADER = 'X-Deploy-Token'
 
 export type DeployRoutesOptions = {
   deployment: IDeploymentComponent
+  /** Required in the `X-Deploy-Token` header to cancel. Never exposed through the API. */
+  deployToken: string
   isWorld: boolean
   /** Ends the CLI run successfully. */
   resolve: () => void
@@ -34,6 +38,12 @@ function acceptsEventStream(request: IHttpServerComponent.IRequest): boolean {
   return (request.headers.get('accept') ?? '').toLowerCase().includes('text/event-stream')
 }
 
+function hasDeployToken(request: IHttpServerComponent.IRequest, deployToken: string): boolean {
+  const provided = Buffer.from(request.headers.get(DEPLOY_TOKEN_HEADER) ?? '')
+  const expected = Buffer.from(deployToken)
+  return provided.length === expected.length && timingSafeEqual(provided, expected)
+}
+
 function stateEvent(state: DeploymentState): string {
   return `event: state\ndata: ${JSON.stringify(state)}\n\n`
 }
@@ -48,7 +58,7 @@ export function setDeployResourceRoutes(
   options: DeployRoutesOptions
 ): Router<object> {
   const { logger } = components
-  const { deployment, isWorld, resolve, reject, onLinkerResponse } = options
+  const { deployment, deployToken, isWorld, resolve, reject, onLinkerResponse } = options
   const heartbeatIntervalMs = options.heartbeatIntervalMs ?? SSE_HEARTBEAT_INTERVAL_MS
   const followedSettleDelayMs = options.followedSettleDelayMs ?? FOLLOWED_SETTLE_DELAY_MS
   let followed = false
@@ -67,14 +77,14 @@ export function setDeployResourceRoutes(
     } catch {
       return { status: 400, body: { message: 'Invalid payload: the body must be JSON' } }
     }
+    // Checked before validating, and after reading the body since another request may start it meanwhile.
+    if (!deployment.canStart()) return conflict()
     if (!value || !value.address || !value.authChain || !value.chainId) {
       const errorMessage = `Invalid payload: ${Object.keys(value ?? {}).join(' - ')}`
       logger.error(errorMessage)
       if (!respondAsync) settle(resolve)
       return { status: 400, body: { message: errorMessage } }
     }
-
-    if (!deployment.canStart()) return conflict()
 
     onLinkerResponse?.(value)
     const running = deployment.run(value)
@@ -144,10 +154,13 @@ export function setDeployResourceRoutes(
     }
   })
 
-  router.delete(DEPLOY_RESOURCE_PATH, async () => {
+  router.delete(DEPLOY_RESOURCE_PATH, async (ctx) => {
+    if (!hasDeployToken(ctx.request, deployToken)) {
+      return { status: 403, body: { message: 'Invalid or missing deploy token' } }
+    }
     followed = true
     const outcome = deployment.cancel()
-    if (outcome === 'final') return conflict()
+    if (outcome === 'final' || outcome === 'refused') return conflict()
     if (outcome === 'cancelled') {
       logger.warn('Deployment cancelled.')
       settle(() => reject(deploymentCancelledError()))

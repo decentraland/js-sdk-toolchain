@@ -10,10 +10,13 @@ import {
   IDeploymentComponent
 } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/deployment'
 import { setDeployResourceRoutes } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/routes'
+import { LINKER_CORS_OPTIONS } from '../../../../packages/@dcl/sdk-commands/src/run-dapp'
 import { DeploymentResult, DeploymentState } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/state'
 import { LinkerResponse } from '../../../../packages/@dcl/sdk-commands/src/linker-dapp/routes'
 
 type Server = { stop(): Promise<void>; url: string }
+
+const DEPLOY_TOKEN = 'a1b2c3d4e5f60718293a4b5c6d7e8f90'
 
 const payload = { address: '0x1', authChain: [{ type: 'SIGNER', payload: '0x1', signature: '' }], chainId: 1 }
 
@@ -36,7 +39,10 @@ async function startServer(router: Router<object>): Promise<Server> {
   const port = await freePort()
   const logger = createLogger()
   const config = createRecordConfigComponent({ HTTP_SERVER_PORT: String(port), HTTP_SERVER_HOST: '127.0.0.1' })
-  const server = await createServerComponent<object>({ config, logs: { getLogger: () => logger } as any }, { cors: {} })
+  const server = await createServerComponent<object>(
+    { config, logs: { getLogger: () => logger } as any },
+    { cors: LINKER_CORS_OPTIONS }
+  )
   server.use(router.allowedMethods())
   server.use(router.middleware())
   await server.start!({} as any)
@@ -65,6 +71,10 @@ function postDeploy(url: string, headers: Record<string, string> = {}, body: unk
   })
 }
 
+function cancelDeploy(url: string, headers: Record<string, string> = { 'x-deploy-token': DEPLOY_TOKEN }) {
+  return fetch(url, { method: 'DELETE', headers })
+}
+
 describe('when using the deploy resource of the linker server', () => {
   let deploy: jest.Mock<Promise<DeploymentResult>, [LinkerResponse, DeployContext]>
   let deployment: IDeploymentComponent
@@ -72,12 +82,14 @@ describe('when using the deploy resource of the linker server', () => {
   let reject: jest.Mock
   let server: Server
   let isWorld: boolean
+  let needsUndeploy: boolean
   let uploadContext: DeployContext
   let finishUpload: (result: DeploymentResult) => void
   let failUpload: (error: Error) => void
 
   beforeEach(() => {
     isWorld = true
+    needsUndeploy = false
     resolve = jest.fn()
     reject = jest.fn()
     deploy = jest.fn((_response, context) => {
@@ -91,12 +103,13 @@ describe('when using the deploy resource of the linker server', () => {
   })
 
   async function start() {
-    deployment = createDeployment({ needsUndeploy: false, deploy })
+    deployment = createDeployment({ needsUndeploy, deploy })
     const router = setDeployResourceRoutes(
       new Router(),
       { logger: createLogger() as any },
       {
         deployment,
+        deployToken: DEPLOY_TOKEN,
         isWorld,
         resolve,
         reject,
@@ -135,11 +148,73 @@ describe('when using the deploy resource of the linker server', () => {
     })
 
     it('should respond with the uploading state', () => {
-      expect(body).toEqual({ phase: 'uploading', upload: null, result: null, error: null })
+      expect(body).toEqual({ phase: 'uploading', upload: null, result: null, error: null, cancelRequested: false })
     })
 
     it('should start the deployment with the signed payload', () => {
       expect(deploy).toHaveBeenCalledWith(payload, expect.anything())
+    })
+
+    describe('and the client cancels it without the deploy token', () => {
+      let cancel: Response
+      let cancelBody: unknown
+      let state: DeploymentState
+
+      beforeEach(async () => {
+        cancel = await cancelDeploy(server.url, {})
+        cancelBody = await cancel.json()
+        state = await (await fetch(server.url)).json()
+      })
+
+      it('should respond with a 403 Forbidden', () => {
+        expect({ status: cancel.status, body: cancelBody }).toEqual({
+          status: 403,
+          body: { message: 'Invalid or missing deploy token' }
+        })
+      })
+
+      it('should not abort the upload', () => {
+        expect(uploadContext.signal.aborted).toBe(false)
+      })
+
+      it('should leave the state unchanged', () => {
+        expect(state).toEqual(expect.objectContaining({ phase: 'uploading', cancelRequested: false }))
+      })
+    })
+
+    describe('and the client cancels it with a wrong deploy token', () => {
+      let cancel: Response
+
+      beforeEach(async () => {
+        cancel = await cancelDeploy(server.url, { 'x-deploy-token': DEPLOY_TOKEN.replace('a', 'b') })
+      })
+
+      it('should respond with a 403 Forbidden', () => {
+        expect(cancel.status).toBe(403)
+      })
+
+      it('should not abort the upload', () => {
+        expect(uploadContext.signal.aborted).toBe(false)
+      })
+    })
+
+    describe('and the client sends a malformed payload while it runs', () => {
+      let response: Response
+      let body: DeploymentState
+
+      beforeEach(async () => {
+        response = await postDeploy(server.url, {}, { address: '0x1' })
+        body = await response.json()
+        await new Promise((r) => setTimeout(r, 150))
+      })
+
+      it('should respond with a 409 Conflict and the current state', () => {
+        expect({ status: response.status, phase: body.phase }).toEqual({ status: 409, phase: 'uploading' })
+      })
+
+      it('should keep the CLI running', () => {
+        expect(resolve).not.toHaveBeenCalled()
+      })
     })
 
     describe('and the client starts it again', () => {
@@ -174,7 +249,8 @@ describe('when using the deploy resource of the linker server', () => {
           phase: 'deployed',
           upload: null,
           result: { entityId: 'bafkreientity', message: 'Live' },
-          error: null
+          error: null,
+          cancelRequested: false
         })
       })
     })
@@ -243,7 +319,7 @@ describe('when using the deploy resource of the linker server', () => {
       let cancel: Response
 
       beforeEach(async () => {
-        cancel = await fetch(server.url, { method: 'DELETE' })
+        cancel = await cancelDeploy(server.url)
         response = await responsePromise
         body = await response.json()
         await settled(reject)
@@ -334,7 +410,7 @@ describe('when using the deploy resource of the linker server', () => {
     it('should respond with the current state', () => {
       expect({ status: response.status, body }).toEqual({
         status: 200,
-        body: { phase: 'awaiting-signature', upload: null, result: null, error: null }
+        body: { phase: 'awaiting-signature', upload: null, result: null, error: null, cancelRequested: false }
       })
     })
   })
@@ -382,7 +458,7 @@ describe('when using the deploy resource of the linker server', () => {
 
     beforeEach(async () => {
       await start()
-      await fetch(server.url, { method: 'DELETE' })
+      await cancelDeploy(server.url)
       const response = await fetch(server.url, { headers: { accept: 'text/event-stream' } })
       events = parseEvents(await response.text())
     })
@@ -407,13 +483,98 @@ describe('when using the deploy resource of the linker server', () => {
     })
   })
 
+  describe('and the client cancels it while the server is still answering', () => {
+    let cancel: Response
+    let cancelBody: DeploymentState
+
+    beforeEach(async () => {
+      deploy.mockImplementationOnce(
+        (_response, context) =>
+          new Promise<DeploymentResult>((res) => {
+            uploadContext = context
+            finishUpload = res
+          })
+      )
+      await start()
+      await postDeploy(server.url, { prefer: 'respond-async' })
+      cancel = await cancelDeploy(server.url)
+      cancelBody = await cancel.json()
+    })
+
+    afterEach(async () => {
+      finishUpload({ entityId: 'bafkreientity' })
+      await settled(resolve)
+    })
+
+    it('should accept the cancellation', () => {
+      expect(cancel.status).toBe(202)
+    })
+
+    it('should show the cancellation as requested while the outcome is pending', () => {
+      expect(cancelBody).toEqual(expect.objectContaining({ phase: 'uploading', cancelRequested: true }))
+    })
+  })
+
+  describe('and the client cancels it while the world is being undeployed', () => {
+    let cancel: Response
+    let cancelBody: DeploymentState
+
+    beforeEach(async () => {
+      needsUndeploy = true
+      await start()
+      await postDeploy(server.url, { prefer: 'respond-async' })
+      cancel = await cancelDeploy(server.url)
+      cancelBody = await cancel.json()
+    })
+
+    afterEach(async () => {
+      finishUpload({ entityId: 'bafkreientity' })
+      await settled(resolve)
+    })
+
+    it('should respond with a 409 Conflict and the undeploying state', () => {
+      expect({ status: cancel.status, body: cancelBody }).toEqual({
+        status: 409,
+        body: expect.objectContaining({ phase: 'undeploying', cancelRequested: false })
+      })
+    })
+
+    it('should not abort the deployment', () => {
+      expect(uploadContext.signal.aborted).toBe(false)
+    })
+  })
+
+  describe('and a browser preflights a cancellation from another origin', () => {
+    let response: Response
+
+    beforeEach(async () => {
+      await start()
+      response = await fetch(server.url, {
+        method: 'OPTIONS',
+        headers: {
+          origin: 'http://localhost:3000',
+          'access-control-request-method': 'DELETE',
+          'access-control-request-headers': 'x-deploy-token'
+        }
+      })
+    })
+
+    it('should allow the DELETE method', () => {
+      expect(response.headers.get('access-control-allow-methods')).toContain('DELETE')
+    })
+
+    it('should allow the deploy token header', () => {
+      expect(response.headers.get('access-control-allow-headers')?.toLowerCase()).toContain('x-deploy-token')
+    })
+  })
+
   describe('and the client cancels it before the signature', () => {
     let response: Response
     let body: DeploymentState
 
     beforeEach(async () => {
       await start()
-      response = await fetch(server.url, { method: 'DELETE' })
+      response = await cancelDeploy(server.url)
       body = await response.json()
       await settled(reject)
     })
@@ -447,7 +608,7 @@ describe('when using the deploy resource of the linker server', () => {
       let againBody: DeploymentState
 
       beforeEach(async () => {
-        again = await fetch(server.url, { method: 'DELETE' })
+        again = await cancelDeploy(server.url)
         againBody = await again.json()
       })
 

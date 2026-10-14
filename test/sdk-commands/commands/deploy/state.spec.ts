@@ -25,8 +25,14 @@ describe('when following the state of a deployment', () => {
   })
 
   describe('and nothing happened yet', () => {
-    it('should be awaiting the signature without upload, result or error', () => {
-      expect(state.get()).toEqual({ phase: 'awaiting-signature', upload: null, result: null, error: null })
+    it('should be awaiting the signature without upload, result, error or cancellation', () => {
+      expect(state.get()).toEqual({
+        phase: 'awaiting-signature',
+        upload: null,
+        result: null,
+        error: null,
+        cancelRequested: false
+      })
     })
   })
 
@@ -177,8 +183,51 @@ describe('when following the state of a deployment', () => {
       state.deployed({ entityId: 'bafkreientity' })
     })
 
-    it('should stay cancelled', () => {
-      expect(state.get()).toEqual(expect.objectContaining({ phase: 'cancelled', result: null }))
+    it('should stay cancelled without an error', () => {
+      expect(state.get()).toEqual(expect.objectContaining({ phase: 'cancelled', result: null, error: null }))
+    })
+  })
+
+  describe('and a cancellation is requested', () => {
+    beforeEach(() => {
+      state.setPhase('uploading')
+      listener.mockClear()
+      state.requestCancel()
+      state.requestCancel()
+    })
+
+    it('should flag the cancellation without ending the deployment', () => {
+      expect(state.get()).toEqual(expect.objectContaining({ phase: 'uploading', cancelRequested: true }))
+    })
+
+    it('should notify the change once', () => {
+      expect(listener.mock.calls.map(([s]) => s.cancelRequested)).toEqual([true])
+    })
+  })
+
+  describe('and a cancellation is requested after it ended', () => {
+    beforeEach(() => {
+      state.deployed({ entityId: 'bafkreientity' })
+      state.requestCancel()
+    })
+
+    it('should not flag the cancellation', () => {
+      expect(state.get().cancelRequested).toBe(false)
+    })
+  })
+
+  describe('and the deployment is cancelled with a caveat', () => {
+    beforeEach(() => {
+      state.cancelled({ code: 'DEPLOY_CANCELLED_AFTER_UNDEPLOY', message: 'The world scenes were removed' })
+    })
+
+    it('should end as cancelled carrying the caveat as its error', () => {
+      expect(state.get()).toEqual(
+        expect.objectContaining({
+          phase: 'cancelled',
+          error: { code: 'DEPLOY_CANCELLED_AFTER_UNDEPLOY', message: 'The world scenes were removed' }
+        })
+      )
     })
   })
 

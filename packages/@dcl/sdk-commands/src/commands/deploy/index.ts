@@ -22,7 +22,8 @@ import {
   getScenesOnOtherParcels,
   checkWorldDeploymentPermission,
   isEntityPublished,
-  promptUser
+  promptUser,
+  resolveDeployToken
 } from './utils'
 import { buildScene } from '../build'
 import { getValidWorkspace } from '../../logic/workspace-validations'
@@ -31,15 +32,14 @@ import { analyticsFeatures } from './analytics-features'
 import { getInstalledPackageVersion } from '../../logic/config'
 import { drainResponse } from '../../logic/fetch'
 import { uploadDeployment } from './upload'
-import { createDeployment, DeployContext, deploymentCancelledError } from './deployment'
+import { createDeployment, DeployContext, deploymentCancelledError, settleCancelledUpload } from './deployment'
 
 interface Options {
   args: Result<typeof args>
   components: CliComponents
 }
 
-const PUBLICATION_CHECK_ATTEMPTS = 4
-const PUBLICATION_CHECK_DELAY_MS = 1500
+const PUBLICATION_CHECK_TIMEOUT_MS = 5000
 
 interface ProgrammaticDeployResult {
   finish: () => Promise<void>
@@ -65,7 +65,8 @@ export const args = declareArgs({
   '--port': Number,
   '-p': '--port',
   '--programmatic': Boolean,
-  '--multi-scene': Boolean
+  '--multi-scene': Boolean,
+  '--deploy-token': String
 })
 
 export function help(options: Options) {
@@ -82,11 +83,17 @@ export function help(options: Options) {
       --skip-validations        Skip permissions verifications on the client side when deploying content
       --programmatic            Enable programmatic mode - returns a promise that resolves when deployment completes
       --multi-scene             Deploy alongside existing scenes in a world (additive deploy, no deletion)
+      --deploy-token   [token]  Token required to cancel the deployment through the API. Random per run by default
 
     Deployment API (linker server):
       POST   /api/deploy        Sign and start; with 'Prefer: respond-async' it answers 202 right away
-      GET    /api/deploy        Deployment state as JSON, or as server-sent events with 'Accept: text/event-stream'
-      DELETE /api/deploy        Cancel the deployment
+      GET    /api/deploy        Deployment state as JSON, or as server-sent events with 'Accept: text/event-stream'.
+                                The stream ends after a final state: EventSource clients must close() it then,
+                                or they reconnect
+      DELETE /api/deploy        Cancel the deployment. Requires the 'X-Deploy-Token' header (403 otherwise); the
+                                linker URL carries the token as '?token='. Answers 409 while undeploying a world.
+                                A cancel after the world's scenes were removed ends with the error code
+                                DEPLOY_CANCELLED_AFTER_UNDEPLOY
 
     Example:
     - Deploy your scene:
@@ -109,6 +116,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   const multiScene = !!options.args['--multi-scene']
   const autoYes = !!options.args['--yes']
   const targetContent = options.args['--target-content']
+  const deployToken = resolveDeployToken(options.args['--deploy-token'])
 
   if (workspace.projects.length !== 1) {
     throw new CliError('DEPLOY_WORKSPACE_NOT_SUPPORTED', i18next.t('errors.deploy.workspace_not_supported'))
@@ -234,6 +242,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       isHttps: !!options.args['--https']
     },
     deployment,
+    deployToken,
     deleteScenesFromWorldPayload,
     targetContent,
     multiScene
@@ -355,11 +364,14 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       responseData = await uploadDeployment(options.components, client, deployData, { signal, progress: state })
     } catch (e: any) {
       if (signal.aborted) {
-        if (!(await publishedDespiteCancel(client, state.get().upload?.stage === 'processing'))) {
-          options.components.logger.warn('Deployment cancelled.')
-          throw deploymentCancelledError()
-        }
-        options.components.logger.warn('The deployment was cancelled after the server received it.')
+        await settleCancelledUpload(options.components, e, {
+          fullySent: state.get().upload?.stage === 'processing',
+          isPublished: () =>
+            isEntityPublished(client, entityId, {
+              world: isWorld && worldName && targetContent ? { name: worldName, targetContent } : undefined,
+              timeoutMs: PUBLICATION_CHECK_TIMEOUT_MS
+            })
+        })
         responseData = {}
       } else {
         options.components.logger.error('Could not upload content:')
@@ -394,20 +406,5 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     }
 
     return { entityId, ...(responseData.message ? { message: responseData.message } : {}) }
-  }
-
-  // A cancelled upload may still get published when the server already received all of it.
-  async function publishedDespiteCancel(client: Parameters<typeof isEntityPublished>[0], fullySent: boolean) {
-    const attempts = fullySent ? PUBLICATION_CHECK_ATTEMPTS : 1
-    const world = isWorld && worldName && targetContent ? { name: worldName, targetContent } : undefined
-    for (let attempt = 1; attempt <= attempts; attempt++) {
-      try {
-        if (await isEntityPublished(client, entityId, world)) return true
-      } catch (e: any) {
-        options.components.logger.warn(`Could not check whether the deployment got published: ${e.message}`)
-      }
-      if (attempt < attempts) await new Promise((resolve) => setTimeout(resolve, PUBLICATION_CHECK_DELAY_MS))
-    }
-    return false
   }
 }

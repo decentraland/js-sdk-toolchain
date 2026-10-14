@@ -15,6 +15,12 @@ export interface dAppOptions {
   uri: string
 }
 
+// Request headers are reflected on preflight, which lets clients send X-Deploy-Token.
+export const LINKER_CORS_OPTIONS = {
+  methods: ['GET', 'HEAD', 'POST', 'DELETE', 'OPTIONS'],
+  exposedHeaders: ['Location', 'Preference-Applied']
+}
+
 export async function runDapp(
   cliComponents: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   router: Router<object>,
@@ -38,10 +44,7 @@ export async function runDapp(
         { ...cliComponents, config, logs },
         {
           https,
-          cors: {
-            methods: ['GET', 'HEAD', 'POST', 'DELETE', 'OPTIONS'],
-            exposedHeaders: ['Location', 'Preference-Applied']
-          }
+          cors: LINKER_CORS_OPTIONS
         }
       )
 
