@@ -1,6 +1,7 @@
 import { Result } from 'arg'
 import { args as startArgs } from '.'
 import { CliComponents } from '../../components'
+import { getBadgesServerUrl } from './badges-server-url'
 
 const isWindows = /^win/.test(process.platform)
 
@@ -116,6 +117,10 @@ async function runApp(
     }
     if (mcpPort !== undefined) {
       params.set('mcp-port', String(mcpPort))
+    }
+    const badgesServerUrl = getBadgesServerUrl()
+    if (badgesServerUrl) {
+      params.set('badges-url', badgesServerUrl)
     }
 
     // Forward any params placed after a standalone `--` verbatim into the deep link.

@@ -6,7 +6,10 @@ export enum CommsMessage {
   RES_CRDT_STATE = 9,
   CRDT_SERVER = 4,
   CRDT_AUTHORITATIVE = 5,
-  CUSTOM_EVENT = 6
+  CUSTOM_EVENT = 6,
+  // The SDK's own room traffic (see internal-messages.ts). Separate from CUSTOM_EVENT so it
+  // never reaches a scene's Room listeners or shares the creators' message registry.
+  SDK_EVENT = 10
 }
 
 export function BinaryMessageBus<T extends CommsMessage>(
