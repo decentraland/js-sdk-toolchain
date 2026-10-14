@@ -34,7 +34,16 @@ export async function runDapp(
 
       const https = isHttps ? await getCredentials(cliComponents) : undefined
 
-      const server = await createServerComponent({ ...cliComponents, config, logs }, { https, cors: {} })
+      const server = await createServerComponent(
+        { ...cliComponents, config, logs },
+        {
+          https,
+          cors: {
+            methods: ['GET', 'HEAD', 'POST', 'DELETE', 'OPTIONS'],
+            exposedHeaders: ['Location', 'Preference-Applied']
+          }
+        }
+      )
 
       return { ...cliComponents, config, logs, server }
     },

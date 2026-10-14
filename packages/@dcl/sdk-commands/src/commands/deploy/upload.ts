@@ -1,7 +1,13 @@
-import { ContentClient, PartialDeploymentNotSupportedError, PartialDeploymentResult } from 'dcl-catalyst-client'
+import {
+  ContentClient,
+  PartialDeploymentNotSupportedError,
+  PartialDeploymentResult,
+  UploadProgress
+} from 'dcl-catalyst-client'
 import { CliComponents } from '../../components'
 import { CliError } from '../../logic/error'
 import { printProgressInfo } from '../../logic/beautiful-logs'
+import { IDeploymentStateComponent } from './state'
 
 type DeploymentData = Parameters<ContentClient['deploy']>[0]
 
@@ -10,6 +16,11 @@ type PartialUploadResult = PartialDeploymentResult & { message?: string }
 
 export type UploadResult = {
   message?: string
+}
+
+export type UploadOptions = {
+  signal?: AbortSignal
+  progress?: Pick<IDeploymentStateComponent, 'reportUpload' | 'reportBatches'>
 }
 
 const REQUEST_TIMEOUT_MS = 600000
@@ -45,8 +56,25 @@ function deploymentSize(deployData: DeploymentData): number {
   return total
 }
 
-async function uploadInSingleRequest(client: ContentClient, deployData: DeploymentData): Promise<UploadResult> {
-  const response = (await client.deploy(deployData, { timeout: REQUEST_TIMEOUT_MS })) as any
+function uploadProgressReporter(progress: UploadOptions['progress']) {
+  return (
+    progress &&
+    (({ phase, sentBytes, totalBytes }: UploadProgress) =>
+      progress.reportUpload({ stage: phase, sentBytes, totalBytes }))
+  )
+}
+
+async function uploadInSingleRequest(
+  client: ContentClient,
+  deployData: DeploymentData,
+  { signal, progress }: UploadOptions
+): Promise<UploadResult> {
+  progress?.reportBatches(null)
+  const response = (await client.deploy(deployData, {
+    timeout: REQUEST_TIMEOUT_MS,
+    signal,
+    onUploadProgress: uploadProgressReporter(progress)
+  })) as any
   if (response.status !== 200) {
     throw new Error(await response.text())
   }
@@ -61,28 +89,35 @@ async function uploadInSingleRequest(client: ContentClient, deployData: Deployme
 export async function uploadDeployment(
   components: Pick<CliComponents, 'logger'>,
   client: ContentClient,
-  deployData: DeploymentData
+  deployData: DeploymentData,
+  options: UploadOptions = {}
 ): Promise<UploadResult> {
+  const { signal, progress } = options
   const size = deploymentSize(deployData)
   if (size < MIN_PARTIAL_DEPLOYMENT_BYTES) {
-    return uploadInSingleRequest(client, deployData)
+    return uploadInSingleRequest(client, deployData, options)
   }
 
   try {
+    progress?.reportBatches({ completedBatches: 0, totalBatches: 1 })
     const result: PartialUploadResult = await client.deployPartial(deployData, {
       timeout: REQUEST_TIMEOUT_MS,
+      signal,
       maxBatchSizeBytes: batchSize(deployData),
       concurrency: PARTIAL_BATCH_CONCURRENCY,
-      onProgress: ({ uploadedBytes, totalBytes, completedBatches, totalBatches }) =>
+      onUploadProgress: uploadProgressReporter(progress),
+      onProgress: ({ uploadedBytes, totalBytes, completedBatches, totalBatches }) => {
+        progress?.reportBatches({ completedBatches, totalBatches })
         printProgressInfo(
           components.logger,
           `Uploaded ${formatMegabytes(uploadedBytes)} of ${formatMegabytes(totalBytes)} ` +
             `(batch ${completedBatches}/${totalBatches})`
         )
+      }
     })
     return { message: result.message }
   } catch (error: any) {
-    if (!(error instanceof PartialDeploymentNotSupportedError)) {
+    if (!(error instanceof PartialDeploymentNotSupportedError) || signal?.aborted) {
       throw error
     }
     if (size > MAX_SINGLE_REQUEST_BYTES) {
@@ -93,6 +128,6 @@ export async function uploadDeployment(
       )
     }
     components.logger.warn('The target server does not support batched uploads, uploading in a single request.')
-    return uploadInSingleRequest(client, deployData)
+    return uploadInSingleRequest(client, deployData, options)
   }
 }

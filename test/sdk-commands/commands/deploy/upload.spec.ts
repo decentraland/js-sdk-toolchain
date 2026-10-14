@@ -195,6 +195,102 @@ describe('when uploading a deployment', () => {
     })
   })
 
+  describe('and the deployment progress is followed', () => {
+    let progress: { reportUpload: jest.Mock; reportBatches: jest.Mock }
+    let signal: AbortSignal
+
+    beforeEach(() => {
+      progress = { reportUpload: jest.fn(), reportBatches: jest.fn() }
+      signal = new AbortController().signal
+    })
+
+    describe('and it uploads in a single request', () => {
+      let client: ContentClient
+
+      beforeEach(async () => {
+        client = { deploy } as unknown as ContentClient
+        deploy.mockImplementationOnce(async (_data, options) => {
+          options.onUploadProgress({ phase: 'uploading', sentBytes: 40, totalBytes: 100 })
+          return { status: 200, json: async () => ({}) }
+        })
+        await uploadDeployment({ logger }, client, deployData, { signal, progress })
+      })
+
+      it('should report the upload without batches', () => {
+        expect(progress.reportBatches).toHaveBeenCalledWith(null)
+      })
+
+      it('should report the bytes sent with the stage of the upload', () => {
+        expect(progress.reportUpload).toHaveBeenCalledWith({ stage: 'uploading', sentBytes: 40, totalBytes: 100 })
+      })
+
+      it('should hand the cancellation signal to the client', () => {
+        expect(deploy).toHaveBeenCalledWith(deployData, expect.objectContaining({ signal }))
+      })
+    })
+
+    describe('and it uploads in batches', () => {
+      let client: ContentClient
+      let deployPartial: jest.Mock
+
+      beforeEach(async () => {
+        deployPartial = jest.fn()
+        client = { deploy, deployPartial } as unknown as ContentClient
+        deployData = createDeployData(4 * PARTIAL_BATCH_BYTES, 4)
+        deployPartial.mockImplementationOnce(async (_data, options) => {
+          options.onUploadProgress({ phase: 'processing', sentBytes: 4e6, totalBytes: 4e6 })
+          options.onProgress({ uploadedBytes: 2e6, totalBytes: 4e6, completedBatches: 1, totalBatches: 2 })
+          return { creationTimestamp: 1 }
+        })
+        await uploadDeployment({ logger }, client, deployData, { signal, progress })
+      })
+
+      it('should report the batches staged so far, starting with the first one pending', () => {
+        expect(progress.reportBatches.mock.calls).toEqual([
+          [{ completedBatches: 0, totalBatches: 1 }],
+          [{ completedBatches: 1, totalBatches: 2 }]
+        ])
+      })
+
+      it('should report the bytes sent with the stage of the upload', () => {
+        expect(progress.reportUpload).toHaveBeenCalledWith({ stage: 'processing', sentBytes: 4e6, totalBytes: 4e6 })
+      })
+
+      it('should hand the cancellation signal to the client', () => {
+        expect(deployPartial).toHaveBeenCalledWith(deployData, expect.objectContaining({ signal }))
+      })
+    })
+
+    describe('and it is cancelled while the server rejects the batches as unsupported', () => {
+      let client: ContentClient
+      let deployPartial: jest.Mock
+      let error: unknown
+      let controller: AbortController
+
+      beforeEach(async () => {
+        deployPartial = jest.fn()
+        client = { deploy, deployPartial } as unknown as ContentClient
+        controller = new AbortController()
+        deployData = createDeployData(MIN_PARTIAL_DEPLOYMENT_BYTES)
+        deployPartial.mockImplementationOnce(async () => {
+          controller.abort()
+          throw new PartialDeploymentNotSupportedError('The server does not support partial deployments', 400)
+        })
+        error = await uploadDeployment({ logger }, client, deployData, { signal: controller.signal, progress }).catch(
+          (e) => e
+        )
+      })
+
+      it('should reject with the server error', () => {
+        expect(error).toBeInstanceOf(PartialDeploymentNotSupportedError)
+      })
+
+      it('should not retry the upload in a single request', () => {
+        expect(deploy).not.toHaveBeenCalled()
+      })
+    })
+  })
+
   describe('and the deployment is below the batching threshold', () => {
     let client: ContentClient
 

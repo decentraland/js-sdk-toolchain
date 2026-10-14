@@ -20,28 +20,37 @@ import { getPointers } from '../../logic/catalyst-requests'
 import { drainResponse } from '../../logic/fetch'
 import { Router } from '@well-known-components/http-server'
 import { dAppOptions, runDapp } from '../../run-dapp'
+import { IDeploymentComponent } from './deployment'
+import { setDeployResourceRoutes } from './routes'
 
 /**
  * Minimal undici-backed fetch component for the catalyst client. Replaces
  * @well-known-components/fetch-component, which uses cross-fetch -> node-fetch v2
  * and trips a gzip "Premature close" under keep-alive socket reuse on recent Node
- * runtimes (nodejs/node#63989). Honors the `timeout` option (used by deploy) via an
- * AbortController; all other init fields pass straight through to undici.fetch.
+ * runtimes (nodejs/node#63989). Honors the `timeout`, `signal` and `abortController`
+ * options via an AbortController; all other init fields (including `duplex` for
+ * streamed uploads) pass straight through to undici.fetch.
  */
 function createFetchComponent() {
   return {
-    async fetch(url: string, init: RequestInit & { timeout?: number } = {}): Promise<Response> {
-      const { timeout, signal, ...rest } = init
+    async fetch(
+      url: string,
+      init: RequestInit & { timeout?: number; abortController?: AbortController } = {}
+    ): Promise<Response> {
+      const { timeout, signal, abortController, ...rest } = init
+      const externalSignals = [signal, abortController?.signal].filter((s): s is AbortSignal => !!s)
       const controller = new AbortController()
-      if (signal?.aborted) controller.abort()
       const onExternalAbort = () => controller.abort()
-      signal?.addEventListener('abort', onExternalAbort, { once: true })
+      for (const external of externalSignals) {
+        if (external.aborted) controller.abort()
+        external.addEventListener('abort', onExternalAbort, { once: true })
+      }
       const timer = timeout ? setTimeout(() => controller.abort(), timeout) : undefined
       try {
         return await fetch(url, { ...rest, signal: controller.signal })
       } finally {
         if (timer) clearTimeout(timer)
-        signal?.removeEventListener('abort', onExternalAbort)
+        for (const external of externalSignals) external.removeEventListener('abort', onExternalAbort)
       }
     }
   }
@@ -55,7 +64,8 @@ export async function getCatalyst(
   if (target) {
     const catalyst = createCatalystClient({
       url: target.endsWith('/') ? target.slice(0, -1) : target,
-      fetcher: createFetchComponent()
+      fetcher: createFetchComponent(),
+      streamingUploads: true
     })
 
     const content = await catalyst.getContentClient()
@@ -67,19 +77,30 @@ export async function getCatalyst(
   }
 
   if (targetContent) {
-    return { client: createContentClient({ url: targetContent, fetcher: createFetchComponent() }), url: targetContent }
+    return {
+      client: createContentClient({ url: targetContent, fetcher: createFetchComponent(), streamingUploads: true }),
+      url: targetContent
+    }
   }
 
   let catalystClient: CatalystClient
 
   if (chainId === ChainId.ETHEREUM_SEPOLIA) {
-    catalystClient = createCatalystClient({ url: 'peer.decentraland.zone', fetcher: createFetchComponent() })
+    catalystClient = createCatalystClient({
+      url: 'peer.decentraland.zone',
+      fetcher: createFetchComponent(),
+      streamingUploads: true
+    })
   } else {
     const catalysts = getCatalystServersFromCache('mainnet')
 
     for (const catalyst of catalysts) {
       try {
-        const client = createCatalystClient({ url: catalyst.address, fetcher: createFetchComponent() })
+        const client = createCatalystClient({
+          url: catalyst.address,
+          fetcher: createFetchComponent(),
+          streamingUploads: true
+        })
         const about = await client.fetchAbout()
         if (about.healthy) {
           catalystClient = client
@@ -110,7 +131,8 @@ export async function deleteWorldScenes(
   components: Pick<CliComponents, 'logger'>,
   worldName: string,
   deleteSignature: string,
-  targetContent?: string
+  targetContent?: string,
+  signal?: AbortSignal
 ): Promise<Response> {
   const { logger } = components
 
@@ -131,7 +153,7 @@ export async function deleteWorldScenes(
     headers[`x-identity-auth-chain-${i}`] = JSON.stringify(link)
   })
 
-  const response = await fetch(deleteUrl, { method: 'DELETE', headers })
+  const response = await fetch(deleteUrl, { method: 'DELETE', headers, signal })
   logger.info(`[DELETE] deleting world scenes status=${response.status}`)
   return response
 }
@@ -144,7 +166,7 @@ export async function getAddressAndSignature(
   files: IFile[],
   skipValidations: boolean,
   linkOptions: Omit<dAppOptions, 'uri'>,
-  deployCallback: (response: LinkerResponse) => Promise<void>,
+  deployment: IDeploymentComponent,
   deleteScenesFromWorldPayload?: string,
   targetContent?: string,
   multiScene?: boolean
@@ -166,7 +188,7 @@ export async function getAddressAndSignature(
       deleteSignature = JSON.stringify(deleteAuthChain)
     }
     const linkerResponse: LinkerResponse = { authChain, address: wallet.address, deleteSignature }
-    await deployCallback(linkerResponse)
+    await deployment.run(linkerResponse)
     awaitResponse.resolve()
     return {}
   }
@@ -181,7 +203,7 @@ export async function getAddressAndSignature(
     multiScene
   )
   const { router: commonRouter } = setRoutes(components, sceneInfo)
-  const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployCallback)
+  const router = setDeployRoutes(commonRouter, components, awaitResponse, sceneInfo, files, deployment)
 
   components.logger.info('You need to sign the content before the deployment:')
   const { program } = await runDapp(components, router, { ...linkOptions, uri: `/` })
@@ -194,12 +216,11 @@ function setDeployRoutes(
   awaitResponse: IFuture<void>,
   sceneInfo: SceneInfo,
   files: IFile[],
-  deployCallback: (response: LinkerResponse) => Promise<void>
+  deployment: IDeploymentComponent
 ): Router<object> {
   const { logger } = components
 
   const resolveLinkerPromise = () => setTimeout(() => awaitResponse.resolve(), 100)
-  const rejectLinkerPromise = (e: Error) => setTimeout(() => awaitResponse.reject(e), 100)
   let linkerResponse: LinkerResponse
 
   router.get('/api/files', async () => ({
@@ -268,26 +289,13 @@ function setDeployRoutes(
     }
   })
 
-  router.post('/api/deploy', async (ctx) => {
-    const value = (await ctx.request.json()) as LinkerResponse
-    if (!value.address || !value.authChain || !value.chainId) {
-      const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
-      logger.error(errorMessage)
-      resolveLinkerPromise()
-      return { status: 400, body: { message: errorMessage } }
-    }
-
-    linkerResponse = value
-
-    try {
-      await deployCallback(value)
-      if (sceneInfo.isWorld) {
-        resolveLinkerPromise()
-      }
-      return {}
-    } catch (e) {
-      rejectLinkerPromise(e as Error)
-      return { status: 400, body: { message: (e as Error).message } }
+  setDeployResourceRoutes(router, components, {
+    deployment,
+    isWorld: sceneInfo.isWorld,
+    resolve: () => awaitResponse.resolve(),
+    reject: (e) => awaitResponse.reject(e),
+    onLinkerResponse: (value) => {
+      linkerResponse = value
     }
   })
 
@@ -385,6 +393,31 @@ export async function fetchWorldScenes(
   const data = (await response.json()) as WorldScenesResponse
   logger.info(`[DEPLOY] fetching scenes from world success: total=${data.total}, scenes=${data.scenes?.length}`)
   return data.scenes || []
+}
+
+/**
+ * Whether the entity is live on the content server. Worlds servers don't list entities by id, so a world
+ * is checked through its scenes.
+ */
+export async function isEntityPublished(
+  client: Pick<ContentClient, 'fetchEntitiesByIds'>,
+  entityId: string,
+  world?: { name: string; targetContent: string }
+): Promise<boolean> {
+  if (world) {
+    const encodedName = encodeURIComponent(world.name)
+    const response = await fetch(
+      `${world.targetContent}/world/${encodedName}/scenes?entity_id=${encodeURIComponent(entityId)}`
+    )
+    if (!response.ok) {
+      await drainResponse(response)
+      throw new Error(`Failed to fetch world scenes: ${response.status} ${response.statusText}`)
+    }
+    const data = (await response.json()) as Partial<WorldScenesResponse>
+    return (data.scenes ?? []).some((scene) => scene.entityId === entityId)
+  }
+  const entities = await client.fetchEntitiesByIds([entityId])
+  return entities.some((entity) => entity.id === entityId)
 }
 
 export function promptUser(question: string): Promise<boolean> {
