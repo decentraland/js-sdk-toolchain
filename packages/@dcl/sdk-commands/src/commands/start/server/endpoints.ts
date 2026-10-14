@@ -418,17 +418,10 @@ async function getSceneJson(
     )
   )
 
-  for (const pointer of Array.from(requestedPointers)) {
-    if (!requestedPointers.has(pointer)) continue
-    const theDeployment = allDeployments.find(($) => $ && $.pointers.includes(pointer))
-
-    if (theDeployment) {
-      // remove all the required pointers from the requestedPointers set
-      // to prevent sending duplicated entities
-      theDeployment.pointers.forEach(($) => requestedPointers.delete($))
-
-      // add the deployment to the results
-      resultEntities.push(theDeployment)
+  for (const deployment of allDeployments) {
+    if (deployment && deployment.pointers.some((p) => requestedPointers.has(p))) {
+      deployment.pointers.forEach((p) => requestedPointers.delete(p))
+      resultEntities.push(deployment)
     }
   }
 
