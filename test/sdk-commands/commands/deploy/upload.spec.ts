@@ -1,4 +1,8 @@
-import type { ContentClient } from 'dcl-catalyst-client'
+import {
+  ContentClient,
+  PartialDeploymentNotSupportedError,
+  PartialDeploymentValidationError
+} from '../../../../packages/@dcl/sdk-commands/node_modules/dcl-catalyst-client'
 import {
   MAX_SINGLE_REQUEST_BYTES,
   MIN_PARTIAL_DEPLOYMENT_BYTES,
@@ -10,12 +14,6 @@ import {
 import { CliError } from '../../../../packages/@dcl/sdk-commands/src/logic/error'
 
 type DeploymentData = Parameters<ContentClient['deploy']>[0]
-
-function namedError(name: string, message: string): Error {
-  const error = new Error(message)
-  error.name = name
-  return error
-}
 
 function createLogger() {
   return { log: jest.fn(), info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() }
@@ -130,7 +128,7 @@ describe('when uploading a deployment', () => {
       let error: unknown
 
       beforeEach(async () => {
-        rejection = namedError('PartialDeploymentValidationError', 'The partial deployment was rejected: too big')
+        rejection = new PartialDeploymentValidationError('The partial deployment was rejected: too big', 400)
         deployPartial.mockRejectedValueOnce(rejection)
         error = await uploadDeployment({ logger }, client, deployData).catch((e) => e)
       })
@@ -147,7 +145,7 @@ describe('when uploading a deployment', () => {
     describe('and the server does not support partial deployments', () => {
       beforeEach(() => {
         deployPartial.mockRejectedValueOnce(
-          namedError('PartialDeploymentNotSupportedError', 'The server does not support partial deployments')
+          new PartialDeploymentNotSupportedError('The server does not support partial deployments', 400)
         )
       })
 
@@ -197,7 +195,7 @@ describe('when uploading a deployment', () => {
     })
   })
 
-  describe('and the client does not support partial deployments', () => {
+  describe('and the deployment is below the batching threshold', () => {
     let client: ContentClient
 
     beforeEach(() => {

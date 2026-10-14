@@ -1,29 +1,12 @@
-import { ContentClient } from 'dcl-catalyst-client'
+import { ContentClient, PartialDeploymentNotSupportedError, PartialDeploymentResult } from 'dcl-catalyst-client'
 import { CliComponents } from '../../components'
 import { CliError } from '../../logic/error'
 import { printProgressInfo } from '../../logic/beautiful-logs'
 
 type DeploymentData = Parameters<ContentClient['deploy']>[0]
 
-// Mirrors the partial deployment surface of dcl-catalyst-client (ADR-325) until a release ships it.
-type PartialDeploymentProgress = {
-  uploadedBytes: number
-  totalBytes: number
-  completedBatches: number
-  totalBatches: number
-}
-
-type PartialDeploymentClient = {
-  deployPartial?: (
-    deployData: DeploymentData,
-    options?: {
-      timeout?: number
-      maxBatchSizeBytes?: number
-      concurrency?: number
-      onProgress?: (progress: PartialDeploymentProgress) => void
-    }
-  ) => Promise<{ creationTimestamp: number; message?: string }>
-}
+// Worlds also answers the publishing batch with a deployment message.
+type PartialUploadResult = PartialDeploymentResult & { message?: string }
 
 export type UploadResult = {
   message?: string
@@ -80,14 +63,13 @@ export async function uploadDeployment(
   client: ContentClient,
   deployData: DeploymentData
 ): Promise<UploadResult> {
-  const partialClient = client as ContentClient & PartialDeploymentClient
   const size = deploymentSize(deployData)
-  if (size < MIN_PARTIAL_DEPLOYMENT_BYTES || typeof partialClient.deployPartial !== 'function') {
+  if (size < MIN_PARTIAL_DEPLOYMENT_BYTES) {
     return uploadInSingleRequest(client, deployData)
   }
 
   try {
-    const result = await partialClient.deployPartial(deployData, {
+    const result: PartialUploadResult = await client.deployPartial(deployData, {
       timeout: REQUEST_TIMEOUT_MS,
       maxBatchSizeBytes: batchSize(deployData),
       concurrency: PARTIAL_BATCH_CONCURRENCY,
@@ -100,7 +82,7 @@ export async function uploadDeployment(
     })
     return { message: result.message }
   } catch (error: any) {
-    if (error?.name !== 'PartialDeploymentNotSupportedError') {
+    if (!(error instanceof PartialDeploymentNotSupportedError)) {
       throw error
     }
     if (size > MAX_SINGLE_REQUEST_BYTES) {
