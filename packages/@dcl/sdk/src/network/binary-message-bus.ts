@@ -1,9 +1,12 @@
 import { ReadWriteByteBuffer } from '@dcl/ecs/dist/serialization/ByteBuffer'
 
 export enum CommsMessage {
-  CRDT = 1,
-  REQ_CRDT_STATE = 2,
-  RES_CRDT_STATE = 3
+  CRDT = 7,
+  REQ_CRDT_STATE = 8,
+  RES_CRDT_STATE = 9,
+  CRDT_SERVER = 4,
+  CRDT_AUTHORITATIVE = 5,
+  CUSTOM_EVENT = 6
 }
 
 export function BinaryMessageBus<T extends CommsMessage>(
@@ -20,7 +23,9 @@ export function BinaryMessageBus<T extends CommsMessage>(
     __processMessages: (messages: Uint8Array[]) => {
       for (const message of messages) {
         const commsMsg = decodeCommsMessage<T>(message)
-        if (!commsMsg) continue
+        if (!commsMsg) {
+          continue
+        }
         const { sender, messageType, data } = commsMsg
         const fn = mapping.get(messageType)
         if (fn) fn(data, sender)
