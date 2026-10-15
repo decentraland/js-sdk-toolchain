@@ -7,7 +7,9 @@ import {
 import { CliComponents } from '../../components'
 import { CliError } from '../../logic/error'
 import { printProgressInfo } from '../../logic/beautiful-logs'
+import { withDeadline } from '../../logic/fetch'
 import { IDeploymentStateComponent } from './state'
+import { CatalystFetchInit } from './utils'
 
 type DeploymentData = Parameters<ContentClient['deploy']>[0]
 
@@ -24,6 +26,8 @@ export type UploadOptions = {
 }
 
 const REQUEST_TIMEOUT_MS = 600000
+
+export const CONTENT_AVAILABILITY_TIMEOUT_MS = 30000
 
 // The infrastructure in front of the content servers times out requests larger than ~200MB.
 export const MAX_SINGLE_REQUEST_BYTES = 200 * 1000 * 1000
@@ -56,13 +60,32 @@ function deploymentSize(deployData: DeploymentData): number {
   return total
 }
 
+async function fetchAvailableContent(
+  client: ContentClient,
+  contentHashes: string[],
+  signal?: AbortSignal
+): Promise<Set<string>> {
+  try {
+    const availability = await withDeadline(
+      (deadline) => {
+        const init: CatalystFetchInit = { signal: deadline, rejectHttpErrors: true }
+        return client.isContentAvailable(contentHashes, init as Parameters<ContentClient['isContentAvailable']>[1])
+      },
+      { timeoutMs: CONTENT_AVAILABILITY_TIMEOUT_MS, signal }
+    )
+    if (!Array.isArray(availability)) throw new Error('unexpected response')
+    return new Set(availability.filter(({ available }) => available === true).map(({ cid }) => cid))
+  } catch (error: any) {
+    if (signal?.aborted) throw error
+    const reason = error?.message ?? String(error)
+    throw new CliError('DEPLOY_CONTENT_CHECK_FAILED', `Couldn't check which content the server already has (${reason})`)
+  }
+}
+
 // A single request only uploads the files missing on the server, plus the entity file.
 async function missingBytes(client: ContentClient, deployData: DeploymentData, signal?: AbortSignal): Promise<number> {
   const contentHashes = Array.from(deployData.files.keys()).filter((hash) => hash !== deployData.entityId)
-  const availability = contentHashes.length
-    ? await client.isContentAvailable(contentHashes, { timeout: REQUEST_TIMEOUT_MS, signal })
-    : []
-  const available = new Set(availability.filter(({ available }) => available).map(({ cid }) => cid))
+  const available = contentHashes.length ? await fetchAvailableContent(client, contentHashes, signal) : new Set()
   let total = 0
   for (const [hash, file] of deployData.files) {
     if (!available.has(hash)) total += file.byteLength

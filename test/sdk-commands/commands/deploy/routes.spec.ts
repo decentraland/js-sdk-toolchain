@@ -82,18 +82,19 @@ describe('when using the deploy resource of the linker server', () => {
   let reject: jest.Mock
   let server: Server
   let isWorld: boolean
-  let needsUndeploy: boolean
+  let undeployFirst: boolean
   let uploadContext: DeployContext
   let finishUpload: (result: DeploymentResult) => void
   let failUpload: (error: Error) => void
 
   beforeEach(() => {
     isWorld = true
-    needsUndeploy = false
+    undeployFirst = false
     resolve = jest.fn()
     reject = jest.fn()
     deploy = jest.fn((_response, context) => {
       uploadContext = context
+      if (undeployFirst) context.startUndeploy()
       return new Promise<DeploymentResult>((res, rej) => {
         finishUpload = res
         failUpload = rej
@@ -103,7 +104,7 @@ describe('when using the deploy resource of the linker server', () => {
   })
 
   async function start() {
-    deployment = createDeployment({ needsUndeploy, deploy })
+    deployment = createDeployment({ deploy })
     const router = setDeployResourceRoutes(
       new Router(),
       { logger: createLogger() as any },
@@ -520,7 +521,7 @@ describe('when using the deploy resource of the linker server', () => {
     let cancelBody: DeploymentState
 
     beforeEach(async () => {
-      needsUndeploy = true
+      undeployFirst = true
       await start()
       await postDeploy(server.url, { prefer: 'respond-async' })
       cancel = await cancelDeploy(server.url)

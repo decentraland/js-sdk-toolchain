@@ -30,7 +30,7 @@ import { getValidWorkspace } from '../../logic/workspace-validations'
 import { LinkerResponse } from '../../linker-dapp/routes'
 import { analyticsFeatures } from './analytics-features'
 import { getInstalledPackageVersion } from '../../logic/config'
-import { drainResponse } from '../../logic/fetch'
+import { drainResponse, withDeadline } from '../../logic/fetch'
 import { uploadDeployment } from './upload'
 import { createDeployment, DeployContext, deploymentCancelledError, settleCancelledUpload } from './deployment'
 
@@ -44,6 +44,8 @@ const PUBLICATION_CHECK_TIMEOUT_MS = 5000
 interface ProgrammaticDeployResult {
   finish: () => Promise<void>
   stop: () => Promise<void>
+  /** Required in the `X-Deploy-Token` header to cancel the deployment through `DELETE /api/deploy`. */
+  deployToken: string
 }
 
 export const args = declareArgs({
@@ -83,7 +85,8 @@ export function help(options: Options) {
       --skip-validations        Skip permissions verifications on the client side when deploying content
       --programmatic            Enable programmatic mode - returns a promise that resolves when deployment completes
       --multi-scene             Deploy alongside existing scenes in a world (additive deploy, no deletion)
-      --deploy-token   [token]  Token required to cancel the deployment through the API. Random per run by default
+      --deploy-token   [token]  Token required to cancel the deployment through the API (at least 16 characters).
+                                Random per run by default
 
     Deployment API (linker server):
       POST   /api/deploy        Sign and start; with 'Prefer: respond-async' it answers 202 right away
@@ -91,7 +94,7 @@ export function help(options: Options) {
                                 The stream ends after a final state: EventSource clients must close() it then,
                                 or they reconnect
       DELETE /api/deploy        Cancel the deployment. Requires the 'X-Deploy-Token' header (403 otherwise); the
-                                linker URL carries the token as '?token='. Answers 409 while undeploying a world.
+                                linker URL carries the token in its fragment ('#token='). Answers 409 while undeploying a world.
                                 A cancel after the world's scenes were removed ends with the error code
                                 DEPLOY_CANCELLED_AFTER_UNDEPLOY
 
@@ -228,7 +231,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     needsDelete && worldName ? buildDeleteScenesFromWorldPayload(worldName) : undefined
 
   const awaitResponse = future<void>()
-  const deployment = createDeployment({ needsUndeploy: needsDelete && !!worldName, deploy: deployEntity })
+  const deployment = createDeployment({ deploy: deployEntity })
   const { program } = await getAddressAndSignature(
     options.components,
     awaitResponse,
@@ -258,7 +261,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       },
       stop: async () => {
         void program?.stop()
-      }
+      },
+      deployToken
     }
   }
 
@@ -269,7 +273,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     void program?.stop()
   }
 
-  async function deployEntity(linkerResponse: LinkerResponse, { signal, state }: DeployContext) {
+  async function deployEntity(linkerResponse: LinkerResponse, { signal, state, startUndeploy }: DeployContext) {
     const { authChain, chainId } = linkerResponse
     const throwIfCancelled = () => {
       if (signal.aborted) throw deploymentCancelledError()
@@ -283,7 +287,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
           worldName,
           linkerResponse.address,
           targetContent,
-          sceneJson.scene.parcels
+          sceneJson.scene.parcels,
+          signal
         )
         if (!permissionCheck.allowed) {
           const deniedMsg = permissionCheck.deniedParcels?.length
@@ -297,14 +302,17 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
         }
         options.components.logger.log(`[DEPLOY] Permissions verified.`)
       } catch (e: any) {
-        if (e instanceof CliError) throw e
+        if (e instanceof CliError || signal.aborted) throw e
         options.components.logger.warn(`Could not verify deployment permissions: ${e.message}`)
       }
     }
 
     // Uploading data
     throwIfCancelled()
-    const { client, url } = await getCatalyst(chainId, options.args['--target'], options.args['--target-content'])
+    const { client, url } = await withDeadline(
+      () => getCatalyst(chainId, options.args['--target'], options.args['--target-content']),
+      { signal }
+    )
     throwIfCancelled()
 
     if (needsDelete && worldName && !linkerResponse.deleteSignature) {
@@ -315,6 +323,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     }
 
     if (needsDelete && worldName && linkerResponse.deleteSignature) {
+      startUndeploy()
       options.components.logger.info(`[DEPLOY] deleting scenes for "${worldName}"`)
 
       try {
@@ -377,6 +386,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
         options.components.logger.error('Could not upload content:')
         options.components.logger.error(e.message)
         options.components.analytics.track('Scene deploy failure', { ...trackProps, error: e.message ?? '' })
+        if (e instanceof CliError) throw e
         throw new CliError(
           'DEPLOY_UPLOAD_FAILED',
           i18next.t('errors.deploy.failed_to_upload', { error: e.message }),

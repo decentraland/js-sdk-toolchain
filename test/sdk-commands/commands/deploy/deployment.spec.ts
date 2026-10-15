@@ -5,7 +5,7 @@ import {
   IDeploymentComponent,
   settleCancelledUpload
 } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/deployment'
-import { DeploymentResult } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/state'
+import { DeploymentResult, DeploymentState } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/state'
 import { LinkerResponse } from '../../../../packages/@dcl/sdk-commands/src/linker-dapp/routes'
 import { CliError } from '../../../../packages/@dcl/sdk-commands/src/logic/error'
 
@@ -24,19 +24,26 @@ describe('when running a deployment', () => {
   })
 
   describe('and it has to undeploy the world scenes first', () => {
-    let phaseWhileDeploying: string
+    let stateWhilePreparing: DeploymentState
+    let phaseWhileUndeploying: string
 
     beforeEach(async () => {
-      deploy.mockImplementationOnce(async (_response, { state }) => {
-        phaseWhileDeploying = state.get().phase
+      deploy.mockImplementationOnce(async (_response, { state, startUndeploy }) => {
+        stateWhilePreparing = state.get()
+        startUndeploy()
+        phaseWhileUndeploying = state.get().phase
         return { entityId: 'bafkreientity' }
       })
-      deployment = createDeployment({ needsUndeploy: true, deploy })
+      deployment = createDeployment({ deploy })
       await deployment.run(linkerResponse)
     })
 
-    it('should be undeploying while it runs', () => {
-      expect(phaseWhileDeploying).toBe('undeploying')
+    it('should be uploading without upload progress while preparing the undeploy', () => {
+      expect(stateWhilePreparing).toEqual(expect.objectContaining({ phase: 'uploading', upload: null }))
+    })
+
+    it('should be undeploying once the undeploy starts', () => {
+      expect(phaseWhileUndeploying).toBe('undeploying')
     })
   })
 
@@ -49,7 +56,7 @@ describe('when running a deployment', () => {
         phaseWhileDeploying = state.get().phase
         return { entityId: 'bafkreientity', message: 'Live' }
       })
-      deployment = createDeployment({ needsUndeploy: false, deploy })
+      deployment = createDeployment({ deploy })
       result = await deployment.run(linkerResponse)
     })
 
@@ -77,7 +84,7 @@ describe('when running a deployment', () => {
 
     beforeEach(async () => {
       deploy.mockRejectedValueOnce(new CliError('DEPLOY_NO_PERMISSION', 'No permission'))
-      deployment = createDeployment({ needsUndeploy: false, deploy })
+      deployment = createDeployment({ deploy })
       error = await deployment.run(linkerResponse).catch((e) => e)
     })
 
@@ -95,7 +102,7 @@ describe('when running a deployment', () => {
   describe('and it fails with an error that is not a CLI error', () => {
     beforeEach(async () => {
       deploy.mockRejectedValueOnce(new Error('boom'))
-      deployment = createDeployment({ needsUndeploy: false, deploy })
+      deployment = createDeployment({ deploy })
       await deployment.run(linkerResponse).catch(() => undefined)
     })
 
@@ -108,7 +115,7 @@ describe('when running a deployment', () => {
     let outcome: CancelOutcome
 
     beforeEach(() => {
-      deployment = createDeployment({ needsUndeploy: false, deploy })
+      deployment = createDeployment({ deploy })
       outcome = deployment.cancel()
     })
 
@@ -131,7 +138,7 @@ describe('when running a deployment', () => {
     let signal: AbortSignal
 
     beforeEach(() => {
-      deployment = createDeployment({ needsUndeploy: false, deploy })
+      deployment = createDeployment({ deploy })
     })
 
     describe('and the upload gets aborted', () => {
@@ -225,6 +232,46 @@ describe('when running a deployment', () => {
     })
   })
 
+  describe('and it is cancelled while preparing to undeploy the world scenes', () => {
+    let outcome: CancelOutcome
+    let error: unknown
+    let phases: string[]
+
+    beforeEach(async () => {
+      phases = []
+      let preparing: () => void = () => undefined
+      deploy.mockImplementationOnce(async (_response, context) => {
+        await new Promise<void>((resolve) => {
+          preparing = resolve
+        })
+        context.startUndeploy()
+        return { entityId: 'bafkreientity' }
+      })
+      deployment = createDeployment({ deploy })
+      deployment.state.subscribe((state) => phases.push(state.phase))
+      const running = deployment.run(linkerResponse)
+      outcome = deployment.cancel()
+      preparing()
+      error = await running.catch((e) => e)
+    })
+
+    it('should accept the cancellation', () => {
+      expect(outcome).toBe('cancelling')
+    })
+
+    it('should reject with a DEPLOY_CANCELLED error', () => {
+      expect(error).toEqual(expect.objectContaining({ constructor: CliError, name: 'DEPLOY_CANCELLED' }))
+    })
+
+    it('should end as cancelled without an error', () => {
+      expect(deployment.state.get()).toEqual(expect.objectContaining({ phase: 'cancelled', error: null }))
+    })
+
+    it('should never start undeploying', () => {
+      expect(phases).not.toContain('undeploying')
+    })
+  })
+
   describe('and it is cancelled while undeploying the world scenes', () => {
     let outcome: CancelOutcome
     let signal: AbortSignal
@@ -236,9 +283,10 @@ describe('when running a deployment', () => {
           new Promise((resolve) => {
             signal = context.signal
             finish = resolve
+            context.startUndeploy()
           })
       )
-      deployment = createDeployment({ needsUndeploy: true, deploy })
+      deployment = createDeployment({ deploy })
       void deployment.run(linkerResponse)
       outcome = deployment.cancel()
     })
@@ -268,11 +316,12 @@ describe('when running a deployment', () => {
       deploy.mockImplementationOnce(
         (_response, context) =>
           new Promise((_resolve, reject) => {
+            context.startUndeploy()
             context.state.setPhase('uploading')
             context.signal.addEventListener('abort', () => reject(new Error('This operation was aborted')))
           })
       )
-      deployment = createDeployment({ needsUndeploy: true, deploy })
+      deployment = createDeployment({ deploy })
       const running = deployment.run(linkerResponse)
       outcome = deployment.cancel()
       error = await running.catch((e) => e)
@@ -299,12 +348,44 @@ describe('when running a deployment', () => {
     })
   })
 
+  describe('and it cannot be told whether the entity got published after undeploying the world scenes', () => {
+    let error: unknown
+
+    beforeEach(async () => {
+      deploy.mockImplementationOnce(
+        (_response, context) =>
+          new Promise((_resolve, reject) => {
+            context.startUndeploy()
+            context.state.setPhase('uploading')
+            context.signal.addEventListener('abort', () =>
+              reject(new CliError('DEPLOY_CANCEL_OUTCOME_UNCERTAIN', 'Could not confirm'))
+            )
+          })
+      )
+      deployment = createDeployment({ deploy })
+      const running = deployment.run(linkerResponse)
+      deployment.cancel()
+      error = await running.catch((e) => e)
+    })
+
+    it('should reject with the uncertain outcome error', () => {
+      expect(error).toEqual(expect.objectContaining({ name: 'DEPLOY_CANCEL_OUTCOME_UNCERTAIN' }))
+    })
+
+    it('should end as cancelled carrying the uncertain outcome', () => {
+      expect(deployment.state.get().error).toEqual({
+        code: 'DEPLOY_CANCEL_OUTCOME_UNCERTAIN',
+        message: 'Could not confirm'
+      })
+    })
+  })
+
   describe('and it is cancelled after it ended', () => {
     let outcome: CancelOutcome
 
     beforeEach(async () => {
       deploy.mockResolvedValueOnce({ entityId: 'bafkreientity' })
-      deployment = createDeployment({ needsUndeploy: false, deploy })
+      deployment = createDeployment({ deploy })
       await deployment.run(linkerResponse)
       outcome = deployment.cancel()
     })

@@ -40,7 +40,7 @@ describe('when running the linker dapp for a deployment', () => {
     await stop()
   })
 
-  it('should print the linker URL carrying the deploy token', () => {
-    expect(logger.info).toHaveBeenCalledWith(`App ready at http://localhost:${port}/?token=a1b2c3`)
+  it('should print the linker URL carrying the deploy token in its fragment', () => {
+    expect(logger.info).toHaveBeenCalledWith(`App ready at http://localhost:${port}/#token=a1b2c3`)
   })
 })

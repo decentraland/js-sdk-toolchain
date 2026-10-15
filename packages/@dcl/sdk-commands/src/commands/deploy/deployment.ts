@@ -3,13 +3,22 @@ import { LinkerResponse } from '../../linker-dapp/routes'
 import { CliError, CliErrorName } from '../../logic/error'
 import { createDeploymentState, DeploymentResult, IDeploymentStateComponent } from './state'
 
-export type DeployContext = { signal: AbortSignal; state: IDeploymentStateComponent }
+export type DeployContext = {
+  signal: AbortSignal
+  state: IDeploymentStateComponent
+  /**
+   * Moves to `undeploying` right before the undeploy request is sent, so a cancel is refused from then on.
+   * Throws a `DEPLOY_CANCELLED` error when the deployment was already cancelled.
+   */
+  startUndeploy(): void
+}
 
 export type DeployFunction = (linkerResponse: LinkerResponse, context: DeployContext) => Promise<DeploymentResult>
 
 export type CancelOutcome = 'cancelled' | 'cancelling' | 'refused' | 'final'
 
-// Backoff between checks of whether a cancelled upload got published anyway (~30 s in total).
+// Backoff between checks of whether a cancelled upload got published anyway: 30 s of delays, plus up to
+// 5 s per check (6 checks), so the outcome of a cancel settles in about 60 s at worst.
 export const PUBLICATION_CHECK_DELAYS_MS: readonly number[] = [1000, 2000, 4000, 8000, 15000]
 
 export interface IDeploymentComponent {
@@ -22,9 +31,9 @@ export interface IDeploymentComponent {
    */
   run(linkerResponse: LinkerResponse): Promise<DeploymentResult>
   /**
-   * Cancels the deployment: before the signature it ends as `cancelled` right away, during the upload it
-   * aborts the requests in flight and `run` settles the outcome. It is refused while undeploying, since the
-   * world's scenes may already be gone once the undeploy request is sent.
+   * Cancels the deployment: before the signature it ends as `cancelled` right away, while preparing or
+   * uploading it aborts the requests in flight and `run` settles the outcome. It is refused while undeploying,
+   * since the world's scenes may already be gone once the undeploy request is sent.
    */
   cancel(): CancelOutcome
 }
@@ -55,30 +64,36 @@ const CANCEL_ERRORS = new Set([
 ])
 
 export function createDeployment(options: {
-  needsUndeploy: boolean
   deploy: DeployFunction
   state?: IDeploymentStateComponent
 }): IDeploymentComponent {
-  const { needsUndeploy, deploy } = options
+  const { deploy } = options
   const state = options.state ?? createDeploymentState()
   const abortController = new AbortController()
+  let undeployStarted = false
 
   function canStart() {
     return state.get().phase === 'awaiting-signature'
   }
 
   function cancelError(error: unknown): CliError<CliErrorName> {
-    // Cancelling is refused while undeploying, so a cancelled run that had to undeploy already did.
-    if (needsUndeploy) return cancelledAfterUndeployError()
+    if (error instanceof CliError && error.name === 'DEPLOY_CANCEL_OUTCOME_UNCERTAIN') return error
+    if (undeployStarted) return cancelledAfterUndeployError()
     if (error instanceof CliError && CANCEL_ERRORS.has(error.name)) return error
     return deploymentCancelledError()
   }
 
   async function run(linkerResponse: LinkerResponse): Promise<DeploymentResult> {
     if (!canStart()) throw new Error('The deployment already started')
-    state.setPhase(needsUndeploy ? 'undeploying' : 'uploading')
+    // `uploading` without upload progress while preparing; `undeploying` only once the undeploy is sent.
+    state.setPhase('uploading')
+    const startUndeploy = () => {
+      if (abortController.signal.aborted) throw deploymentCancelledError()
+      undeployStarted = true
+      state.setPhase('undeploying')
+    }
     try {
-      const result = await deploy(linkerResponse, { signal: abortController.signal, state })
+      const result = await deploy(linkerResponse, { signal: abortController.signal, state, startUndeploy })
       state.deployed(result)
       return result
     } catch (error: any) {

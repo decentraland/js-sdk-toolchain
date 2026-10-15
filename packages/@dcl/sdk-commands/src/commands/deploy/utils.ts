@@ -18,7 +18,8 @@ import { IFuture } from '../../logic/future'
 import { getEstateRegistry, getLandRegistry } from '../../logic/config'
 import { getObject } from '../../logic/coordinates'
 import { getPointers } from '../../logic/catalyst-requests'
-import { drainResponse } from '../../logic/fetch'
+import { drainResponse, withDeadline } from '../../logic/fetch'
+import { CliError } from '../../logic/error'
 import { Router } from '@well-known-components/http-server'
 import { dAppOptions, runDapp } from '../../run-dapp'
 import { IDeploymentComponent } from './deployment'
@@ -29,16 +30,14 @@ import { setDeployResourceRoutes } from './routes'
  * @well-known-components/fetch-component, which uses cross-fetch -> node-fetch v2
  * and trips a gzip "Premature close" under keep-alive socket reuse on recent Node
  * runtimes (nodejs/node#63989). Honors the `timeout`, `signal` and `abortController`
- * options via an AbortController; all other init fields (including `duplex` for
- * streamed uploads) pass straight through to undici.fetch.
+ * options via an AbortController (until the headers arrive); `rejectHttpErrors` rejects
+ * non-2xx responses with an {@link HttpStatusError}. All other init fields (including
+ * `duplex` for streamed uploads) pass straight through to undici.fetch.
  */
 export function createFetchComponent() {
   return {
-    async fetch(
-      url: string,
-      init: RequestInit & { timeout?: number; abortController?: AbortController } = {}
-    ): Promise<Response> {
-      const { timeout, signal, abortController, ...rest } = init
+    async fetch(url: string, init: CatalystFetchInit = {}): Promise<Response> {
+      const { timeout, signal, abortController, rejectHttpErrors, ...rest } = init
       const externalSignals = [signal, abortController?.signal].filter((s): s is AbortSignal => !!s)
       const controller = new AbortController()
       const onExternalAbort = () => controller.abort()
@@ -48,12 +47,29 @@ export function createFetchComponent() {
       }
       const timer = timeout ? setTimeout(() => controller.abort(), timeout) : undefined
       try {
-        return await fetch(url, { ...rest, signal: controller.signal })
+        const response = await fetch(url, { ...rest, signal: controller.signal })
+        if (rejectHttpErrors && !response.ok) {
+          await drainResponse(response)
+          throw new HttpStatusError(response.status)
+        }
+        return response
       } finally {
         if (timer) clearTimeout(timer)
         for (const external of externalSignals) external.removeEventListener('abort', onExternalAbort)
       }
     }
+  }
+}
+
+export type CatalystFetchInit = RequestInit & {
+  timeout?: number
+  abortController?: AbortController
+  rejectHttpErrors?: boolean
+}
+
+export class HttpStatusError extends Error {
+  constructor(readonly status: number) {
+    super(`HTTP ${status}`)
   }
 }
 
@@ -306,14 +322,26 @@ function setDeployRoutes(
   return router
 }
 
+export const MIN_DEPLOY_TOKEN_LENGTH = 16
+
 /** The `--deploy-token` given to the CLI, or a random one for this run. */
 export function resolveDeployToken(deployTokenArg?: string): string {
-  return deployTokenArg || randomBytes(16).toString('hex')
+  if (deployTokenArg === undefined) return randomBytes(16).toString('hex')
+  if (deployTokenArg.length < MIN_DEPLOY_TOKEN_LENGTH) {
+    throw new CliError(
+      'DEPLOY_INVALID_ARGUMENTS',
+      `--deploy-token must be at least ${MIN_DEPLOY_TOKEN_LENGTH} characters long.`
+    )
+  }
+  return deployTokenArg
 }
 
-/** The linker dapp reads the token that authorizes cancelling the deployment from its URL. */
+/**
+ * The linker dapp reads the token that authorizes cancelling the deployment from its URL fragment, which is
+ * never sent in HTTP requests.
+ */
 export function deployLinkerUri(deployToken: string): string {
-  return `/?token=${encodeURIComponent(deployToken)}`
+  return `/#token=${encodeURIComponent(deployToken)}`
 }
 
 export function sceneHasWorldCfg(scene: Scene) {
@@ -419,21 +447,27 @@ export async function isEntityPublished(
   options: { world?: { name: string; targetContent: string }; timeoutMs: number }
 ): Promise<boolean> {
   const { world, timeoutMs } = options
-  if (world) {
-    const encodedName = encodeURIComponent(world.name)
-    const response = await fetch(
-      `${world.targetContent}/world/${encodedName}/scenes?entity_id=${encodeURIComponent(entityId)}`,
-      { signal: AbortSignal.timeout(timeoutMs) }
-    )
-    if (!response.ok) {
-      await drainResponse(response)
-      throw new Error(`Failed to fetch world scenes: ${response.status} ${response.statusText}`)
-    }
-    const data = (await response.json()) as Partial<WorldScenesResponse>
-    return (data.scenes ?? []).some((scene) => scene.entityId === entityId)
-  }
-  const entities = await client.fetchEntitiesByIds([entityId], { timeout: timeoutMs })
-  return entities.some((entity) => entity.id === entityId)
+  // Bounds the whole check, body included: the catalyst client's fetcher stops its timer at the headers.
+  return withDeadline(
+    async (signal) => {
+      if (world) {
+        const encodedName = encodeURIComponent(world.name)
+        const response = await fetch(
+          `${world.targetContent}/world/${encodedName}/scenes?entity_id=${encodeURIComponent(entityId)}`,
+          { signal }
+        )
+        if (!response.ok) {
+          await drainResponse(response)
+          throw new Error(`Failed to fetch world scenes: ${response.status} ${response.statusText}`)
+        }
+        const data = (await response.json()) as Partial<WorldScenesResponse>
+        return (data.scenes ?? []).some((scene) => scene.entityId === entityId)
+      }
+      const entities = await client.fetchEntitiesByIds([entityId], { signal })
+      return entities.some((entity) => entity.id === entityId)
+    },
+    { timeoutMs }
+  )
 }
 
 export function promptUser(question: string): Promise<boolean> {
@@ -459,11 +493,12 @@ interface WorldPermissionsResponse {
 
 export async function fetchWorldPermissions(
   worldName: string,
-  targetContent: string
+  targetContent: string,
+  signal?: AbortSignal
 ): Promise<WorldPermissionsResponse> {
   const encodedName = encodeURIComponent(worldName)
   const url = `${targetContent}/world/${encodedName}/permissions`
-  const response = await fetch(url)
+  const response = await fetch(url, { signal })
   if (!response.ok) {
     await drainResponse(response)
     throw new Error(`Failed to fetch world permissions: ${response.status} ${response.statusText}`)
@@ -474,11 +509,12 @@ export async function fetchWorldPermissions(
 export async function fetchParcelPermissions(
   worldName: string,
   address: string,
-  targetContent: string
+  targetContent: string,
+  signal?: AbortSignal
 ): Promise<string[]> {
   const encodedName = encodeURIComponent(worldName)
   const url = `${targetContent}/world/${encodedName}/permissions/deployment/address/${address.toLowerCase()}/parcels`
-  const response = await fetch(url)
+  const response = await fetch(url, { signal })
   if (!response.ok) {
     await drainResponse(response)
     throw new Error(`Failed to fetch parcel permissions: ${response.status} ${response.statusText}`)
@@ -492,9 +528,10 @@ export async function checkWorldDeploymentPermission(
   worldName: string,
   address: string,
   targetContent: string,
-  deployingParcels: string[]
+  deployingParcels: string[],
+  signal?: AbortSignal
 ): Promise<{ allowed: boolean; deniedParcels?: string[] }> {
-  const permissions = await fetchWorldPermissions(worldName, targetContent)
+  const permissions = await fetchWorldPermissions(worldName, targetContent, signal)
   const lowerAddress = address.toLowerCase()
 
   // Check if wallet is the world owner
@@ -520,7 +557,7 @@ export async function checkWorldDeploymentPermission(
   }
 
   // Check per-parcel permissions
-  const allowedParcels = await fetchParcelPermissions(worldName, address, targetContent)
+  const allowedParcels = await fetchParcelPermissions(worldName, address, targetContent, signal)
   const allowedSet = new Set(allowedParcels)
   const deniedParcels = deployingParcels.filter((p) => !allowedSet.has(p))
 

@@ -11,6 +11,7 @@ import {
   UploadResult,
   uploadDeployment
 } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/upload'
+import { HttpStatusError } from '../../../../packages/@dcl/sdk-commands/src/commands/deploy/utils'
 import { CliError } from '../../../../packages/@dcl/sdk-commands/src/logic/error'
 
 type DeploymentData = Parameters<ContentClient['deploy']>[0]
@@ -195,7 +196,7 @@ describe('when uploading a deployment', () => {
           it('should check the availability of the content files only', () => {
             expect(isContentAvailable).toHaveBeenCalledWith(
               ['bafkreicontent0', 'bafkreicontent1', 'bafkreicontent2', 'bafkreicontent3'],
-              expect.objectContaining({ timeout: 600000 })
+              { signal: expect.any(AbortSignal), rejectHttpErrors: true }
             )
           })
 
@@ -234,6 +235,72 @@ describe('when uploading a deployment', () => {
 
           it('should resolve with the message of the single request', () => {
             expect(result).toEqual({ message: 'Deployed' })
+          })
+        })
+
+        describe('and the server fails to tell which content it already has', () => {
+          let error: unknown
+
+          beforeEach(async () => {
+            isContentAvailable.mockRejectedValueOnce(new HttpStatusError(503))
+            error = await uploadDeployment({ logger }, client, deployData).catch((e) => e)
+          })
+
+          it('should reject with an error carrying the HTTP status', () => {
+            expect(error).toEqual(
+              expect.objectContaining({
+                constructor: CliError,
+                name: 'DEPLOY_CONTENT_CHECK_FAILED',
+                message: "Couldn't check which content the server already has (HTTP 503)"
+              })
+            )
+          })
+
+          it('should not upload the deployment in a single request', () => {
+            expect(deploy).not.toHaveBeenCalled()
+          })
+        })
+
+        describe('and it is cancelled while checking which content the server already has', () => {
+          let error: unknown
+
+          beforeEach(async () => {
+            const controller = new AbortController()
+            isContentAvailable.mockImplementationOnce(
+              (_hashes, options) =>
+                new Promise((_resolve, reject) => {
+                  options.signal.addEventListener('abort', () => reject(new Error('This operation was aborted')))
+                })
+            )
+            const uploading = uploadDeployment({ logger }, client, deployData, { signal: controller.signal }).catch(
+              (e) => e
+            )
+            await new Promise((resolve) => setImmediate(resolve))
+            controller.abort()
+            error = await uploading
+          })
+
+          it('should reject with the cancellation instead of a content check error', () => {
+            expect(error).toEqual(expect.objectContaining({ name: 'AbortError' }))
+          })
+        })
+
+        describe('and the server answers which content it has with a malformed response', () => {
+          let error: unknown
+
+          beforeEach(async () => {
+            isContentAvailable.mockResolvedValueOnce({ error: 'Internal error' })
+            error = await uploadDeployment({ logger }, client, deployData).catch((e) => e)
+          })
+
+          it('should reject with an error explaining the response was unexpected', () => {
+            expect(error).toEqual(
+              expect.objectContaining({
+                constructor: CliError,
+                name: 'DEPLOY_CONTENT_CHECK_FAILED',
+                message: "Couldn't check which content the server already has (unexpected response)"
+              })
+            )
           })
         })
 
