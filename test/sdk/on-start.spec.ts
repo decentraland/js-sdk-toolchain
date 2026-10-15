@@ -109,6 +109,54 @@ describe('SDK onStart default on-screen buttons', () => {
     })
   })
 
+  describe('when the scene only set non-button fields while its module was evaluated', () => {
+    it('should apply the default and keep the joystick setting after hideJoystick()', async () => {
+      ecs.TouchScreenControls.hideJoystick()
+
+      await sdk.onStart()
+
+      expect(hiddenActions().length).toBe(5)
+      expect(ecs.TouchScreenControls.getOrNull(ecs.engine.RootEntity)?.hideJoystick).toBe(true)
+    })
+
+    it('should apply the default and keep the main action after setMainAction()', async () => {
+      ecs.TouchScreenControls.setMainAction(ecs.InputAction.IA_ACTION_3)
+
+      await sdk.onStart()
+
+      expect(hiddenActions().length).toBe(5)
+      expect(ecs.TouchScreenControls.getOrNull(ecs.engine.RootEntity)?.mainAction).toBe(ecs.InputAction.IA_ACTION_3)
+    })
+  })
+
+  describe('when the scene called showAll() while its module was evaluated', () => {
+    it('should keep every button visible', async () => {
+      ecs.TouchScreenControls.showAll()
+
+      await sdk.onStart()
+
+      expect(hiddenActions()).toEqual([])
+    })
+  })
+
+  describe('when main.composite only sets non-button fields', () => {
+    it('should apply the default and keep the composite fields', async () => {
+      mainComposite = {}
+      jest.spyOn(ecs.Composite, 'instance').mockImplementation(() => {
+        ecs.TouchScreenControls.createOrReplace(ecs.engine.RootEntity, {
+          touchInputs: [],
+          hideJoystick: true,
+          hideCrosshair: false
+        })
+      })
+
+      await sdk.onStart()
+
+      expect(hiddenActions().length).toBe(5)
+      expect(ecs.TouchScreenControls.getOrNull(ecs.engine.RootEntity)?.hideJoystick).toBe(true)
+    })
+  })
+
   describe('when main.composite sets TouchScreenControls', () => {
     it('should keep the composite value', async () => {
       mainComposite = {}

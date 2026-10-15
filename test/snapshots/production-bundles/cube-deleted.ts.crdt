@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=272.4k bytes
+SCENE_COMPILED_JS_SIZE_PROD=272.6k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,12 +8,12 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 79k
-  MALLOC_COUNT = 15317
-  ALIVE_OBJS_DELTA ~= 3.40k
+  MALLOC_COUNT = 15334
+  ALIVE_OBJS_DELTA ~= 3.41k
 CALL onStart()
-  OPCODES ~= 1k
-  MALLOC_COUNT = 39
-  ALIVE_OBJS_DELTA ~= 0.02k
+  OPCODES ~= 0k
+  MALLOC_COUNT = 37
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
@@ -42,4 +42,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 7k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1127.44k bytes
+  MEMORY_USAGE_COUNT ~= 1128.57k bytes

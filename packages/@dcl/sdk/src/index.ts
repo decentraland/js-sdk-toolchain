@@ -47,10 +47,11 @@ export async function onStart() {
     }
   }
 
-  // Scenes start with the default on-screen button set. This must stay after the composite is
-  // instanced and before the first update: a value authored in main.composite is already set
-  // here, and one preloaded through the transport replaces this still-unsent write.
-  if (TouchScreenControls.getOrNull(engine.RootEntity) === null) {
-    TouchScreenControls.showDefault()
-  }
+  // Scenes start with the default on-screen button set unless they already chose their buttons
+  // (a visibility helper ran, or the value lists a button); hideJoystick() or setMainAction()
+  // alone do not count. This must stay after the composite is instanced and before the first
+  // update: a value authored in main.composite is already set here, and one preloaded through the
+  // transport replaces this still-unsent write.
+  // applyDefaultIfUnset is @internal, so it is stripped from the @dcl/ecs typings.
+  ;(TouchScreenControls as typeof TouchScreenControls & { applyDefaultIfUnset(): void }).applyDefaultIfUnset()
 }

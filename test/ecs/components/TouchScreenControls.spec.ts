@@ -98,6 +98,84 @@ describe('TouchScreenControls convenience helpers', () => {
     expect(value?.hideCrosshair).toBe(true)
   })
 
+  describe('applyDefaultIfUnset()', () => {
+    const defaultHidden = [
+      InputAction.IA_SECONDARY,
+      InputAction.IA_ACTION_3,
+      InputAction.IA_ACTION_4,
+      InputAction.IA_ACTION_5,
+      InputAction.IA_ACTION_6
+    ]
+
+    function setup() {
+      const engine = Engine()
+      const TouchScreenControls = components.TouchScreenControls(engine)
+      const hidden = () =>
+        (TouchScreenControls.getOrNull(ROOT_ENTITY)?.touchInputs ?? []).filter((t) => t.hide).map((t) => t.inputAction)
+      return { engine, TouchScreenControls, hidden }
+    }
+
+    it('should apply the default set when the component is absent', () => {
+      const { TouchScreenControls, hidden } = setup()
+
+      TouchScreenControls.applyDefaultIfUnset()
+
+      expect(hidden()).toEqual(defaultHidden)
+    })
+
+    it('should apply the default set and keep the other fields when no button was chosen', () => {
+      const { TouchScreenControls, hidden } = setup()
+      TouchScreenControls.hideJoystick()
+      TouchScreenControls.setMainAction(InputAction.IA_PRIMARY)
+
+      TouchScreenControls.applyDefaultIfUnset()
+
+      expect(hidden()).toEqual(defaultHidden)
+      expect(TouchScreenControls.getOrNull(ROOT_ENTITY)?.hideJoystick).toBe(true)
+      expect(TouchScreenControls.getOrNull(ROOT_ENTITY)?.mainAction).toBe(InputAction.IA_PRIMARY)
+    })
+
+    it('should keep the value after showAll(), even though it lists no button', () => {
+      const { TouchScreenControls, hidden } = setup()
+      TouchScreenControls.showAll()
+
+      TouchScreenControls.applyDefaultIfUnset()
+
+      expect(hidden()).toEqual([])
+    })
+
+    it('should keep the value after hide()', () => {
+      const { TouchScreenControls, hidden } = setup()
+      TouchScreenControls.hide([InputAction.IA_JUMP])
+
+      TouchScreenControls.applyDefaultIfUnset()
+
+      expect(hidden()).toEqual([InputAction.IA_JUMP])
+    })
+
+    it('should keep a value that lists a button', () => {
+      const { TouchScreenControls, hidden } = setup()
+      TouchScreenControls.createOrReplace(ROOT_ENTITY, {
+        touchInputs: [{ inputAction: InputAction.IA_POINTER, hide: true }],
+        hideJoystick: false,
+        hideCrosshair: false
+      })
+
+      TouchScreenControls.applyDefaultIfUnset()
+
+      expect(hidden()).toEqual([InputAction.IA_POINTER])
+    })
+
+    it('should see a helper call made through another wrapper of the same engine', () => {
+      const { engine, TouchScreenControls, hidden } = setup()
+      components.TouchScreenControls(engine).showAll()
+
+      TouchScreenControls.applyDefaultIfUnset()
+
+      expect(hidden()).toEqual([])
+    })
+  })
+
   it('hide() merges the given actions into the current config', () => {
     const engine = Engine()
     const TouchScreenControls = components.TouchScreenControls(engine)
