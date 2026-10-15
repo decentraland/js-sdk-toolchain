@@ -10,6 +10,7 @@ describe('Generated UiText ProtoBuf', () => {
       value: 'casla-boedo',
       color: { r: 0, g: 0, b: 0, a: 0 },
       font: undefined,
+      fontSrc: undefined,
       fontSize: undefined,
       textAlign: undefined,
       textWrap: undefined
@@ -19,6 +20,7 @@ describe('Generated UiText ProtoBuf', () => {
       value: 'casla',
       color: { r: 0, g: 0, b: 1, a: 0 },
       font: undefined,
+      fontSrc: undefined,
       fontSize: undefined,
       textAlign: undefined,
       textWrap: undefined
