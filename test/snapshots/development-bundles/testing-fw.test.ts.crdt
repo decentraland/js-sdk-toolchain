@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=633.9k bytes
+SCENE_COMPILED_JS_SIZE_PROD=637.3k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -10,19 +10,20 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 85k
-  MALLOC_COUNT = 17693
-  ALIVE_OBJS_DELTA ~= 3.52k
+  MALLOC_COUNT = 17934
+  ALIVE_OBJS_DELTA ~= 3.57k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   OPCODES ~= 3k
-  MALLOC_COUNT = 58
-  ALIVE_OBJS_DELTA ~= 0.02k
+  MALLOC_COUNT = 79
+  ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"two way communication"}]}
+  Scene: PUT_COMPONENT e=0x0 c=1218 t=1 data={"touchInputs":[{"inputAction":2,"hide":true},{"inputAction":10,"hide":true},{"inputAction":11,"hide":true},{"inputAction":12,"hide":true},{"inputAction":13,"hide":true}],"hideJoystick":false,"hideCrosshair":false}
   LOG: ["Adding one to position.y=0"]
-  OPCODES ~= 6k
-  MALLOC_COUNT = 12
+  OPCODES ~= 11k
+  MALLOC_COUNT = 32
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test two way communication"]
@@ -34,7 +35,7 @@ CALL onUpdate(0.1)
   LOG: ["Adding one to position.y=1"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=3 data={"position":{"x":2,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   OPCODES ~= 12k
-  MALLOC_COUNT = 80
+  MALLOC_COUNT = 78
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   LOG: ["⏱️ yield"]
@@ -42,14 +43,14 @@ CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x0 c=1 t=4 data=null
   Scene: DELETE_ENTITY e=0x200
   OPCODES ~= 10k
-  MALLOC_COUNT = -78
+  MALLOC_COUNT = -80
   ALIVE_OBJS_DELTA ~= -0.03k
 CALL onUpdate(0.1)
   LOG: ["⏱️ yield"]
   Scene: PUT_COMPONENT e=0x0 c=1 t=5 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=6 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
-  OPCODES ~= 8k
+  OPCODES ~= 9k
   MALLOC_COUNT = 48
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
@@ -61,4 +62,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 6k
   MALLOC_COUNT = -53
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1584.16k bytes
+  MEMORY_USAGE_COUNT ~= 1607.41k bytes
