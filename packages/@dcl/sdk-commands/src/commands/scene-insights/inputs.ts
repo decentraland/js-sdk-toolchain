@@ -143,8 +143,23 @@ export function parseInteger(value: number, flag: string, min: number, max: numb
   return value
 }
 
-/** Expands a metric name, so `cpu.run_ms` can be typed for `dcl.scene.cpu.run_ms`. */
+/** The metric names the insights service serves: `dcl.scene.<group>.<field>`. */
+const METRIC_NAME_PATTERN = /^dcl\.scene\.[a-z0-9_]+\.[a-z0-9_]+$/
+
+/**
+ * Expands a metric name, so `cpu.run_ms` can be typed for `dcl.scene.cpu.run_ms`.
+ *
+ * @throws {CliError} SCENE_INSIGHTS_INVALID_ARGUMENT when the result is not `dcl.scene.<group>.<field>`
+ */
 export function normalizeMetricName(raw: string): string {
-  const name = raw.trim()
-  return name.startsWith('dcl.scene.') ? name : `dcl.scene.${name}`
+  const trimmed = raw.trim()
+  const name = trimmed.startsWith('dcl.scene.') ? trimmed : `dcl.scene.${trimmed}`
+  // checked here because the name becomes a path segment: `..` or `/` would change the path
+  if (!METRIC_NAME_PATTERN.test(name)) {
+    throw new CliError(
+      'SCENE_INSIGHTS_INVALID_ARGUMENT',
+      `Invalid metric "${raw}": expected <group>.<field> (lowercase letters, digits and _), e.g. cpu.run_ms`
+    )
+  }
+  return name
 }

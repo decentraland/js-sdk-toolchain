@@ -170,7 +170,7 @@ describe('when running the metrics subcommand', () => {
   describe('and no metric is named', () => {
     beforeEach(async () => {
       client = {
-        listMetricNames: jest.fn().mockResolvedValueOnce({
+        listMetrics: jest.fn().mockResolvedValueOnce({
           sceneKey: 'k',
           from: 'a',
           to: 'b',
@@ -211,9 +211,7 @@ describe('when running the metrics subcommand', () => {
     })
 
     it('should request the metric with the step', () => {
-      expect(getMetricSeries).toHaveBeenCalledWith(
-        expect.objectContaining({ metric: 'dcl.scene.logs.lines', step: 10 })
-      )
+      expect(getMetricSeries).toHaveBeenCalledWith('dcl.scene.logs.lines', expect.objectContaining({ step: 10 }))
     })
 
     it('should print a sparkline with a gap and one row per bucket', () => {

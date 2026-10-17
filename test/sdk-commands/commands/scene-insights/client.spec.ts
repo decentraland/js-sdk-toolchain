@@ -155,6 +155,32 @@ describe('when using the insights client', () => {
     })
   })
 
+  describe('and it lists the metrics', () => {
+    beforeEach(async () => {
+      fetchMock.mockResolvedValueOnce(Response.json({ sceneKey: 'k', from: 'a', to: 'b', metrics: [] }))
+      await client.listMetrics({ from: '1d' })
+    })
+
+    it('should request the metrics collection', () => {
+      expect(fetchMock.mock.calls[0][0]).toBe(`${BASE_URL}/v1/metrics?from=1d`)
+    })
+  })
+
+  describe("and it requests a metric's series", () => {
+    beforeEach(async () => {
+      fetchMock.mockResolvedValueOnce(Response.json({ sceneKey: 'k', metric: 'dcl.scene.cpu.run_ms', points: [] }))
+      await client.getMetricSeries('dcl.scene.cpu.run_ms', { step: 60, execution: undefined })
+    })
+
+    it('should put the metric in the path and the rest in the query', () => {
+      expect(fetchMock.mock.calls[0][0]).toBe(`${BASE_URL}/v1/metrics/dcl.scene.cpu.run_ms/series?step=60`)
+    })
+
+    it('should sign the path that names the metric', () => {
+      expect(signMock).toHaveBeenCalledWith('GET', '/v1/metrics/dcl.scene.cpu.run_ms/series', METADATA)
+    })
+  })
+
   describe('and the service is busy once', () => {
     let result: unknown
 
@@ -180,7 +206,7 @@ describe('when using the insights client', () => {
     })
 
     it('should throw a request error with the reason and what to check', async () => {
-      await expect(client.listMetricNames({})).rejects.toMatchObject({
+      await expect(client.listMetrics({})).rejects.toMatchObject({
         name: 'SCENE_INSIGHTS_FORBIDDEN',
         message: expect.stringMatching(
           /403: No access to this scene \(the signed-in address is not in the scene's logsPermissions/

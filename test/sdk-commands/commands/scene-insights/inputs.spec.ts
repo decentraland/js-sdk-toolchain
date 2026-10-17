@@ -254,6 +254,20 @@ describe('when normalizing a metric name', () => {
       expect(normalizeMetricName('dcl.scene.mem.heap_used')).toBe('dcl.scene.mem.heap_used')
     })
   })
+
+  describe('and it would change the request path', () => {
+    it('should throw an invalid argument error', () => {
+      expect(() => normalizeMetricName('../logs')).toThrow(
+        expect.objectContaining({ name: 'SCENE_INSIGHTS_INVALID_ARGUMENT' })
+      )
+    })
+  })
+
+  describe('and it has no field', () => {
+    it('should throw an error with the expected form', () => {
+      expect(() => normalizeMetricName('cpu')).toThrow('expected <group>.<field>')
+    })
+  })
 })
 
 describe('when parsing a duration', () => {

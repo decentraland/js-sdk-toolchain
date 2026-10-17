@@ -134,7 +134,7 @@ export async function runMetrics(
   output: Output
 ): Promise<MetricNamesResult | MetricSeries> {
   if (!params.metric) {
-    const names = await client.listMetricNames({ from: params.from, to: params.to })
+    const names = await client.listMetrics({ from: params.from, to: params.to })
     if (output.json) return names
     formatMetricNames(names).forEach((line) => output.write(line))
     if (names.metrics.length > 0) {
@@ -143,8 +143,7 @@ export async function runMetrics(
     return names
   }
 
-  const series = await client.getMetricSeries({
-    metric: params.metric,
+  const series = await client.getMetricSeries(params.metric, {
     from: params.from,
     to: params.to,
     step: params.step,

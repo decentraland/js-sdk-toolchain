@@ -18,8 +18,10 @@ const TAIL_SEEN_IDS = 10_000
 export interface InsightsClient {
   searchLogs(query: Query): Promise<LogSearchResult>
   listExecutions(query: Query): Promise<ExecutionsResult>
-  listMetricNames(query: Query): Promise<MetricNamesResult>
-  getMetricSeries(query: Query): Promise<MetricSeries>
+  /** The metrics with data for the scene (`GET /v1/metrics`). */
+  listMetrics(query: Query): Promise<MetricNamesResult>
+  /** One metric's series (`GET /v1/metrics/<metric>/series`); the metric name is part of the signed path. */
+  getMetricSeries(metric: string, query: Query): Promise<MetricSeries>
   /**
    * Follows the live tail until `signal` aborts or the service ends the stream with an error.
    * Reconnects on its own after a dropped connection or a server restart, resuming from the last
@@ -269,8 +271,8 @@ export function createInsightsClient(
   return {
     searchLogs: (query) => get<LogSearchResult>('/v1/logs', query),
     listExecutions: (query) => get<ExecutionsResult>('/v1/executions', query),
-    listMetricNames: (query) => get<MetricNamesResult>('/v1/metrics/names', query),
-    getMetricSeries: (query) => get<MetricSeries>('/v1/metrics', query),
+    listMetrics: (query) => get<MetricNamesResult>('/v1/metrics', query),
+    getMetricSeries: (metric, query) => get<MetricSeries>(`/v1/metrics/${encodeURIComponent(metric)}/series`, query),
     tail
   }
 }
