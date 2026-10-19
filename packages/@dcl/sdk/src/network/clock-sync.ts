@@ -349,5 +349,3 @@ export function createClockSync(
     forgetPlayer: (userId: string) => registry.forget(userId)
   }
 }
-
-export type ClockSync = ReturnType<typeof createClockSync>
