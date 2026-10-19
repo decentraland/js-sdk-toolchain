@@ -51,7 +51,14 @@ describe('ClockEstimator', () => {
   let estimator: ClockEstimator
 
   beforeEach(() => {
-    estimator = new ClockEstimator({ windowSize: 3, maxRttMs: 2000, maxSlewRate: 0.05, snapThresholdMs: 1000 })
+    estimator = new ClockEstimator({
+      windowSize: 3,
+      maxRttMs: 2000,
+      maxSlewRate: 0.05,
+      backwardSlewRate: 0.5,
+      snapThresholdMs: 1000,
+      warmupSamples: 1
+    })
   })
 
   describe('when a sample arrives', () => {
@@ -208,6 +215,89 @@ describe('ClockEstimator', () => {
       expect(offset).toBe(4000)
     })
   })
+  describe('when the first samples are still warming up', () => {
+    let offset: number | undefined
+
+    beforeEach(() => {
+      estimator = new ClockEstimator({ windowSize: 5, warmupSamples: 3, backwardSlewRate: 0.5 })
+      estimator.addSample(1000, 5100, 5100, 1400) // rtt 400, offset 3900: the return leg was queued
+      estimator.offsetAt(1400)
+      estimator.addSample(2000, 6050, 6050, 2100) // rtt 100, offset 4000
+    })
+
+    describe('and the better sample asks to move forward', () => {
+      beforeEach(() => {
+        offset = estimator.offsetAt(2100)
+      })
+
+      it('should apply it at once', () => {
+        expect(offset).toBe(4000)
+      })
+    })
+
+    describe('and the better sample asks to move backward', () => {
+      beforeEach(() => {
+        estimator = new ClockEstimator({ windowSize: 5, warmupSamples: 3, backwardSlewRate: 0.5 })
+        estimator.addSample(1000, 5300, 5300, 1400) // rtt 400, offset 4100
+        estimator.offsetAt(2100)
+        estimator.addSample(2000, 6050, 6050, 2100) // rtt 100, offset 4000
+        offset = estimator.offsetAt(2200)
+      })
+
+      it('should walk it in at the backward rate so the clock slows instead of reversing', () => {
+        expect(offset).toBe(4050)
+      })
+    })
+  })
+
+  describe('when a sample contradicts the whole window', () => {
+    let offset: number | undefined
+
+    beforeEach(() => {
+      estimator = new ClockEstimator({ windowSize: 5, warmupSamples: 1, backwardSlewRate: 0.5 })
+      estimator.addSample(1000, 5100, 5100, 1200) // rtt 200, offset 4000
+      estimator.addSample(2000, 6050, 6050, 2080) // rtt 80, offset 4010
+      estimator.offsetAt(5100)
+    })
+
+    describe('and it is ahead, as after the local clock stepped back', () => {
+      beforeEach(() => {
+        estimator.addSample(5000, 12050, 12050, 5100) // rtt 100, offset 7000
+        offset = estimator.offsetAt(5100)
+      })
+
+      it('should restart the window from it', () => {
+        expect(estimator.stats()?.samples).toBe(1)
+      })
+
+      it('should jump to it', () => {
+        expect(offset).toBe(7000)
+      })
+    })
+
+    describe('and it is behind, as after the local clock stepped forward', () => {
+      beforeEach(() => {
+        estimator.addSample(5000, 6050, 6050, 5100) // rtt 100, offset 1000
+        offset = estimator.offsetAt(5200)
+      })
+
+      it('should walk it in at the backward rate', () => {
+        expect(offset).toBe(3960)
+      })
+
+      describe('and the remaining correction drops below the snap threshold', () => {
+        beforeEach(() => {
+          estimator.addSample(5200, 6250, 6250, 5300) // rtt 100, offset 1000
+          estimator.addSample(5400, 6450, 6450, 5500) // rtt 100, offset 1000
+          for (let now = 5300; now <= 10_100; now += 100) offset = estimator.offsetAt(now)
+        })
+
+        it('should keep the backward rate until the correction is done', () => {
+          expect(offset).toBe(1510)
+        })
+      })
+    })
+  })
 })
 
 describe('ServerClockRegistry', () => {
@@ -327,7 +417,7 @@ describe('createClockSync', () => {
       sync = createClockSync(
         { room: transport.room as any, emit: transport.emit, isServer: () => false },
         { wall: () => wall, local: () => local },
-        { pingIntervalMs: 1500 }
+        { pingIntervalMs: 1500, warmupSamples: 1 }
       )
     })
 
@@ -413,9 +503,10 @@ describe('createClockSync', () => {
         })
       })
 
-      describe('and a faster reply asks for a large backwards correction', () => {
+      describe('and a reply contradicts the estimate by seconds', () => {
         let before: number | undefined
-        let after: number | undefined
+        let first: number | undefined
+        let second: number | undefined
 
         beforeEach(() => {
           before = sync.getServerTime()
@@ -423,11 +514,38 @@ describe('createClockSync', () => {
           sync.flush()
           local = 101_550
           transport.deliver('__sdkClockPong', { clientAt: 101_500, receivedAt: 499_525, serverAt: 499_525 })
-          after = sync.getServerTime()
+          first = sync.getServerTime()
+          local = 101_650
+          second = sync.getServerTime()
         })
 
-        it('should never return an earlier server time', () => {
-          expect(after).toBe(before)
+        it('should not return an earlier server time', () => {
+          expect(first).toBeGreaterThan(before!)
+        })
+
+        it('should keep the clock running at half speed while it walks the correction in', () => {
+          expect(second! - first!).toBe(50)
+        })
+      })
+
+      describe('and a better reply arrives while frozen and nothing reads the clock for a while', () => {
+        let drift: number
+
+        beforeEach(() => {
+          sync.freeze(true)
+          local = 101_500
+          sync.flush()
+          local = 101_540
+          transport.deliver('__sdkClockPong', { clientAt: 101_500, receivedAt: 501_570, serverAt: 501_570 }) // rtt 40, offset 400_050
+          for (local = 101_556; local <= 111_540; local += 16) sync.flush()
+          sync.freeze(false)
+          local = 111_556
+          sync.flush()
+          drift = sync.getServerTime()! - (local + 400_000)
+        })
+
+        it('should resume slewing from where the ticks left it instead of jumping', () => {
+          expect(drift).toBeCloseTo(0.8, 5)
         })
       })
 

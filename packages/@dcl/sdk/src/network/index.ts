@@ -36,7 +36,8 @@ const {
  * Estimated authoritative-server clock, in milliseconds since the epoch, or undefined until the first
  * ping has been answered. Every client in the room converges on this clock, so it is the one to schedule
  * shared events against (countdowns, song positions, race starts). Corrections are slewed rather than
- * jumped and the value never decreases while connected. The server returns its own clock.
+ * jumped and the value never decreases while connected. The server returns its own clock, but only once the
+ * runtime has confirmed it is the server; before that it returns undefined too.
  * @public
  */
 export function getServerTime(): number | undefined {
@@ -64,8 +65,10 @@ export function freezeServerClock(frozen: boolean) {
 
 /**
  * Server only: the median of a player's recent round trips in milliseconds, capped at 500, or undefined if
- * that player has not acknowledged a clock reply yet. A client can inflate it up to the cap by delaying its
- * acks, so treat it as a bound on how early a client may claim an input happened, never as a fact.
+ * that player has not acknowledged a clock reply yet. It reads high by about half a server tick plus half a
+ * client frame, since each side only sees a message on its next tick. The client reports part of the figure,
+ * so it can place it anywhere between 0 and the cap: treat it as a lenient bound on how early a client may
+ * claim an input happened, never as a fact.
  * @public
  */
 export function getPlayerLatency(userId: string): number | undefined {

@@ -39,12 +39,16 @@ export const CLOCK_SYNC_DEFAULTS = {
   /** How often a client pings, in milliseconds. */
   pingIntervalMs: 1500,
   /** Samples kept per client; the best of these decides the offset. */
-  windowSize: 10,
+  windowSize: 20,
+  /** Until the window holds more than this many samples, corrections are applied at once. */
+  warmupSamples: 3,
   /** Round trips above this are dropped, and unanswered pings older than this are forgotten, in milliseconds. */
   maxRttMs: 2000,
   /** How fast the applied offset may move towards a new estimate, in ms per ms of local time. */
   maxSlewRate: 0.05,
-  /** Corrections larger than this are applied at once instead of slewed, in milliseconds. */
+  /** Rate for urgent corrections backwards; below 1 so the clock slows down but never stops or reverses. */
+  backwardSlewRate: 0.5,
+  /** Corrections larger than this are urgent: applied at once forwards, at `backwardSlewRate` backwards. */
   snapThresholdMs: 1000,
   /** The server answers at most one ping per client in this many milliseconds. */
   serverMinPingIntervalMs: 800,
@@ -76,6 +80,7 @@ export class ClockEstimator {
   private applied: number | undefined
   private appliedAt = 0
   private frozen = false
+  private catchingUp = false
 
   constructor(options: Partial<ClockSyncOptions> = {}) {
     this.settings = { ...CLOCK_SYNC_DEFAULTS, ...options }
@@ -89,8 +94,11 @@ export class ClockEstimator {
     const held = serverAt - receivedAt
     const rtt = arrivedAt - clientAt - held
     if (held < 0 || rtt < 0 || rtt > this.settings.maxRttMs) return false
+    const offset = (receivedAt - clientAt + serverAt - arrivedAt) / 2
+    // Each sample bounds the true offset to within rtt / 2; disjoint bounds mean a clock stepped.
+    if (this.target !== undefined && Math.abs(offset - this.target) > (rtt + this.best().rtt) / 2) this.samples = []
     this.lastRtt = rtt
-    this.samples.push({ rtt, offset: (receivedAt - clientAt + serverAt - arrivedAt) / 2 })
+    this.samples.push({ rtt, offset })
     if (this.samples.length > this.settings.windowSize) this.samples.shift()
     this.target = this.best().offset
     if (this.applied === undefined) {
@@ -113,12 +121,17 @@ export class ClockEstimator {
     if (this.applied === undefined || this.target === undefined) return undefined
     const diff = this.target - this.applied
     if (!this.frozen && diff !== 0) {
-      if (Math.abs(diff) > this.settings.snapThresholdMs) {
+      // Latched until the target is reached, so an urgent correction does not crawl once under the threshold.
+      this.catchingUp ||=
+        this.samples.length <= this.settings.warmupSamples || Math.abs(diff) > this.settings.snapThresholdMs
+      if (this.catchingUp && diff > 0) {
         this.applied = this.target
       } else {
-        const step = this.settings.maxSlewRate * Math.max(0, now - this.appliedAt)
+        const rate = this.catchingUp ? this.settings.backwardSlewRate : this.settings.maxSlewRate
+        const step = rate * Math.max(0, now - this.appliedAt)
         this.applied += Math.max(-step, Math.min(step, diff))
       }
+      if (this.applied === this.target) this.catchingUp = false
     }
     this.appliedAt = now
     return this.applied
@@ -139,6 +152,7 @@ export class ClockEstimator {
     this.target = undefined
     this.applied = undefined
     this.appliedAt = 0
+    this.catchingUp = false
   }
 
   stats(): Omit<ClockSyncStats, 'offset'> | undefined {
@@ -311,6 +325,7 @@ export function createClockSync(
         return
       }
       const t = clocks.local()
+      estimator.offsetAt(t)
       for (const ack of pendingAcks) send('__sdkClockAck', { serverAt: ack.serverAt, heldMs: t - ack.arrivedAt })
       pendingAcks.length = 0
       if (t - lastPingAt < settings.pingIntervalMs) return
