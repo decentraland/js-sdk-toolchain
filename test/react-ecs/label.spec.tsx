@@ -3,6 +3,7 @@ import { components } from '../../packages/@dcl/ecs/src'
 import {
   ReactEcs,
   Label,
+  UiEntity,
   UiFontType,
   TextAlignType,
   scaleFontSize,
@@ -285,5 +286,22 @@ describe('UiText React Ecs', () => {
     it('should handle zero as scale unit correctly', () => {
       expect(getScaleAndUnit(0)).toEqual([0, 'vw'])
     })
+  })
+})
+
+describe('UiEntity uiText fontSrc', () => {
+  it('should pass fontSrc through to UiText', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiText = components.UiText(engine)
+    const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+
+    const ui = () => (
+      <UiEntity uiTransform={{ width: 100 }} uiText={{ value: 'BOEDO', fontSrc: 'fonts/BungeeShade-Regular.ttf' }} />
+    )
+
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
+    await engine.update(1)
+
+    expect(UiText.get(uiEntity).fontSrc).toBe('fonts/BungeeShade-Regular.ttf')
   })
 })
