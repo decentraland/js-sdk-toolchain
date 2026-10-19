@@ -4,6 +4,7 @@ import { addSyncTransport } from './message-bus-sync'
 import { getUserData } from '~system/UserIdentity'
 import { isServer as isServerApi } from '~system/EngineApi'
 import { Atom } from '../atom'
+import type { ClockSyncStats } from './clock-sync'
 
 // Create isServer atom for consistent state
 const isServerAtom = Atom<boolean>(false)
@@ -34,11 +35,12 @@ const {
 /**
  * Estimated authoritative-server clock, in milliseconds since the epoch, or undefined until the first
  * ping has been answered. Every client in the room converges on this clock, so it is the one to schedule
- * shared events against (countdowns, song positions, race starts). The server returns its own clock.
+ * shared events against (countdowns, song positions, race starts). Corrections are slewed rather than
+ * jumped and the value never decreases while connected. The server returns its own clock.
  * @public
  */
 export function getServerTime(): number | undefined {
-  return isServer() ? Date.now() : clockSync.getServerTime()
+  return clockSync.getServerTime()
 }
 
 /**
@@ -46,13 +48,14 @@ export function getServerTime(): number | undefined {
  * Undefined until the first ping has been answered. Clients only.
  * @public
  */
-export function getClockSyncStats() {
+export function getClockSyncStats(): ClockSyncStats | undefined {
   return clockSync.getStats()
 }
 
 /**
- * Hold the server-clock estimate fixed so `getServerTime()` cannot jump while something time-critical runs,
- * for example a synchronized performance. Pass false to resume following the live estimate. Clients only.
+ * Hold the server-clock estimate fixed so `getServerTime()` keeps a constant rate while something
+ * time-critical runs, for example a synchronized performance. Safe to call every frame; a freeze requested
+ * before the first reply holds the first estimate. Pass false to slew back to the live estimate. Clients only.
  * @public
  */
 export function freezeServerClock(frozen: boolean) {
@@ -60,14 +63,16 @@ export function freezeServerClock(frozen: boolean) {
 }
 
 /**
- * Server only: the last measured round trip to a connected player in milliseconds, or undefined if that
- * player has not acknowledged a clock reply yet. Use half of it to bound how early a client may claim an
- * input happened relative to the server's own arrival time.
+ * Server only: the median of a player's recent round trips in milliseconds, capped at 500, or undefined if
+ * that player has not acknowledged a clock reply yet. A client can inflate it up to the cap by delaying its
+ * acks, so treat it as a bound on how early a client may claim an input happened, never as a fact.
  * @public
  */
 export function getPlayerLatency(userId: string): number | undefined {
   return clockSync.getPlayerLatency(userId)
 }
+
+export type { ClockSyncStats }
 
 // Re-export the room messaging system
 export { registerMessages, getRoom } from './events'

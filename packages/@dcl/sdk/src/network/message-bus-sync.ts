@@ -92,6 +92,7 @@ export function addSyncTransport(
           }
         }
       }
+      clockSync.flush()
       const peerMessages = getMessagesToSend()
       const response = await sendBinary({ data: [], peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)
@@ -113,9 +114,11 @@ export function addSyncTransport(
 
   // Built-in clock synchronization rides on the room with reserved message names
   Object.assign(getEventRegistry(), CLOCK_SYNC_MESSAGES)
-  const clockSync = createClockSync(eventBus as unknown as Room<typeof CLOCK_SYNC_MESSAGES>, () =>
-    isServerAtom.getOrNull()
-  )
+  const clockSync = createClockSync({
+    room: eventBus as unknown as Room<typeof CLOCK_SYNC_MESSAGES>,
+    emit: (data, to) => binaryMessageBus.emit(CommsMessage.CUSTOM_EVENT, data, to),
+    isServer: () => isServerAtom.getOrNull()
+  })
 
   engine.addTransport(transport)
   // End add sync transport
@@ -249,7 +252,6 @@ export function addSyncTransport(
 
   // System to retry state request if no response is received within the retry interval
   engine.addSystem((dt: number) => {
-    clockSync.update()
     if (requestingState && !stateIsSyncronized) {
       elapsedTimeSinceRequest += dt
       if (elapsedTimeSinceRequest >= STATE_REQUEST_RETRY_INTERVAL) {
