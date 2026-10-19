@@ -5588,6 +5588,7 @@ export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
     fontSize?: ScaleUnit | undefined;
+    fontSrc?: string | undefined;
     textAlign?: TextAlignType | undefined;
     textWrap?: UiTextWrapType | undefined;
     value: string;

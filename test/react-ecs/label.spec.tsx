@@ -41,6 +41,29 @@ describe('UiText React Ecs', () => {
     })
   })
 
+  it('should pass fontSrc through to UiText alongside the font fallback', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiText = components.UiText(engine)
+    const entityIndex = engine.addEntity() as number
+
+    // Helpers
+    const rootDivEntity = (entityIndex + 1) as Entity
+    const getText = (entity: Entity) => UiText.get(entity)
+
+    const ui = () => (
+      <Label uiTransform={{ width: 100 }} value="DCLROCKS" font="serif" fontSrc="fonts/BungeeShade-Regular.ttf" />
+    )
+
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
+    await engine.update(1)
+
+    expect(getText(rootDivEntity)).toMatchObject({
+      value: 'DCLROCKS',
+      font: Font.F_SERIF,
+      fontSrc: 'fonts/BungeeShade-Regular.ttf'
+    })
+  })
+
   it('should generate a UI and update the width of a div', async () => {
     const { engine, uiRenderer } = setupEngine()
     const UiTransform = components.UiTransform(engine)
