@@ -93,7 +93,7 @@ describe('openExplorerUiAndWait', () => {
 
   beforeEach(() => {
     engine = Engine()
-    transport = { send: async () => {}, filter: () => true }
+    transport = { send: async () => {}, filter: () => true, allowReservedEntities: true } as Transport
     engine.addTransport(transport)
 
     ExplorerUiEvents = channel('explorerUi', components.ExplorerUiEventsResult(engine))
