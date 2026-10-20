@@ -758,6 +758,7 @@ export const componentDefinitionByName: {
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
+    "core::EnvironmentFog": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEnvironmentFog>>;
     "core::ExplorerItemPurchaseResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBExplorerItemPurchaseResult>>;
     "core::ExplorerUiEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBExplorerUiEventsResult>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
@@ -783,6 +784,7 @@ export const componentDefinitionByName: {
     "core::RealmInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBRealmInfo>>;
     "core::Skybox": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkybox>>;
     "core::SkyboxTime": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSkyboxTime>>;
+    "core::Sun": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBSun>>;
     "core::TextShape": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTextShape>>;
     "core::TouchScreenControls": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTouchScreenControls>>;
     "core::TriggerArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBTriggerArea>>;
@@ -1287,6 +1289,9 @@ export namespace EntityUtils {
     // (undocumented)
     export function toEntityId(entityNumber: number, entityVersion: number): Entity;
 }
+
+// @public (undocumented)
+export const EnvironmentFog: LastWriteWinElementSetComponentDefinition<PBEnvironmentFog>;
 
 // @public
 export const Epsilon = 0.000001;
@@ -2829,6 +2834,21 @@ export namespace PBEngineInfo {
 }
 
 // @public (undocumented)
+export interface PBEnvironmentFog {
+    // (undocumented)
+    color?: ColorGradient | undefined;
+    density?: number | undefined;
+}
+
+// @public (undocumented)
+export namespace PBEnvironmentFog {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBEnvironmentFog;
+    // (undocumented)
+    export function encode(message: PBEnvironmentFog, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBExplorerItemPurchaseResult {
     requestId: number;
     // (undocumented)
@@ -3782,12 +3802,9 @@ export namespace PBRealmInfo {
 // @public (undocumented)
 export interface PBSkybox {
     clouds?: PBSkybox_Clouds | undefined;
-    fog?: PBSkybox_Fog | undefined;
-    reflectionMap?: TextureUnion | undefined;
     skyboxTexture?: TextureUnion | undefined;
     skyColors?: PBSkybox_SkyColors | undefined;
     stars?: PBSkybox_Stars | undefined;
-    sun?: PBSkybox_Sun | undefined;
 }
 
 // @public (undocumented)
@@ -3804,7 +3821,6 @@ export interface PBSkybox_Clouds {
     color?: ColorGradient | undefined;
     opacity?: number | undefined;
     speed?: number | undefined;
-    texture?: TextureUnion | undefined;
 }
 
 // @public (undocumented)
@@ -3816,31 +3832,10 @@ export namespace PBSkybox_Clouds {
 }
 
 // @public (undocumented)
-export interface PBSkybox_Fog {
-    // (undocumented)
-    color?: ColorGradient | undefined;
-    density?: number | undefined;
-    // (undocumented)
-    endDistance?: number | undefined;
-    startDistance?: number | undefined;
-}
-
-// @public (undocumented)
-export namespace PBSkybox_Fog {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkybox_Fog;
-    // (undocumented)
-    export function encode(message: PBSkybox_Fog, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBSkybox_SkyColors {
-    // (undocumented)
     horizon?: ColorGradient | undefined;
-    // (undocumented)
     nadir?: ColorGradient | undefined;
     rim?: ColorGradient | undefined;
-    // (undocumented)
     zenith?: ColorGradient | undefined;
 }
 
@@ -3866,20 +3861,6 @@ export namespace PBSkybox_Stars {
 }
 
 // @public (undocumented)
-export interface PBSkybox_Sun {
-    color?: ColorGradient | undefined;
-    visible?: boolean | undefined;
-}
-
-// @public (undocumented)
-export namespace PBSkybox_Sun {
-    // (undocumented)
-    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSkybox_Sun;
-    // (undocumented)
-    export function encode(message: PBSkybox_Sun, writer?: _m0.Writer): _m0.Writer;
-}
-
-// @public (undocumented)
 export interface PBSkyboxTime {
     fixedTime: number;
     transitionMode?: TransitionMode | undefined;
@@ -3894,10 +3875,27 @@ export namespace PBSkyboxTime {
 }
 
 // @public (undocumented)
+export interface PBSun {
+    color?: ColorGradient | undefined;
+    direction?: PBVector3 | undefined;
+    intensity?: number | undefined;
+    visible?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBSun {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBSun;
+    // (undocumented)
+    export function encode(message: PBSun, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBTextShape {
     font?: Font | undefined;
     fontAutoSize?: boolean | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     height?: number | undefined;
     lineCount?: number | undefined;
     lineSpacing?: number | undefined;
@@ -4129,6 +4127,7 @@ export interface PBUiDropdown {
     emptyLabel?: string | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     // (undocumented)
     options: string[];
     selectedIndex?: number | undefined;
@@ -4164,6 +4163,7 @@ export interface PBUiInput {
     disabled: boolean;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     // (undocumented)
     placeholder: string;
     placeholderColor?: PBColor4 | undefined;
@@ -4213,6 +4213,7 @@ export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     textAlign?: TextAlignMode | undefined;
     textWrap?: TextWrap | undefined;
     value: string;
@@ -5178,6 +5179,9 @@ export interface Spec {
     // (undocumented)
     [key: string]: ISchema;
 }
+
+// @public (undocumented)
+export const Sun: LastWriteWinElementSetComponentDefinition<PBSun>;
 
 // @alpha
 export const SyncComponents: ISyncComponents;
