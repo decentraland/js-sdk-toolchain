@@ -3802,7 +3802,7 @@ export namespace PBRealmInfo {
 // @public (undocumented)
 export interface PBSkybox {
     clouds?: PBSkybox_Clouds | undefined;
-    skyboxTexture?: TextureUnion | undefined;
+    skyboxTexture?: string | undefined;
     skyColors?: PBSkybox_SkyColors | undefined;
     stars?: PBSkybox_Stars | undefined;
 }

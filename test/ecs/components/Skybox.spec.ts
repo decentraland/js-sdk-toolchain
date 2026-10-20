@@ -1,4 +1,4 @@
-import { Engine, components, TextureWrapMode, PBSkybox } from '../../../packages/@dcl/ecs/src'
+import { Engine, components, PBSkybox } from '../../../packages/@dcl/ecs/src'
 import { testComponentSerialization } from './assertion'
 
 describe('Generated Skybox ProtoBuf', () => {
@@ -7,39 +7,7 @@ describe('Generated Skybox ProtoBuf', () => {
     const Skybox = components.Skybox(newEngine)
 
     testComponentSerialization<PBSkybox>(Skybox, {
-      skyboxTexture: {
-        tex: {
-          $case: 'texture',
-          texture: {
-            src: 'images/env.png',
-            wrapMode: TextureWrapMode.TWM_REPEAT,
-            filterMode: undefined,
-            offset: undefined,
-            tiling: undefined
-          }
-        }
-      },
-      skyColors: undefined,
-      clouds: undefined,
-      stars: undefined
-    })
-  })
-
-  it('should serialize/deserialize Skybox with skyboxTexture set to a video texture', () => {
-    const newEngine = Engine()
-    const Skybox = components.Skybox(newEngine)
-
-    testComponentSerialization<PBSkybox>(Skybox, {
-      skyboxTexture: {
-        tex: {
-          $case: 'videoTexture',
-          videoTexture: {
-            videoPlayerEntity: 256,
-            wrapMode: TextureWrapMode.TWM_CLAMP,
-            filterMode: undefined
-          }
-        }
-      },
+      skyboxTexture: 'images/sky.png',
       skyColors: undefined,
       clouds: undefined,
       stars: undefined
@@ -184,18 +152,7 @@ describe('Generated Skybox ProtoBuf', () => {
     const Skybox = components.Skybox(newEngine)
 
     testComponentSerialization<PBSkybox>(Skybox, {
-      skyboxTexture: {
-        tex: {
-          $case: 'texture',
-          texture: {
-            src: 'images/env.png',
-            wrapMode: TextureWrapMode.TWM_REPEAT,
-            filterMode: undefined,
-            offset: undefined,
-            tiling: undefined
-          }
-        }
-      },
+      skyboxTexture: 'images/env.png',
       skyColors: undefined,
       clouds: {
         color: undefined,
