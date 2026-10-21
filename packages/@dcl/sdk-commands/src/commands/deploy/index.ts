@@ -21,27 +21,31 @@ import {
   fetchWorldScenes,
   getScenesOnOtherParcels,
   checkWorldDeploymentPermission,
-  promptUser
+  isEntityPublished,
+  promptUser,
+  resolveDeployToken
 } from './utils'
 import { buildScene } from '../build'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { LinkerResponse } from '../../linker-dapp/routes'
 import { analyticsFeatures } from './analytics-features'
 import { getInstalledPackageVersion } from '../../logic/config'
-import { drainResponse } from '../../logic/fetch'
+import { drainResponse, withDeadline } from '../../logic/fetch'
+import { uploadDeployment } from './upload'
+import { createDeployment, DeployContext, deploymentCancelledError, settleCancelledUpload } from './deployment'
 
 interface Options {
   args: Result<typeof args>
   components: CliComponents
 }
 
+const PUBLICATION_CHECK_TIMEOUT_MS = 5000
+
 interface ProgrammaticDeployResult {
   finish: () => Promise<void>
   stop: () => Promise<void>
-}
-
-interface DeployResponse {
-  message?: string
+  /** Required in the `X-Deploy-Token` header to cancel the deployment through `DELETE /api/deploy`. */
+  deployToken: string
 }
 
 export const args = declareArgs({
@@ -63,7 +67,8 @@ export const args = declareArgs({
   '--port': Number,
   '-p': '--port',
   '--programmatic': Boolean,
-  '--multi-scene': Boolean
+  '--multi-scene': Boolean,
+  '--deploy-token': String
 })
 
 export function help(options: Options) {
@@ -80,6 +85,18 @@ export function help(options: Options) {
       --skip-validations        Skip permissions verifications on the client side when deploying content
       --programmatic            Enable programmatic mode - returns a promise that resolves when deployment completes
       --multi-scene             Deploy alongside existing scenes in a world (additive deploy, no deletion)
+      --deploy-token   [token]  Token required to cancel the deployment through the API (at least 16 characters).
+                                Random per run by default
+
+    Deployment API (linker server):
+      POST   /api/deploy        Sign and start; with 'Prefer: respond-async' it answers 202 right away
+      GET    /api/deploy        Deployment state as JSON, or as server-sent events with 'Accept: text/event-stream'.
+                                The stream ends after a final state: EventSource clients must close() it then,
+                                or they reconnect
+      DELETE /api/deploy        Cancel the deployment. Requires the 'X-Deploy-Token' header (403 otherwise); the
+                                linker URL carries the token in its fragment ('#token='). Answers 409 while undeploying a world.
+                                A cancel after the world's scenes were removed ends with the error code
+                                DEPLOY_CANCELLED_AFTER_UNDEPLOY
 
     Example:
     - Deploy your scene:
@@ -102,6 +119,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   const multiScene = !!options.args['--multi-scene']
   const autoYes = !!options.args['--yes']
   const targetContent = options.args['--target-content']
+  const deployToken = resolveDeployToken(options.args['--deploy-token'])
 
   if (workspace.projects.length !== 1) {
     throw new CliError('DEPLOY_WORKSPACE_NOT_SUPPORTED', i18next.t('errors.deploy.workspace_not_supported'))
@@ -213,6 +231,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     needsDelete && worldName ? buildDeleteScenesFromWorldPayload(worldName) : undefined
 
   const awaitResponse = future<void>()
+  const deployment = createDeployment({ deploy: deployEntity })
   const { program } = await getAddressAndSignature(
     options.components,
     awaitResponse,
@@ -225,7 +244,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       linkerPort,
       isHttps: !!options.args['--https']
     },
-    deployEntity,
+    deployment,
+    deployToken,
     deleteScenesFromWorldPayload,
     targetContent,
     multiScene
@@ -241,7 +261,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       },
       stop: async () => {
         void program?.stop()
-      }
+      },
+      deployToken
     }
   }
 
@@ -252,8 +273,11 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     void program?.stop()
   }
 
-  async function deployEntity(linkerResponse: LinkerResponse) {
+  async function deployEntity(linkerResponse: LinkerResponse, { signal, state, startUndeploy }: DeployContext) {
     const { authChain, chainId } = linkerResponse
+    const throwIfCancelled = () => {
+      if (signal.aborted) throw deploymentCancelledError()
+    }
 
     if (isWorld && worldName && targetContent && linkerResponse.address) {
       options.components.logger.log(`[DEPLOY] Checking permissions for wallet ${linkerResponse.address}...`)
@@ -263,7 +287,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
           worldName,
           linkerResponse.address,
           targetContent,
-          sceneJson.scene.parcels
+          sceneJson.scene.parcels,
+          signal
         )
         if (!permissionCheck.allowed) {
           const deniedMsg = permissionCheck.deniedParcels?.length
@@ -277,13 +302,18 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
         }
         options.components.logger.log(`[DEPLOY] Permissions verified.`)
       } catch (e: any) {
-        if (e instanceof CliError) throw e
+        if (e instanceof CliError || signal.aborted) throw e
         options.components.logger.warn(`Could not verify deployment permissions: ${e.message}`)
       }
     }
 
     // Uploading data
-    const { client, url } = await getCatalyst(chainId, options.args['--target'], options.args['--target-content'])
+    throwIfCancelled()
+    const { client, url } = await withDeadline(
+      () => getCatalyst(chainId, options.args['--target'], options.args['--target-content']),
+      { signal }
+    )
+    throwIfCancelled()
 
     if (needsDelete && worldName && !linkerResponse.deleteSignature) {
       throw new CliError(
@@ -293,6 +323,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
     }
 
     if (needsDelete && worldName && linkerResponse.deleteSignature) {
+      startUndeploy()
       options.components.logger.info(`[DEPLOY] deleting scenes for "${worldName}"`)
 
       try {
@@ -300,7 +331,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
           options.components,
           worldName,
           linkerResponse.deleteSignature,
-          targetContent
+          targetContent,
+          signal
         )
 
         if (deleteResponse.ok) {
@@ -315,7 +347,7 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
           )
         }
       } catch (e: any) {
-        if (e instanceof CliError) throw e
+        if (e instanceof CliError || signal.aborted) throw e
         throw new CliError(
           'DEPLOY_DELETE_FAILED',
           `Error deleting existing scenes from "${worldName}": ${e.message}\n` +
@@ -324,6 +356,8 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       }
     }
 
+    throwIfCancelled()
+    state.setPhase('uploading')
     printProgressInfo(options.components.logger, `Uploading data to: ${url}...`)
 
     const deployData = { entityId, files: entityFiles, authChain }
@@ -334,48 +368,53 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
       chainId === ChainId.ETHEREUM_MAINNET ? 'https://play.decentraland.org' : 'https://play.decentraland.zone'
     const sceneUrl = `${domain}/?NETWORK=${network}&position=${position}${worldRealm}`
 
+    let responseData: { message?: string }
     try {
-      const response = (await client.deploy(deployData, {
-        timeout: 600000
-      })) as any
-
-      let responseData
-
-      if (response.status !== 200) {
-        responseData = await response.text()
-        throw new Error(responseData)
-      }
-
-      responseData = (await response.json()) as DeployResponse
-
-      if (responseData.message) {
-        printProgressInfo(options.components.logger, responseData.message)
-      }
-
-      printSuccess(options.components.logger, 'Content uploaded successfully', sceneUrl)
-      options.components.analytics.track('Scene deploy success', {
-        ...trackProps,
-        sceneId: entityId,
-        targetContentServer: url,
-        worldName: sceneJson.worldConfiguration?.name,
-        isPortableExperience: !!sceneJson.isPortableExperience,
-        dependencies,
-        dependencyVersions,
-        serverlessMultiplayer: trackFeatures.serverlessMultiplayer
-      })
-
-      if (!isWorld) {
-        options.components.logger.info('You can close the terminal now')
-      }
+      responseData = await uploadDeployment(options.components, client, deployData, { signal, progress: state })
     } catch (e: any) {
-      options.components.logger.error('Could not upload content:')
-      options.components.logger.error(e.message)
-      options.components.analytics.track('Scene deploy failure', { ...trackProps, error: e.message ?? '' })
-      throw new CliError(
-        'DEPLOY_UPLOAD_FAILED',
-        i18next.t('errors.deploy.failed_to_upload', { error: e.message }),
-        e.stack
-      )
+      if (signal.aborted) {
+        await settleCancelledUpload(options.components, e, {
+          fullySent: state.get().upload?.stage === 'processing',
+          isPublished: () =>
+            isEntityPublished(client, entityId, {
+              world: isWorld && worldName && targetContent ? { name: worldName, targetContent } : undefined,
+              timeoutMs: PUBLICATION_CHECK_TIMEOUT_MS
+            })
+        })
+        responseData = {}
+      } else {
+        options.components.logger.error('Could not upload content:')
+        options.components.logger.error(e.message)
+        options.components.analytics.track('Scene deploy failure', { ...trackProps, error: e.message ?? '' })
+        if (e instanceof CliError) throw e
+        throw new CliError(
+          'DEPLOY_UPLOAD_FAILED',
+          i18next.t('errors.deploy.failed_to_upload', { error: e.message }),
+          e.stack
+        )
+      }
     }
+
+    if (responseData.message) {
+      printProgressInfo(options.components.logger, responseData.message)
+    }
+
+    printSuccess(options.components.logger, 'Content uploaded successfully', sceneUrl)
+    options.components.analytics.track('Scene deploy success', {
+      ...trackProps,
+      sceneId: entityId,
+      targetContentServer: url,
+      worldName: sceneJson.worldConfiguration?.name,
+      isPortableExperience: !!sceneJson.isPortableExperience,
+      dependencies,
+      dependencyVersions,
+      serverlessMultiplayer: trackFeatures.serverlessMultiplayer
+    })
+
+    if (!isWorld) {
+      options.components.logger.info('You can close the terminal now')
+    }
+
+    return { entityId, ...(responseData.message ? { message: responseData.message } : {}) }
   }
 }
