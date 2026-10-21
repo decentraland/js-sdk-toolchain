@@ -126,6 +126,29 @@ describe('when using the deploy resource of the linker server', () => {
     jest.resetAllMocks()
   })
 
+  describe('and a browser page asks to cancel it with the deploy token', () => {
+    let preflight: Response
+
+    beforeEach(async () => {
+      await start()
+      preflight = await fetch(server.url, {
+        method: 'OPTIONS',
+        headers: {
+          origin: 'http://localhost:8001',
+          'access-control-request-method': 'DELETE',
+          'access-control-request-headers': 'x-deploy-token'
+        }
+      })
+    })
+
+    it('should allow the DELETE with the X-Deploy-Token header', () => {
+      expect({
+        methods: preflight.headers.get('access-control-allow-methods'),
+        headers: preflight.headers.get('access-control-allow-headers')
+      }).toEqual({ methods: expect.stringContaining('DELETE'), headers: expect.stringContaining('x-deploy-token') })
+    })
+  })
+
   describe('and the client starts it asynchronously', () => {
     let response: Response
     let body: DeploymentState

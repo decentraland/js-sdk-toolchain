@@ -15,7 +15,6 @@ export interface dAppOptions {
   uri: string
 }
 
-// Request headers are reflected on preflight, which lets clients send X-Deploy-Token.
 export const LINKER_CORS_OPTIONS = {
   methods: ['GET', 'HEAD', 'POST', 'DELETE', 'OPTIONS'],
   exposedHeaders: ['Location', 'Preference-Applied']

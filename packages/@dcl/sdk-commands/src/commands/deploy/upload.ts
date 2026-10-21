@@ -43,7 +43,6 @@ function formatMegabytes(bytes: number): string {
   return `${(bytes / 1e6).toFixed(1)} MB`
 }
 
-// Files are never split across batches, so a file above the batch size gets a batch of its own size.
 function batchSize(deployData: DeploymentData): number {
   let largest = 0
   for (const file of deployData.files.values()) {

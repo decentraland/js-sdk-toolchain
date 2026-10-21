@@ -77,7 +77,6 @@ export function setDeployResourceRoutes(
     } catch {
       return { status: 400, body: { message: 'Invalid payload: the body must be JSON' } }
     }
-    // Checked before validating, and after reading the body since another request may start it meanwhile.
     if (!deployment.canStart()) return conflict()
     if (!value || !value.address || !value.authChain || !value.chainId) {
       const errorMessage = `Invalid payload: ${Object.keys(value ?? {}).join(' - ')}`

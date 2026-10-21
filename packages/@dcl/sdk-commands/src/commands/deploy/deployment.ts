@@ -85,7 +85,6 @@ export function createDeployment(options: {
 
   async function run(linkerResponse: LinkerResponse): Promise<DeploymentResult> {
     if (!canStart()) throw new Error('The deployment already started')
-    // `uploading` without upload progress while preparing; `undeploying` only once the undeploy is sent.
     state.setPhase('uploading')
     const startUndeploy = () => {
       if (abortController.signal.aborted) throw deploymentCancelledError()
