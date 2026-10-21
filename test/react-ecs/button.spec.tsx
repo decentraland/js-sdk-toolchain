@@ -81,3 +81,18 @@ describe('Button React Ecs', () => {
     })
   })
 })
+
+describe('Button fontSrc', () => {
+  it('should pass fontSrc through to UiText', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiText = components.UiText(engine)
+    const buttonEntity = ((engine.addEntity() as number) + 1) as Entity
+
+    const ui = () => <Button uiTransform={{ width: 100 }} value="BOEDO" fontSrc="fonts/BungeeShade-Regular.ttf" />
+
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
+    await engine.update(1)
+
+    expect(UiText.get(buttonEntity).fontSrc).toBe('fonts/BungeeShade-Regular.ttf')
+  })
+})

@@ -100,3 +100,19 @@ describe('UiDropdown React ECS', () => {
     expect(onChange).toHaveBeenCalledTimes(0)
   })
 })
+
+describe('UiDropdown fontSrc', () => {
+  it('should pass fontSrc through to UiDropdown', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiDropdown = components.UiDropdown(engine)
+    const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+
+    const ui = () => (
+      <Dropdown uiTransform={{ width: 100 }} options={['BOEDO', 'CASLA']} fontSrc="fonts/BungeeShade-Regular.ttf" />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    expect(UiDropdown.get(uiEntity).fontSrc).toBe('fonts/BungeeShade-Regular.ttf')
+  })
+})
