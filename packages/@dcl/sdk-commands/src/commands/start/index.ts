@@ -29,6 +29,8 @@ import { Result } from 'arg'
 import { startValidations } from '../../logic/project-validations'
 import { runExplorerAlpha } from './explorer-alpha'
 import { getLanUrl } from './utils'
+import { spawnAuthServer, waitForServerReady } from './multiplayer-server'
+import { webExplorerBaseUrl, webExplorerEnvParams, lsdDeepLinkPulseParams } from './dcl-env'
 
 interface Options {
   args: Result<typeof args>
@@ -70,6 +72,7 @@ export const args = declareArgs({
   '--multi-instance': Boolean,
   '--asset-bundles': Boolean,
   '--no-client': Boolean,
+  '--no-server': Boolean,
   '--mcp': Boolean,
   '--mcp-port': Number
 })
@@ -89,7 +92,7 @@ export async function help(options: Options) {
       --web3                            (deprecated) No effect. Kept for backwards compatibility
       --skip-build                      Skip build and only serve the files in preview mode
       --debug                           Enables Debug panel mode inside DCL Explorer (default=true)
-      --dclenv                          Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc. Possible values: org, zone, today. (default=org)
+      --dclenv                          Decentraland Environment. Which environment to use for the content. This determines the catalyst server used, asset-bundles, etc., plus the bevy-web domain and the Pulse comms server for the preview. Possible values: org, zone, today. (default=org)
       --realm                           Realm used to serve the content. (default=Localhost)
       --local-scene                     Enable local scene development.
       --position                        Initial Position to start the explorer. (default=position defined at scene.json)
@@ -101,6 +104,7 @@ export async function help(options: Options) {
       --multi-instance                  Allow running multiple Explorer instances simultaneously.
       --asset-bundles                   Preview with optimized asset bundles (forwarded as local-ab=true in the deep link; the Desktop Explorer converts the scene's assets itself).
       --no-client                       Suppress every auto-launch (desktop Explorer deeplink, browser open, mobile QR). The file watcher still notifies a desktop Explorer if it connects on its own — useful when an external tool owns the Explorer process.
+      --no-server                       Do not spawn the Multiplayer Server. Use it when another preview of this project already runs one: two servers for the same scene fight over the scene room.
       --mcp                             Enable the MCP server in the Explorer (forwarded as a deep link parameter).
       --mcp-port                        Port for the MCP server in the Explorer (forwarded as a deep link parameter).
 
@@ -134,8 +138,10 @@ export async function main(options: Options) {
   const withDataLayer = options.args['--data-layer']
   const isHub = !!options.args['--hub']
   const skipClient = !!options.args['--no-client']
+  const skipServer = !!options.args['--no-server']
   const bevyWeb = !!options.args['--bevy-web']
   const isMobile = !!options.args['--mobile']
+  const dclenv = options.args['--dclenv'] || 'org'
   const explorerAlpha = !bevyWeb
 
   const workspace = await getValidWorkspace(options.components, workingDirectory)
@@ -175,9 +181,12 @@ export async function main(options: Options) {
       const config = createRecordConfigComponent({
         HTTP_SERVER_PORT: port.toString(),
         HTTP_SERVER_HOST: '0.0.0.0',
+        // the embedded comms server (RoomsComponent/LinearProtocol) logs every
+        // connect/disconnect at DEBUG; LOG_LEVEL=DEBUG in the env re-enables it
+        LOG_LEVEL: 'INFO',
         ...process.env
       })
-      const logs = await createConsoleLogComponent({})
+      const logs = await createConsoleLogComponent({ config })
       const ws = await createWsComponent({ logs })
       const server = await createServerComponent<PreviewComponents>({ config, ws: ws.ws, logs }, { cors: {} })
       const rooms = await createRoomsComponent({
@@ -212,13 +221,17 @@ export async function main(options: Options) {
         }
       }
 
-      await wireRouter(components, workspace, dataLayer)
+      await wireRouter(components, workspace, dataLayer, dclenv)
       if (watch) {
         for (const project of workspace.projects) {
           await wireFileWatcherToWebSockets(components, project.workingDirectory, project.kind)
         }
       }
       await startComponents()
+
+      const project = workspace.projects[0]
+      const multiplayerServerReady =
+        project && !skipServer ? spawnAuthServer(components, project, `http://localhost:${port}`, dclenv) : undefined
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []
@@ -240,9 +253,11 @@ export async function main(options: Options) {
       const sortedURLs = availableURLs.sort((a, _b) => {
         return a.toLowerCase().includes('localhost') || a.includes('127.0.0.1') || a.includes('0.0.0.0') ? -1 : 1
       })
-      const bevyUrl = `https://decentraland.org/bevy-web/?preview=true&realm=${
-        new URL(sortedURLs[0]).origin
-      }&position=${baseCoords.x},${baseCoords.y}`
+      // no pulse override needed: the zone-hosted page derives its base domain — and with
+      // it its pulse-server fallback — from its own host (see dcl-env.ts)
+      const bevyUrl =
+        `${webExplorerBaseUrl(dclenv)}?preview=true&realm=${new URL(sortedURLs[0]).origin}` +
+        `&position=${baseCoords.x},${baseCoords.y}${webExplorerEnvParams(dclenv)}`
       if (bevyWeb) {
         components.logger.log('Available on:\n')
         components.logger.log(`    ${bevyUrl}`)
@@ -251,11 +266,16 @@ export async function main(options: Options) {
           'Chromium-based browsers require permission for websites to reach localhost (Local Network Access).\n' +
             'When the browser asks to access apps on your device, click "Allow".\n' +
             'If the scene never loads and no prompt appears, enable it manually and reload:\n' +
-            '  chrome://settings/content/siteDetails?site=https%3A%2F%2Fdecentraland.org\n' +
+            `  chrome://settings/content/siteDetails?site=${encodeURIComponent(new URL(bevyUrl).origin)}\n` +
             '  → "Apps on device" (Chrome 145+) or "Local network access" (Chrome 142-144) → Allow'
         )
       }
       components.logger.log('\nPress CTRL+C to exit\n')
+
+      const launchesClient = !skipClient && !isMobile && (explorerAlpha || openBrowser)
+      if (multiplayerServerReady && launchesClient) {
+        await waitForServerReady(components, multiplayerServerReady)
+      }
 
       if (explorerAlpha && !isMobile && !skipClient) {
         const realm = new URL(sortedURLs[0]).origin
@@ -263,7 +283,9 @@ export async function main(options: Options) {
       }
 
       if (isMobile && !skipClient && lanUrl) {
-        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x},${baseCoords.y}`
+        const deepLink = `decentraland://open?preview=${lanUrl}&position=${baseCoords.x},${
+          baseCoords.y
+        }${lsdDeepLinkPulseParams(workspace.projects[0].workingDirectory, dclenv)}`
         QRCode.toString(deepLink, { type: 'terminal', small: true }, (err, qr) => {
           if (!err) {
             components.logger.log(colors.bold('\nScan to preview on mobile: \n'))
