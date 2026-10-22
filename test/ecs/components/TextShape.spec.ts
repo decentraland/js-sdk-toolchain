@@ -11,7 +11,7 @@ describe('Generated TextShape ProtoBuf', () => {
       font: Font.F_SANS_SERIF,
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
       fontSize: 5,
-      fontSrc: undefined,
+      fontSrc: 'fonts/BungeeShade-Regular.ttf',
       fontAutoSize: true,
       width: 100,
       height: 100,

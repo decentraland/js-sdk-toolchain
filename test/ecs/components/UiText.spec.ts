@@ -11,7 +11,7 @@ describe('Generated UiText ProtoBuf', () => {
       color: { r: 0, g: 0, b: 0, a: 0 },
       font: undefined,
       fontSize: undefined,
-      fontSrc: undefined,
+      fontSrc: 'fonts/BungeeShade-Regular.ttf',
       textAlign: undefined,
       textWrap: undefined
     })

@@ -17,7 +17,7 @@ describe('UiDropdown component', () => {
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
       font: Font.F_SANS_SERIF,
       fontSize: 14,
-      fontSrc: undefined
+      fontSrc: 'fonts/BungeeShade-Regular.ttf'
     })
   })
 })
