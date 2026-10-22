@@ -5312,6 +5312,7 @@ export interface TouchScreenControlsComponentDefinitionExtended extends LastWrit
     setMainAction(action: InputAction): void;
     showAll(): void;
     showCrosshair(): void;
+    showDefault(): void;
     showJoystick(): void;
 }
 

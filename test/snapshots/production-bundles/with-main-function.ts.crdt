@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=272.7k bytes
+SCENE_COMPILED_JS_SIZE_PROD=274.1k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -8,18 +8,19 @@ EVAL test/snapshots/production-bundles/with-main-function.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
   OPCODES ~= 80k
-  MALLOC_COUNT = 15335
-  ALIVE_OBJS_DELTA ~= 3.41k
+  MALLOC_COUNT = 15558
+  ALIVE_OBJS_DELTA ~= 3.45k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 6
-  ALIVE_OBJS_DELTA ~= 0.00k
+  MALLOC_COUNT = 37
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1041 t=1 data={"src":"test.glb"}
   Scene: PUT_COMPONENT e=0x200 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
-  OPCODES ~= 8k
-  MALLOC_COUNT = 99
+  Scene: PUT_COMPONENT e=0x0 c=1218 t=1 data={"touchInputs":[{"inputAction":2,"hide":true},{"inputAction":10,"hide":true},{"inputAction":11,"hide":true},{"inputAction":12,"hide":true},{"inputAction":13,"hide":true}],"hideJoystick":false,"hideCrosshair":false}
+  OPCODES ~= 12k
+  MALLOC_COUNT = 95
   ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x202 c=1041 t=1 data={"src":"test.glb"}
@@ -36,4 +37,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 5k
   MALLOC_COUNT = 13
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1127.85k bytes
+  MEMORY_USAGE_COUNT ~= 1139.25k bytes
