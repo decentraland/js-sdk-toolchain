@@ -12,7 +12,22 @@ describe('Generated AvatarBase ProtoBuf', () => {
       eyesColor: Color3.Black(),
       hairColor: Color3.Magenta(),
       bodyShapeUrn: 'boedo-shape-urn',
-      name: 'boedo-casla'
+      name: 'boedo-casla',
+      talking: undefined
+    })
+  })
+
+  it.each([true, false])('should serialize/deserialize AvatarBase with talking: %s', (talking) => {
+    const newEngine = Engine()
+    const AvatarBase = components.AvatarBase(newEngine)
+
+    testComponentSerialization(AvatarBase, {
+      skinColor: Color3.Green(),
+      eyesColor: Color3.Black(),
+      hairColor: Color3.Magenta(),
+      bodyShapeUrn: 'boedo-shape-urn',
+      name: 'boedo-casla',
+      talking
     })
   })
 })
