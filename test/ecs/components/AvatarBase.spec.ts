@@ -17,7 +17,7 @@ describe('Generated AvatarBase ProtoBuf', () => {
     })
   })
 
-  it('should serialize/deserialize AvatarBase with talking', () => {
+  it.each([true, false])('should serialize/deserialize AvatarBase with talking: %s', (talking) => {
     const newEngine = Engine()
     const AvatarBase = components.AvatarBase(newEngine)
 
@@ -27,7 +27,7 @@ describe('Generated AvatarBase ProtoBuf', () => {
       hairColor: Color3.Magenta(),
       bodyShapeUrn: 'boedo-shape-urn',
       name: 'boedo-casla',
-      talking: true
+      talking
     })
   })
 })

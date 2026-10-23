@@ -348,8 +348,13 @@ function processObservables() {
    * PROFILE CHANGE observable
    */
   function subscribeProfileChange() {
-    AvatarBase.onChange(engine.PlayerEntity, () => {
+    let lastAvatarBaseProfile: string | undefined
+    AvatarBase.onChange(engine.PlayerEntity, (value) => {
       if (!profileAddress) return
+      // talking flips on every speaking start/stop and is not profile data
+      const avatarBaseProfile = JSON.stringify({ ...value, talking: undefined })
+      if (avatarBaseProfile === lastAvatarBaseProfile) return
+      lastAvatarBaseProfile = avatarBaseProfile
       onProfileChanged.notifyObservers({ ethAddress: profileAddress, version: 0 })
     })
 
