@@ -38,6 +38,25 @@ function getInspectorComponentsIds() {
   return ids
 }
 
+// The engine and its transport are process-wide, so a workspace with more than
+// one project reuses them. Both are set up once and the state is cleared per
+// project; there is no API to remove a transport once added.
+let captureTransport: Transport | undefined
+
+/**
+ * Drops every component from every entity, so what the engine holds afterwards
+ * belongs to one project only.
+ */
+function clearEngineState(engine: IEngine) {
+  for (const component of engine.componentsIter()) {
+    if ('deleteFrom' in component) {
+      for (const [entity] of engine.getEntitiesWith(component)) {
+        component.deleteFrom(entity)
+      }
+    }
+  }
+}
+
 /**
  * Initializes the ECS engine with a mock transport layer.
  *
@@ -45,16 +64,20 @@ function getInspectorComponentsIds() {
  * This allows us to capture the state of all entities and components.
  */
 function initEngine(): { engine: IEngine; transport: Transport } {
-  const transport: Transport = {
-    filter: () => true,
-    send: async (_messages) => {}
+  if (!captureTransport) {
+    captureTransport = {
+      filter: () => true,
+      send: async (_messages) => {}
+    }
+
+    engine.addTransport(captureTransport)
   }
 
-  engine.addTransport(transport)
+  clearEngineState(engine)
 
   return {
     engine,
-    transport
+    transport: captureTransport
   }
 }
 
