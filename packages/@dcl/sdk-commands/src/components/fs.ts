@@ -24,6 +24,7 @@ export type IFileSystemComponent = Pick<typeof fs, 'createReadStream'> &
     | 'appendFile'
     | 'rm'
     | 'copyFile'
+    | 'realpath'
   > & {
     constants: Pick<typeof fs.constants, 'F_OK' | 'R_OK'>
   } & {
@@ -67,6 +68,7 @@ export function createFsComponent(): IFileSystemComponent {
     readdir: fsPromises.readdir,
     readFile: fsPromises.readFile,
     copyFile: fsPromises.copyFile,
+    realpath: fsPromises.realpath,
     constants: {
       F_OK: fs.constants.F_OK,
       R_OK: fs.constants.R_OK
