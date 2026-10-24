@@ -240,7 +240,10 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
     }
   })
 
-  const nextTickRaycasts: (() => void)[] = []
+  // Keyed by entity so a removal in the same frame can cancel the registration
+  // it is undoing. A second registration for one entity replaces the first,
+  // which is what createOrReplace would have done anyway.
+  const nextTickRaycasts = new Map<Entity, () => void>()
   function registerRaycastWithCallback(
     entity: Entity,
     raycastValue: RaycastSystemOptions,
@@ -259,10 +262,14 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
 
       entitiesCallbackResultMap.set(entity, { callback: callback })
     }
-    nextTickRaycasts.push(onNextTick)
+    nextTickRaycasts.set(entity, onNextTick)
   }
 
   function removeRaycast(entity: Entity) {
+    // The registration this is undoing may not have run yet: it is deliberately
+    // delayed a frame, and leaving it queued would install the raycast a tick
+    // after the scene asked for it to go.
+    nextTickRaycasts.delete(entity)
     Raycast.deleteFrom(entity)
     RaycastResult.deleteFrom(entity)
     entitiesCallbackResultMap.delete(entity)
@@ -270,10 +277,10 @@ export function createRaycastSystem(engine: IEngine): RaycastSystem {
 
   // @internal
   engine.addSystem(function RaycastEventSystem() {
-    for (const addMissingRaycast of nextTickRaycasts) {
+    for (const addMissingRaycast of nextTickRaycasts.values()) {
       addMissingRaycast()
     }
-    nextTickRaycasts.length = 0
+    nextTickRaycasts.clear()
 
     for (const [entity, data] of entitiesCallbackResultMap) {
       const raycast = Raycast.getOrNull(entity)
