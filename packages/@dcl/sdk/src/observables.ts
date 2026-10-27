@@ -12,6 +12,7 @@ import {
 } from '@dcl/ecs'
 import { ManyEntityAction, SendBatchResponse, subscribe } from '~system/EngineApi'
 import players from './players'
+import { localeChangedEvents } from './internal/language-events'
 
 /// --- EVENTS ---
 
@@ -47,6 +48,11 @@ export interface IEvents {
   comms: {
     sender: string
     message: string
+  }
+
+  /** Triggered when the player switches the client language. `locale` is a BCP-47 tag */
+  localeChanged: {
+    locale: string
   }
 
   /**
@@ -215,6 +221,10 @@ export async function pollEvents(sendBatch: (body: ManyEntityAction) => Promise<
           onCommsMessage.notifyObservers(data as IEvents['comms'])
           break
         }
+        case 'localeChanged': {
+          localeChangedEvents.notifyObservers(data as IEvents['localeChanged'])
+          break
+        }
       }
     }
   }
@@ -338,8 +348,13 @@ function processObservables() {
    * PROFILE CHANGE observable
    */
   function subscribeProfileChange() {
-    AvatarBase.onChange(engine.PlayerEntity, () => {
+    let lastAvatarBaseProfile: string | undefined
+    AvatarBase.onChange(engine.PlayerEntity, (value) => {
       if (!profileAddress) return
+      // talking flips on every speaking start/stop and is not profile data
+      const avatarBaseProfile = JSON.stringify({ ...value, talking: undefined })
+      if (avatarBaseProfile === lastAvatarBaseProfile) return
+      lastAvatarBaseProfile = avatarBaseProfile
       onProfileChanged.notifyObservers({ ethAddress: profileAddress, version: 0 })
     })
 

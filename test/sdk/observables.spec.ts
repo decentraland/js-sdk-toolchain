@@ -71,4 +71,24 @@ describe('SDK observables', () => {
       ]).toEqual([1, 0, 0, 0, 0, 0])
     })
   })
+
+  describe('when pollEvents receives a localeChanged event', () => {
+    it('should forward the locale to the internal language events', async () => {
+      let localeChangedEvents: any
+      jest.isolateModules(() => {
+        observables = jest.requireActual('../../packages/@dcl/sdk/src/observables')
+        localeChangedEvents = jest.requireActual(
+          '../../packages/@dcl/sdk/src/internal/language-events'
+        ).localeChangedEvents
+      })
+      localeChangedEvents.add(observer)
+      const sendBatch = jest.fn().mockResolvedValue({
+        events: [{ generic: { eventId: 'localeChanged', eventData: JSON.stringify({ locale: 'es' }) } }]
+      })
+
+      await observables.pollEvents(sendBatch)
+
+      expect(observer.mock.calls[0][0]).toEqual({ locale: 'es' })
+    })
+  })
 })

@@ -118,15 +118,18 @@ export function callScriptMethod(entity: Entity, scriptPath: string, methodName:
  * Creates an ActionCallback function from an ActionRef.
  * The returned function, when called, will trigger the specified action on the entity.
  *
+ * Validation happens here, at resolution time, not inside the returned closure: an
+ * unassigned optional action param is stored by the editor as a truthy placeholder
+ * ({ entity: RootEntity (0), action: '' }), so validating at call time would still hand
+ * the script a callable and make its `if (this.onAction)` guard always pass. Returning
+ * undefined for an unwired ref lets that guard work as intended.
+ *
  * @param actionRef - The action reference containing entity and action name
- * @returns A function that triggers the action when called
+ * @returns A function that triggers the action when called, or undefined if the ref is unwired
  */
-function createActionCallback(actionRef: ActionRef): () => void {
+function createActionCallback(actionRef: ActionRef): (() => void) | undefined {
+  if (!actionRef.entity || !actionRef.action) return undefined
   return () => {
-    if (!actionRef.entity || !actionRef.action) {
-      console.error('[Script] ActionCallback called with invalid action reference:', actionRef)
-      return
-    }
     const actionEvents = getActionEvents(actionRef.entity)
     actionEvents.emit(actionRef.action, {})
   }

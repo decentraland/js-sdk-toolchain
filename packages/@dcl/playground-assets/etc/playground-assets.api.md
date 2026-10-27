@@ -785,6 +785,7 @@ export const componentDefinitionByName: {
     "core::CameraMode": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraMode>>;
     "core::CameraModeArea": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBCameraModeArea>>;
     "core::EngineInfo": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBEngineInfo>>;
+    "core::ExplorerItemPurchaseResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBExplorerItemPurchaseResult>>;
     "core::ExplorerUiEventsResult": GSetComponentGetter<GrowOnlyValueSetComponentDefinition<PBExplorerUiEventsResult>>;
     "core::GlobalLight": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGlobalLight>>;
     "core::GltfContainer": LwwComponentGetter<LastWriteWinElementSetComponentDefinition<PBGltfContainer>>;
@@ -1349,6 +1350,9 @@ export type ExcludeUndefined<T> = {
 export const executeTask: (task: Task<unknown>) => void;
 
 // @public (undocumented)
+export const ExplorerItemPurchaseResult: GrowOnlyValueSetComponentDefinition<PBExplorerItemPurchaseResult>;
+
+// @public (undocumented)
 export const enum ExplorerUi {
     // (undocumented)
     EU_BACKPACK = 2,
@@ -1358,6 +1362,7 @@ export const enum ExplorerUi {
     EU_COMMUNITIES = 4,
     // (undocumented)
     EU_EVENTS = 6,
+    EU_ITEM_PURCHASE = 7,
     // (undocumented)
     EU_MAP = 1,
     // (undocumented)
@@ -1585,6 +1590,9 @@ export interface IEvents {
     comms: {
         sender: string;
         message: string;
+    };
+    localeChanged: {
+        locale: string;
     };
     onEnterScene: {
         userId: string;
@@ -2998,6 +3006,69 @@ export namespace PBEngineInfo {
 }
 
 // @public (undocumented)
+export interface PBExplorerItemPurchaseResult {
+    requestId: number;
+    // (undocumented)
+    status?: {
+        $case: "purchased";
+        purchased: PBExplorerItemPurchaseResult_Purchased;
+    } | {
+        $case: "dismissed";
+        dismissed: PBExplorerItemPurchaseResult_Dismissed;
+    } | {
+        $case: "failed";
+        failed: PBExplorerItemPurchaseResult_Failed;
+    } | undefined;
+    timestamp: number;
+    // (undocumented)
+    urn: string;
+}
+
+// @public (undocumented)
+export namespace PBExplorerItemPurchaseResult {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBExplorerItemPurchaseResult;
+    // (undocumented)
+    export function encode(message: PBExplorerItemPurchaseResult, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBExplorerItemPurchaseResult_Dismissed {
+}
+
+// @public (undocumented)
+export namespace PBExplorerItemPurchaseResult_Dismissed {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBExplorerItemPurchaseResult_Dismissed;
+    // (undocumented)
+    export function encode(_: PBExplorerItemPurchaseResult_Dismissed, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBExplorerItemPurchaseResult_Failed {
+}
+
+// @public (undocumented)
+export namespace PBExplorerItemPurchaseResult_Failed {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBExplorerItemPurchaseResult_Failed;
+    // (undocumented)
+    export function encode(_: PBExplorerItemPurchaseResult_Failed, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBExplorerItemPurchaseResult_Purchased {
+}
+
+// @public (undocumented)
+export namespace PBExplorerItemPurchaseResult_Purchased {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBExplorerItemPurchaseResult_Purchased;
+    // (undocumented)
+    export function encode(_: PBExplorerItemPurchaseResult_Purchased, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
 export interface PBExplorerUiEventsResult {
     // (undocumented)
     event?: {
@@ -3007,6 +3078,7 @@ export interface PBExplorerUiEventsResult {
         $case: "closed";
         closed: PBExplorerUiEventsResult_UiClosed;
     } | undefined;
+    requestId: number;
     timestamp: number;
     ui: ExplorerUi;
 }
@@ -5165,7 +5237,7 @@ export type ReadOnlyGrowOnlyValueSetComponentDefinition<T> = Omit<GrowOnlyValueS
 export type ReadOnlyLastWriteWinElementSetComponentDefinition<T> = Omit<LastWriteWinElementSetComponentDefinition<T>, 'create' | 'createOrReplace' | 'deleteFrom' | 'getMutable' | 'getMutableOrNull' | 'getOrCreateMutable'>;
 
 // @public (undocumented)
-export type ReadonlyPrimitive = number | string | number[] | string[] | boolean | boolean[];
+export type ReadonlyPrimitive = number | string | boolean;
 
 // @public (undocumented)
 export const RealmInfo: LastWriteWinElementSetComponentDefinition<PBRealmInfo>;
@@ -6011,6 +6083,7 @@ export type UiRendererOptions = {
     virtualWidth?: number;
     virtualHeight?: number;
     screenInset?: UiScreenInset;
+    zIndex?: number;
 };
 
 // @public

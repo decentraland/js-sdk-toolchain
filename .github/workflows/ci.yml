@@ -1,16 +1,21 @@
 on:
+  # An extra entry point; the push trigger below is unchanged. For workflows like
+  # merge-sync-to-auth-server.yml, whose merge is written with GITHUB_TOKEN: GitHub
+  # starts no workflow from that token's events, and workflow_dispatch is the exception.
+  workflow_dispatch:
   push:
     branches:
       - main
       - experimental
       - experimental-bevy
+      - auth-server
   pull_request:
   release:
     types:
       - created
 
 env:
-  BRANCH_TAG: ${{ github.ref_name == 'experimental' && 'experimental' || github.ref_name == 'experimental-bevy' && 'experimental-bevy' || '' }}
+  BRANCH_TAG: ${{ github.ref_name == 'experimental' && 'experimental' || github.ref_name == 'experimental-bevy' && 'experimental-bevy' || github.ref_name == 'auth-server' && 'auth-server' || '' }}
 
 name: CI
 jobs:
@@ -256,6 +261,7 @@ jobs:
           echo "Verifying dependency packages are published at version $VERSION"
 
           PACKAGES=("@dcl/js-runtime" "@dcl/ecs" "@dcl/react-ecs" "@dcl/sdk-commands")
+          # npm may take a few minutes to serve a freshly published version (provenance + large tarballs, @dcl/ecs especially)
           MAX_RETRIES=30
           RETRY_DELAY=10
 
