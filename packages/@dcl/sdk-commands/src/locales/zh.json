@@ -79,6 +79,14 @@
       "build_failed": "构建场景失败：{{error}}",
       "bundle_not_found": "在 {{bundlePath}} 找不到打包的场景",
       "execution_failed": "执行场景代码失败：{{error}}"
+    },
+    "world_permissions": {
+      "missing_world": "世界名称是必需的。请使用 --world <名称>",
+      "missing_address": "至少需要一个地址。请使用 --address <钱包>",
+      "invalid_address": "无效的以太坊地址：{{address}}",
+      "invalid_parcel": "无效的地块格式：\"{{parcel}}\"。预期格式为 \"x,y\"（例如 \"0,0\"）",
+      "fetch_failed": "获取世界权限失败：{{error}}",
+      "grant_failed": "授予权限失败：{{error}}"
     }
   }
 }

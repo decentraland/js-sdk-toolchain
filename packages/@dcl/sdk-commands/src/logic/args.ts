@@ -4,7 +4,7 @@ import i18next from 'i18next'
 import { CliError } from './error'
 
 export type Args = {
-  [key: string]: string | StringConstructor | NumberConstructor | BooleanConstructor
+  [key: string]: string | StringConstructor | NumberConstructor | BooleanConstructor | [StringConstructor]
 }
 
 export function parseArgs<T extends Args>(argv: string[], args: T): Result<T> {
