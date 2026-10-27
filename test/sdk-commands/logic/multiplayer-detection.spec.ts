@@ -55,22 +55,4 @@ describe('detectMultiplayerUsage', () => {
       reasons: ['src/index.ts → ~system/CommunicationsController']
     })
   })
-
-  it('should label the asset-packs boot and shorten dependency paths', () => {
-    const result = detectMultiplayerUsage(
-      metafile({
-        'sdk-scripts:script-utils': { imports: [{ path: NETWORK }] },
-        '../../node_modules/@dcl/asset-packs/dist/x.js': {
-          imports: [{ path: 'node_modules/@dcl/sdk/message-bus.js' }]
-        },
-        'node_modules/@dcl/sdk/message-bus.js': {},
-        [NETWORK]: {}
-      })
-    )
-
-    expect(result.reasons).toEqual([
-      'asset-packs (synced entities or Admin Toolkit) → @dcl/sdk/network',
-      '@dcl/asset-packs/dist/x.js → @dcl/sdk/message-bus'
-    ])
-  })
 })

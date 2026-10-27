@@ -8,13 +8,12 @@ describe('pickAssetPacks', () => {
     expect(pickAssetPacks(undefined, bundled)).toEqual({ dir: bundled.dir })
   })
 
-  it('should use the scene copy when it is as new as the bundled one', () => {
-    expect(pickAssetPacks(sceneOwn('2.18.0'), bundled)).toEqual({ dir: sceneOwn('').dir })
-  })
-
-  it('should use the scene copy when it is newer than the bundled one', () => {
-    expect(pickAssetPacks(sceneOwn('2.19.1'), bundled)).toEqual({ dir: sceneOwn('').dir })
-  })
+  it.each(['2.18.0', '2.19.1'])(
+    'should use the scene copy when it is %s, not older than the bundled one',
+    (version) => {
+      expect(pickAssetPacks(sceneOwn(version), bundled)).toEqual({ dir: sceneOwn('').dir })
+    }
+  )
 
   it('should use the bundled copy and warn when the scene copy is older', () => {
     const picked = pickAssetPacks(sceneOwn('2.17.2'), bundled)
