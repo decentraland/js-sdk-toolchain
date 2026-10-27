@@ -13,6 +13,7 @@ import { serializeCrdtMessages } from '../internal/transports/logger'
 import { IsServerRequest, IsServerResponse } from '~system/EngineApi'
 import { Atom } from '../atom'
 import { setGlobalRoom, Room } from './events/implementation'
+import { createMessageBusRelay } from './message-bus-relay'
 
 export type IProfile = { networkId: number; userId: string }
 // user that we asked for the inital crdt state
@@ -109,6 +110,8 @@ export function addSyncTransport(
 
   // Set global eventBus instance
   setGlobalRoom(eventBus)
+
+  const messageBusRelay = createMessageBusRelay(binaryMessageBus, isServerAtom, isRoomReadyAtom, myProfile)
 
   engine.addTransport(transport)
   // End add sync transport
@@ -271,6 +274,7 @@ export function addSyncTransport(
     isStateSyncronized,
     binaryMessageBus,
     eventBus,
-    isRoomReadyAtom
+    isRoomReadyAtom,
+    messageBusRelay
   }
 }

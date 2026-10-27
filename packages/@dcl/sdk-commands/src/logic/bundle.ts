@@ -16,7 +16,9 @@ import { colors } from '../components/log'
 import { printProgressInfo, printProgressStep, printWarning } from './beautiful-logs'
 import { CliError } from './error'
 import { getAllComposites, type Script } from './composite'
-import { isEditorScene } from './project-validations'
+import { isEditorScene, usesNetworkedAssetPacks } from './project-validations'
+import { SceneWithMultiplayer } from './scene-validations'
+import { pickAssetPacks } from './asset-packs'
 import { watch } from 'chokidar'
 import { debounce } from './debounce'
 
@@ -42,6 +44,9 @@ export type CompileOptions = {
 
   ignoreComposite: boolean
   customEntryPoint: boolean
+
+  // called after every successful (re)build, including watch-mode rebuilds
+  onRebuild?: (usage: MultiplayerUsage) => void | Promise<void>
 }
 
 const MAX_STEP = 2
@@ -174,33 +179,121 @@ export async function bundleProject(components: BundleComponents, options: Compi
     ? entrypoints.map((entrypoint) => ({ entrypoint, outputFile: entrypoint.replace(/\.ts$/, '.js') }))
     : [{ entrypoint: entrypoints[0], outputFile: sceneJson.main }]
 
-  // Auto-add build-time defaults for Multiplayer Auth Server scene builds
-  if (!options.single) {
-    const dir = options.workingDirectory
-    await ensureJsonKey(components, path.join(dir, 'scene.json'), 'authoritativeMultiplayer', true)
+  // The flag is derived from what the bundle uses, so scene.json follows every successful build
+  const onBuild = async (usage: MultiplayerUsage) => {
+    if (!options.single) {
+      await applyMultiplayerUsage(components, options.workingDirectory, usage)
+      ;(sceneJson as SceneWithMultiplayer).authoritativeMultiplayer = usage.authoritativeMultiplayer
+    }
+    await options.onRebuild?.(usage)
+  }
+
+  let multiplayer: MultiplayerUsage | undefined
+  for (const input of inputs) {
+    const usage = await bundleSingleProject(components, {
+      ...options,
+      tsconfig,
+      ...input,
+      onBuild
+    })
+    if (usage) {
+      multiplayer = {
+        authoritativeMultiplayer: !!multiplayer?.authoritativeMultiplayer || usage.authoritativeMultiplayer,
+        reasons: [...(multiplayer?.reasons ?? []), ...usage.reasons]
+      }
+    }
+  }
+
+  return { sceneJson, inputs, multiplayer }
+}
+
+export type MultiplayerUsage = { authoritativeMultiplayer: boolean; reasons: string[] }
+
+const MULTIPLAYER_MODULES: { pattern: RegExp; label: string }[] = [
+  { pattern: /@dcl\/sdk\/network\//, label: '@dcl/sdk/network' },
+  { pattern: /@dcl\/sdk\/server\//, label: '@dcl/sdk/server' },
+  { pattern: /@dcl\/sdk\/message-bus\.js$/, label: '@dcl/sdk/message-bus' }
+]
+const COMMS_MODULE = '~system/CommunicationsController'
+
+function importerLabel(inputPath: string): string {
+  if (inputPath === 'sdk-scripts:script-utils') return 'asset-packs (synced entities or Admin Toolkit)'
+  const normalized = inputPath.replace(/\\/g, '/')
+  const nodeModules = normalized.lastIndexOf('node_modules/')
+  return nodeModules >= 0 ? normalized.slice(nodeModules + 'node_modules/'.length) : normalized
+}
+
+function multiplayerModuleLabel(modulePath: string): string | undefined {
+  return MULTIPLAYER_MODULES.find(({ pattern }) => pattern.test(modulePath.replace(/\\/g, '/')))?.label
+}
+
+/**
+ * A scene needs the authoritative multiplayer server iff its bundle includes the SDK
+ * network, server (storage) or message-bus modules, or calls comms directly.
+ * Only modules that survived tree-shaking count.
+ */
+export function detectMultiplayerUsage(metafile: esbuild.Metafile): MultiplayerUsage {
+  const included = new Set<string>()
+  for (const output of Object.values(metafile.outputs)) {
+    for (const [inputPath, { bytesInOutput }] of Object.entries(output.inputs)) {
+      if (bytesInOutput > 0) included.add(inputPath)
+    }
+  }
+
+  let callsCommsDirectly = false
+  const reasons = new Set<string>()
+  for (const inputPath of included) {
+    if (multiplayerModuleLabel(inputPath)) continue
+    for (const imported of metafile.inputs[inputPath]?.imports ?? []) {
+      if (imported.external && imported.path === COMMS_MODULE) {
+        callsCommsDirectly = true
+        reasons.add(`${importerLabel(inputPath)} → ${COMMS_MODULE}`)
+        continue
+      }
+      // Re-export-only entry points (e.g. @dcl/sdk/server) contribute no bytes, so label importers
+      // regardless of inclusion; whether the scene needs a server is decided from included modules.
+      const label = imported.external ? undefined : multiplayerModuleLabel(imported.path)
+      if (label) reasons.add(`${importerLabel(inputPath)} → ${label}`)
+    }
+  }
+
+  const authoritativeMultiplayer = callsCommsDirectly || [...included].some((p) => !!multiplayerModuleLabel(p))
+  return { authoritativeMultiplayer, reasons: authoritativeMultiplayer ? [...reasons] : [] }
+}
+
+async function applyMultiplayerUsage(components: BundleComponents, workingDirectory: string, usage: MultiplayerUsage) {
+  const sceneJsonPath = path.join(workingDirectory, 'scene.json')
+  try {
+    const parsed = JSON.parse(await components.fs.readFile(sceneJsonPath, 'utf-8'))
+    if (parsed.authoritativeMultiplayer !== usage.authoritativeMultiplayer) {
+      parsed.authoritativeMultiplayer = usage.authoritativeMultiplayer
+      await components.fs.writeFile(sceneJsonPath, JSON.stringify(parsed, null, 2))
+    }
+  } catch (_) {
+    // read/write failed — skip silently
+  }
+
+  if (usage.authoritativeMultiplayer) {
+    printProgressInfo(
+      components.logger,
+      `Multiplayer server: ${colors.bold('enabled')} (${usage.reasons.join(', ') || 'network modules bundled'})`
+    )
     await ensureJsonKey(
       components,
-      path.join(dir, 'package.json'),
+      path.join(workingDirectory, 'package.json'),
       'scripts.server-logs',
       'sdk-commands sdk-server-logs'
     )
+  } else {
+    printProgressInfo(components.logger, `Multiplayer server: ${colors.bold('not needed')}`)
   }
-
-  for (const input of inputs) {
-    await bundleSingleProject(components, {
-      ...options,
-      tsconfig,
-      ...input
-    })
-  }
-
-  return { sceneJson, inputs }
 }
 
 type SingleProjectOptions = CompileOptions & {
   tsconfig: string
   entrypoint: string
   outputFile: string
+  onBuild?: (usage: MultiplayerUsage) => Promise<void>
 }
 
 export async function bundleSingleProject(components: BundleComponents, options: SingleProjectOptions) {
@@ -274,8 +367,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
           }
         }
       })(),
-      // Resolve asset-packs from the scene's own node_modules (if the user explicitly installed it),
-      // otherwise fall back to the version bundled inside @dcl/inspector.
+      // Resolve asset-packs from the scene's own node_modules (if the user explicitly installed it and
+      // it isn't older than the bundled one), otherwise fall back to the version bundled inside @dcl/inspector.
       // NOTE: We use a direct path check (fs.existsSync) instead of require.resolve here because
       // require.resolve walks UP the directory tree from workingDirectory, which would incorrectly
       // pick up @dcl/asset-packs installed next to the scene (e.g. at a monorepo root) rather
@@ -288,19 +381,30 @@ export async function bundleSingleProject(components: BundleComponents, options:
           'asset-packs',
           'package.json'
         )
-        if (fs.existsSync(sceneOwnAssetPacks)) {
-          return path.dirname(sceneOwnAssetPacks)
+        const bundledAssetPacks = (() => {
+          try {
+            // Fallback: resolve from @dcl/inspector's node_modules
+            const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
+            return require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
+          } catch {
+            // Last resort: try resolving from current directory
+            return require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] })
+          }
+        })()
+        const readCopy = (packageJsonPath: string) => {
+          try {
+            const { version } = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
+            return { dir: path.dirname(packageJsonPath), version: String(version) }
+          } catch {
+            return { dir: path.dirname(packageJsonPath), version: '' }
+          }
         }
-        try {
-          // Fallback: resolve from @dcl/inspector's node_modules
-          const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
-          return path.dirname(
-            require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
-          )
-        } catch {
-          // Last resort: try resolving from current directory
-          return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
-        }
+        const picked = pickAssetPacks(
+          fs.existsSync(sceneOwnAssetPacks) ? readCopy(sceneOwnAssetPacks) : undefined,
+          readCopy(bundledAssetPacks)
+        )!
+        if (picked.warning) printWarning(components.logger, picked.warning)
+        return picked.dir
       })()
     },
     // convert filesystem paths into file:// to enable VSCode debugger
@@ -332,6 +436,16 @@ export async function bundleSingleProject(components: BundleComponents, options:
     }
   })
 
+  async function rebuild(): Promise<MultiplayerUsage> {
+    const result = await context.rebuild()
+    printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+    const detected = detectMultiplayerUsage(result.metafile!)
+    await options.onBuild?.(detected)
+    return detected
+  }
+
+  let usage: MultiplayerUsage | undefined
+
   /* istanbul ignore if */
   if (options.watch) {
     // Instead of using esbuild's watch, we create our own watcher
@@ -342,8 +456,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
 
     const debouncedRebuild = debounce(async () => {
       try {
-        await context.rebuild()
-        printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+        await rebuild()
       } catch (err: any) {
         /* istanbul ignore next */
         components.logger.error(err.toString())
@@ -365,8 +478,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     // dead when a scene was opened with a pre-existing syntax error, with no
     // watcher alive to pick up the fix.
     try {
-      await context.rebuild()
-      printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+      usage = await rebuild()
     } catch (err: any) {
       /* istanbul ignore next */
       components.logger.error(err.toString())
@@ -374,8 +486,7 @@ export async function bundleSingleProject(components: BundleComponents, options:
     printProgressInfo(components.logger, `The compiler is watching for changes`)
   } else {
     try {
-      await context.rebuild()
-      printProgressInfo(components.logger, `Bundle saved ${colors.bold(options.outputFile)}`)
+      usage = await rebuild()
     } catch (err: any) {
       /* istanbul ignore next */
       throw new CliError('BUNDLE_REBUILD_FAILED', i18next.t('errors.bundle.rebuild_failed', { error: err.toString() }))
@@ -387,6 +498,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
   if (options.watch) printProgressInfo(components.logger, `The compiler is watching for changes`)
 
   await runTypeChecker(components, options)
+
+  return usage
 }
 
 function runTypeChecker(components: BundleComponents, options: CompileOptions) {
@@ -528,7 +641,10 @@ export function compositeLoader(components: BundleComponents, options: SinglePro
           components,
           options.workingDirectory,
           compositeData,
-          { editorScene: await isEditorScene(components, options.workingDirectory) }
+          {
+            editorScene: await isEditorScene(components, options.workingDirectory),
+            networkedAssetPacks: await usesNetworkedAssetPacks(components, options.workingDirectory)
+          }
         )
 
         return {
@@ -690,13 +806,24 @@ export function callScriptMethod(entity, scriptPath, methodName, ..._args) {
 `
 }
 
-const ASSET_PACKS_BOOT = `
+const ASSET_PACKS_BOOT_NETWORKED = `
 import { engine } from '@dcl/sdk/ecs'
-import { syncEntity } from '@dcl/sdk/network'
+import { syncEntity, registerMessages } from '@dcl/sdk/network'
+import { MessageBus } from '@dcl/sdk/message-bus'
 import players from '@dcl/sdk/players'
 import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
 export function _initializeAssetPacks() {
-  initAssetPacks(engine, { syncEntity }, players)
+  initAssetPacks(engine, { syncEntity, messageBus: new MessageBus(), registerMessages }, players)
+}
+`
+
+// No network imports: bundling them marks the scene as needing a multiplayer server.
+const ASSET_PACKS_BOOT_LOCAL = `
+import { engine } from '@dcl/sdk/ecs'
+import players from '@dcl/sdk/players'
+import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'
+export function _initializeAssetPacks() {
+  initAssetPacks(engine, {}, players)
 }
 `
 
@@ -709,10 +836,10 @@ function generateVirtualModuleContent(
   runtimeImports: string,
   runtimeCode: string,
   scriptsArray: string,
-  editorScene: boolean
+  assetPacksBoot: string
 ): string {
   return `
-${editorScene ? ASSET_PACKS_BOOT : ASSET_PACKS_NOOP}
+${assetPacksBoot}
 ${runtimeImports}
 
 ${runtimeCode}
@@ -728,9 +855,14 @@ export async function generateInitializeScriptsModule(
   components: BundleComponents,
   workingDirectory: string,
   compositeData: { scripts: Map<string, Script[]>; [key: string]: any } | null,
-  opts?: { editorScene?: boolean }
+  opts?: { editorScene?: boolean; networkedAssetPacks?: boolean }
 ): Promise<{ contents: string; watchFiles: string[] }> {
   const hasScripts = !!compositeData && compositeData.scripts.size > 0
+  const assetPacksBoot = !opts?.editorScene
+    ? ASSET_PACKS_NOOP
+    : opts.networkedAssetPacks
+      ? ASSET_PACKS_BOOT_NETWORKED
+      : ASSET_PACKS_BOOT_LOCAL
 
   // scriptless non-editor scenes skip the embedded script runtime entirely
   if (!hasScripts && !opts?.editorScene) {
@@ -745,7 +877,7 @@ export async function generateInitializeScriptsModule(
   // default empty implementation if no scripts
   if (!hasScripts) {
     return {
-      contents: generateVirtualModuleContent('', runtimeCode, '[]', !!opts?.editorScene),
+      contents: generateVirtualModuleContent('', runtimeCode, '[]', assetPacksBoot),
       watchFiles: []
     }
   }
@@ -767,7 +899,7 @@ export async function generateInitializeScriptsModule(
     scriptData.runtimeImports,
     runtimeCode,
     scriptData.scriptsArray,
-    !!opts?.editorScene
+    assetPacksBoot
   )
 
   return { contents, watchFiles: scriptData.watchFiles }

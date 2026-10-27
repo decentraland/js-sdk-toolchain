@@ -183,3 +183,30 @@ export async function isEditorScene(components: Pick<CliComponents, 'fs'>, worki
     return false
   }
 }
+
+/**
+ * Returns true if main.composite has synced entities or the Admin Toolkit, the only
+ * asset-packs features that need the network. Only then does the asset-packs boot
+ * import `@dcl/sdk/network`, which marks the scene as needing a multiplayer server.
+ */
+export async function usesNetworkedAssetPacks(
+  components: Pick<CliComponents, 'fs'>,
+  workingDirectory: string
+): Promise<boolean> {
+  const mainCompositePath = path.resolve(workingDirectory, 'assets', 'scene', 'main.composite')
+  if (!(await components.fs.fileExists(mainCompositePath))) return false
+
+  try {
+    const json: unknown = JSON.parse(new TextDecoder().decode(await components.fs.readFile(mainCompositePath)))
+    const composite = json as { components?: unknown }
+    if (!Array.isArray(composite.components)) return false
+    return composite.components.some((c: unknown) => {
+      const { name, data } = (c ?? {}) as { name?: unknown; data?: unknown }
+      if (typeof name !== 'string' || !data || Object.keys(data).length === 0) return false
+      // asset-packs component versions are suffixed (`-v2`), so match by prefix
+      return name === 'core-schema::Sync-Components' || name.startsWith('asset-packs::AdminTools')
+    })
+  } catch {
+    return false
+  }
+}

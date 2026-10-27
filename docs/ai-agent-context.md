@@ -119,7 +119,7 @@ Uses esbuild with `platform: 'browser'`, `format: 'cjs'`, `target: 'es2020'`, an
 | `--explorer-alpha` | Use the new Alpha Explorer deeplink (default) |
 | `--web, --bevy-web` | Open the preview in Bevy Web (`https://decentraland.org/bevy-web/`) instead of the desktop Explorer. Chrome 142+ requires the Local Network Access permission ("Apps on device" in 145+) for the page to reach the localhost preview server; the CLI prints instructions |
 | `--mobile` | Print ASCII QR code for mobile preview |
-| `--no-server` | Don't spawn the Multiplayer Server. Use it when another preview of the same project already runs one, because two servers for one scene fight over the scene room |
+| `--no-server` | Don't spawn the Multiplayer Server. By default it only spawns when the build detects networking (`authoritativeMultiplayer` in `scene.json`, derived on every build), including partway through a watch session. Use it when another preview of the same project already runs one, because two servers for one scene fight over the scene room |
 | `--position <x,y>` | Initial spawn position (default: from `scene.json`) |
 | `--skip-auth-screen` | Skip Explorer's authentication screen |
 | `--hub` | Enable Hub mode |
