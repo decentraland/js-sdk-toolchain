@@ -41,7 +41,10 @@ export function createRendererTransport(engineApi: EngineApiForTransport): Trans
       }
       return !!message
     },
-    type: 'renderer'
+    type: 'renderer',
+    // The renderer/host is the authority for reserved-range entities (avatars,
+    // root/player/camera): it is the only transport allowed to mutate or delete them.
+    allowReservedEntities: true
   }
 
   return rendererTransport

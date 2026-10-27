@@ -11,7 +11,9 @@
   },
   "owner": "",
   "scene": {
-    "parcels": ["0,0"],
+    "parcels": [
+      "0,0"
+    ],
     "base": "0,0"
   },
   "communications": {
@@ -42,5 +44,6 @@
         "z": 8
       }
     }
-  ]
+  ],
+  "authoritativeMultiplayer": true
 }
