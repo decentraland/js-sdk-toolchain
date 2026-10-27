@@ -45,6 +45,7 @@ export function createMessageBusRelay(
     if (await isServerAtom.deref()) {
       if (sender === AUTH_SERVER_PEER_ID) return
       emitFrame({ message: frame.message, from: sender })
+      for (const listener of listeners) listener(frame.message, sender)
       return
     }
 

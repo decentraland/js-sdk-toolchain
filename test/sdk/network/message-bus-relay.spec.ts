@@ -54,13 +54,13 @@ describe('MessageBus relay', () => {
   })
 
   describe('when the server receives a client message', () => {
-    it('should rebroadcast it with the original sender', async () => {
+    it('should rebroadcast it with the original sender and deliver it to its own listeners', async () => {
       const { sent, received, deliver } = setup({ isServer: true, roomReady: true })
 
       await deliver(OTHER, { message: 'hi' })
 
       expect(sent).toEqual([{ message: 'hi', from: OTHER }])
-      expect(received).toEqual([])
+      expect(received).toEqual([['hi', OTHER]])
     })
 
     it('should relay it once its role resolves when the message arrived first', async () => {
