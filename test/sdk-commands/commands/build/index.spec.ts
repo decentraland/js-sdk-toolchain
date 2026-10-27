@@ -293,7 +293,7 @@ describe('bundle script utilities', () => {
       expect(result.watchFiles).toEqual(['/test/project/src/scripts/movePlayer.ts'])
     })
 
-    it('should boot asset-packs in editor scenes', async () => {
+    it('should boot asset-packs without network imports in editor scenes that do not use the network', async () => {
       const compositeData = { scripts: new Map(), compositeLines: [], watchFiles: [], withErrors: false }
 
       const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData, {
@@ -302,9 +302,26 @@ describe('bundle script utilities', () => {
 
       expect(result.contents).toContain("import { initAssetPacks } from '@dcl/asset-packs/dist/scene-entrypoint'")
       expect(result.contents).toMatch(
-        /export function _initializeAssetPacks\(\) \{\s*initAssetPacks\(engine, \{ syncEntity \}, players\)\s*\}/
+        /export function _initializeAssetPacks\(\) \{\s*initAssetPacks\(engine, \{\}, players\)\s*\}/
       )
+      expect(result.contents).not.toContain('@dcl/sdk/network')
+      expect(result.contents).not.toContain('@dcl/sdk/message-bus')
       expect(result.contents).not.toMatch(/^initAssetPacks\(/m)
+    })
+
+    it('should inject the network helpers in editor scenes with synced entities or the Admin Toolkit', async () => {
+      const compositeData = { scripts: new Map(), compositeLines: [], watchFiles: [], withErrors: false }
+
+      const result = await generateInitializeScriptsModule(mockComponents, '/test/project', compositeData, {
+        editorScene: true,
+        networkedAssetPacks: true
+      })
+
+      expect(result.contents).toContain("import { syncEntity, registerMessages } from '@dcl/sdk/network'")
+      expect(result.contents).toContain("import { MessageBus } from '@dcl/sdk/message-bus'")
+      expect(result.contents).toMatch(
+        /initAssetPacks\(engine, \{ syncEntity, messageBus: new MessageBus\(\), registerMessages \}, players\)/
+      )
     })
 
     it('should export a no-op asset-packs boot in scenes that are not editor scenes', async () => {

@@ -5,7 +5,13 @@ import future from '../../logic/future'
 import i18next from 'i18next'
 
 import { CliComponents } from '../../components'
-import { getBaseCoords, getFiles, getValidSceneJson, validateFilesSizes } from '../../logic/scene-validations'
+import {
+  getBaseCoords,
+  getFiles,
+  getValidSceneJson,
+  SceneWithMultiplayer,
+  validateFilesSizes
+} from '../../logic/scene-validations'
 import { declareArgs } from '../../logic/args'
 import { CliError } from '../../logic/error'
 import { printProgressInfo, printSuccess } from '../../logic/beautiful-logs'
@@ -205,10 +211,14 @@ export async function main(options: Options): Promise<ProgrammaticDeployResult |
   }
 
   if (!skipBuild) {
-    await buildScene(
+    const { multiplayer } = await buildScene(
       { ...options, args: { '--dir': projectRoot, '--watch': false, '--production': true, _: [] } },
       project
     )
+    // sceneJson was read before the build, which may have recomputed the flag the infra reads
+    if (multiplayer) {
+      ;(sceneJson as SceneWithMultiplayer).authoritativeMultiplayer = multiplayer.authoritativeMultiplayer
+    }
   }
 
   // Obtain list of files to deploy
