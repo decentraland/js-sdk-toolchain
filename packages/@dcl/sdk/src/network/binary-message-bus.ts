@@ -6,7 +6,8 @@ export enum CommsMessage {
   RES_CRDT_STATE = 9,
   CRDT_SERVER = 4,
   CRDT_AUTHORITATIVE = 5,
-  CUSTOM_EVENT = 6
+  CUSTOM_EVENT = 6,
+  MESSAGE_BUS = 10
 }
 
 export function BinaryMessageBus<T extends CommsMessage>(
