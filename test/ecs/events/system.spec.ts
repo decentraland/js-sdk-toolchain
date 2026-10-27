@@ -339,4 +339,91 @@ describe('Events System', () => {
     const feedback = PointerEvents.getOrNull(entity)?.pointerEvents
     expect(feedback?.length).toBe(0)
   })
+
+  it('should run pointer drag', async () => {
+    const entity = engine.addEntity()
+    let counter = 0
+    EventsSystem.onPointerDrag({ entity }, () => {
+      counter += 1
+    })
+    fakePointer(entity, PointerEventType.PET_DRAG)
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('should remove pointer drag', async () => {
+    const entity = engine.addEntity()
+    const PointerEvents = components.PointerEvents(engine)
+    let counter = 0
+    EventsSystem.onPointerDrag({ entity, opts: { hoverText: 'test' } }, () => {
+      counter += 1
+      EventsSystem.removeOnPointerDrag(entity)
+    })
+    fakePointer(entity, PointerEventType.PET_DRAG)
+    await engine.update(1)
+    expect(counter).toBe(1)
+
+    await engine.update(1)
+    expect(counter).toBe(1)
+    const feedback = PointerEvents.getOrNull(entity)?.pointerEvents
+    expect(feedback?.length).toBe(0)
+  })
+
+  it('should run pointer drag locked', async () => {
+    const entity = engine.addEntity()
+    let counter = 0
+    EventsSystem.onPointerDragLocked({ entity }, () => {
+      counter += 1
+    })
+    fakePointer(entity, PointerEventType.PET_DRAG_LOCKED)
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('should remove pointer drag locked', async () => {
+    const entity = engine.addEntity()
+    const PointerEvents = components.PointerEvents(engine)
+    let counter = 0
+    EventsSystem.onPointerDragLocked({ entity, opts: { hoverText: 'test' } }, () => {
+      counter += 1
+      EventsSystem.removeOnPointerDragLocked(entity)
+    })
+    fakePointer(entity, PointerEventType.PET_DRAG_LOCKED)
+    await engine.update(1)
+    expect(counter).toBe(1)
+
+    await engine.update(1)
+    expect(counter).toBe(1)
+    const feedback = PointerEvents.getOrNull(entity)?.pointerEvents
+    expect(feedback?.length).toBe(0)
+  })
+
+  it('should run pointer drag end', async () => {
+    const entity = engine.addEntity()
+    let counter = 0
+    EventsSystem.onPointerDragEnd({ entity }, () => {
+      counter += 1
+    })
+    fakePointer(entity, PointerEventType.PET_DRAG_END)
+    await engine.update(1)
+    expect(counter).toBe(1)
+  })
+
+  it('should remove pointer drag end', async () => {
+    const entity = engine.addEntity()
+    const PointerEvents = components.PointerEvents(engine)
+    let counter = 0
+    EventsSystem.onPointerDragEnd({ entity, opts: { hoverText: 'test' } }, () => {
+      counter += 1
+      EventsSystem.removeOnPointerDragEnd(entity)
+    })
+    fakePointer(entity, PointerEventType.PET_DRAG_END)
+    await engine.update(1)
+    expect(counter).toBe(1)
+
+    await engine.update(1)
+    expect(counter).toBe(1)
+    const feedback = PointerEvents.getOrNull(entity)?.pointerEvents
+    expect(feedback?.length).toBe(0)
+  })
 })

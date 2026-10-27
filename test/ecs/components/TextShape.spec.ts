@@ -9,6 +9,7 @@ describe('Generated TextShape ProtoBuf', () => {
     testComponentSerialization(TextShape, {
       text: 'true',
       font: Font.F_SANS_SERIF,
+      fontSrc: undefined,
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
       fontSize: 5,
       fontSrc: 'fonts/BungeeShade-Regular.ttf',
@@ -33,6 +34,7 @@ describe('Generated TextShape ProtoBuf', () => {
 
     testComponentSerialization(TextShape, {
       font: undefined,
+      fontSrc: undefined,
       text: 'false',
       fontSize: 15,
       fontSrc: undefined,

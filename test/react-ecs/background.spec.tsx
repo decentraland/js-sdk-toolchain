@@ -128,6 +128,25 @@ describe('UiBackground React Ecs', () => {
         }
       }
     })
+
+    backgroundProps = {
+      uiBackground: {
+        videoTexture: {
+          videoPlayerEntity: 512 as Entity,
+          wrapMode: 'repeat'
+        }
+      }
+    }
+    await engine.update(1)
+    expect(getBackground()?.texture).toMatchObject({
+      tex: {
+        $case: 'videoTexture',
+        videoTexture: {
+          videoPlayerEntity: 512,
+          wrapMode: TextureWrapMode.TWM_REPEAT
+        }
+      }
+    })
   })
 
   it('should text undefined background', async () => {

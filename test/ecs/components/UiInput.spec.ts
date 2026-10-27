@@ -16,7 +16,9 @@ describe('UiInput component', () => {
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
       font: Font.F_SANS_SERIF,
       fontSize: 14,
-      fontSrc: 'fonts/BungeeShade-Regular.ttf'
+      fontSrc: 'fonts/BungeeShade-Regular.ttf',
+      multiLine: true,
+      clearOnSubmit: false
     })
   })
 })

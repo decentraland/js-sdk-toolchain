@@ -93,4 +93,15 @@ describe('Generated MeshRenderer ProtoBuf', () => {
       }
     })
   })
+
+  it('should set a gltf mesh', () => {
+    const newEngine = Engine()
+    const MeshRenderer = components.MeshRenderer(newEngine)
+    const entity = newEngine.addEntity()
+
+    MeshRenderer.setGltfMesh(entity, 'models/test.glb', 'someGltfMeshName')
+    expect(MeshRenderer.get(entity)).toStrictEqual({
+      mesh: { $case: 'gltf', gltf: { gltfSrc: 'models/test.glb', name: 'someGltfMeshName' } }
+    })
+  })
 })
