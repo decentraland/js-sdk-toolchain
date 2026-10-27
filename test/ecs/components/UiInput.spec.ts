@@ -15,8 +15,8 @@ describe('UiInput component', () => {
       placeholderColor: Color4.Blue(),
       textAlign: TextAlignMode.TAM_BOTTOM_CENTER,
       font: Font.F_SANS_SERIF,
-      fontSrc: undefined,
       fontSize: 14,
+      fontSrc: 'fonts/BungeeShade-Regular.ttf',
       multiLine: true,
       clearOnSubmit: false
     })

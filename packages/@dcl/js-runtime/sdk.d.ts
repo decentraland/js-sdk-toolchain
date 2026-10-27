@@ -54,6 +54,7 @@ declare module '~sdk/script-utils' {
    * Users should not call this function directly.
    */
   export function _initializeScripts(engine: any): void
+  export function _initializeAssetPacks(): void
 
   /**
    * Get a specific script instance by entity and script path.

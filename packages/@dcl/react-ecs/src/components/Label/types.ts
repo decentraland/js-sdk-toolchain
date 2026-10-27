@@ -16,10 +16,10 @@ export interface UiLabelProps {
   textAlign?: TextAlignType | undefined
   /** Label font type. @defaultValue 'sans-serif' */
   font?: UiFontType | undefined
+  /** A `.ttf` file in the scene content, or a Google Fonts family name. `font` is used when it can't be loaded. */
+  fontSrc?: string | undefined
   /** Behaviour when text reached. @defaultValue 'wrap' */
   textWrap?: UiTextWrapType | undefined
-  /** A font file in the scene, or a Google Fonts family name; `font` is the fallback. @defaultValue undefined */
-  fontSrc?: string | undefined
 }
 
 /**

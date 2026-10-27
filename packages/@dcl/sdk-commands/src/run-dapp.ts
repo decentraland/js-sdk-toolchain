@@ -15,6 +15,11 @@ export interface dAppOptions {
   uri: string
 }
 
+export const LINKER_CORS_OPTIONS = {
+  methods: ['GET', 'HEAD', 'POST', 'DELETE', 'OPTIONS'],
+  exposedHeaders: ['Location', 'Preference-Applied']
+}
+
 export async function runDapp(
   cliComponents: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
   router: Router<object>,
@@ -34,7 +39,13 @@ export async function runDapp(
 
       const https = isHttps ? await getCredentials(cliComponents) : undefined
 
-      const server = await createServerComponent({ ...cliComponents, config, logs }, { https, cors: {} })
+      const server = await createServerComponent(
+        { ...cliComponents, config, logs },
+        {
+          https,
+          cors: LINKER_CORS_OPTIONS
+        }
+      )
 
       return { ...cliComponents, config, logs, server }
     },

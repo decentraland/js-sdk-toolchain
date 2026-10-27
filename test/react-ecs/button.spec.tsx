@@ -65,7 +65,7 @@ describe('Button React Ecs', () => {
     disabled = true // changes text and background color alpha value
 
     await engine.update(1)
-    expect(getPointerEvent(rootDivEntity) === null)
+    expect(getPointerEvent(rootDivEntity)).toBeNull()
     expect(getText(rootDivEntity)).toMatchObject({
       value: 'BOEDO',
       color: { r: 1, g: 0.2, b: 0.3, a: 0.5 }
@@ -79,5 +79,20 @@ describe('Button React Ecs', () => {
     expect(getBackground(rootDivEntity)).toMatchObject({
       color: { r: 0.98, g: 0.17, b: 0.33, a: 1 / 2 }
     })
+  })
+})
+
+describe('Button fontSrc', () => {
+  it('should pass fontSrc through to UiText', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiText = components.UiText(engine)
+    const buttonEntity = ((engine.addEntity() as number) + 1) as Entity
+
+    const ui = () => <Button uiTransform={{ width: 100 }} value="BOEDO" fontSrc="fonts/BungeeShade-Regular.ttf" />
+
+    uiRenderer.setUiRenderer(ui, WHOLE_SCREEN)
+    await engine.update(1)
+
+    expect(UiText.get(buttonEntity).fontSrc).toBe('fonts/BungeeShade-Regular.ttf')
   })
 })
