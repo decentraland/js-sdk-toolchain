@@ -18,6 +18,7 @@ import { CliError } from './error'
 import { getAllComposites, type Script } from './composite'
 import { isEditorScene, usesNetworkedAssetPacks } from './project-validations'
 import { SceneWithMultiplayer } from './scene-validations'
+import { pickAssetPacks } from './asset-packs'
 import { watch } from 'chokidar'
 import { debounce } from './debounce'
 
@@ -366,8 +367,8 @@ export async function bundleSingleProject(components: BundleComponents, options:
           }
         }
       })(),
-      // Resolve asset-packs from the scene's own node_modules (if the user explicitly installed it),
-      // otherwise fall back to the version bundled inside @dcl/inspector.
+      // Resolve asset-packs from the scene's own node_modules (if the user explicitly installed it and
+      // it isn't older than the bundled one), otherwise fall back to the version bundled inside @dcl/inspector.
       // NOTE: We use a direct path check (fs.existsSync) instead of require.resolve here because
       // require.resolve walks UP the directory tree from workingDirectory, which would incorrectly
       // pick up @dcl/asset-packs installed next to the scene (e.g. at a monorepo root) rather
@@ -380,19 +381,30 @@ export async function bundleSingleProject(components: BundleComponents, options:
           'asset-packs',
           'package.json'
         )
-        if (fs.existsSync(sceneOwnAssetPacks)) {
-          return path.dirname(sceneOwnAssetPacks)
+        const bundledAssetPacks = (() => {
+          try {
+            // Fallback: resolve from @dcl/inspector's node_modules
+            const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
+            return require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
+          } catch {
+            // Last resort: try resolving from current directory
+            return require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] })
+          }
+        })()
+        const readCopy = (packageJsonPath: string) => {
+          try {
+            const { version } = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'))
+            return { dir: path.dirname(packageJsonPath), version: String(version) }
+          } catch {
+            return { dir: path.dirname(packageJsonPath), version: '' }
+          }
         }
-        try {
-          // Fallback: resolve from @dcl/inspector's node_modules
-          const inspectorPath = require.resolve('@dcl/inspector/package.json', { paths: [__dirname] })
-          return path.dirname(
-            require.resolve('@dcl/asset-packs/package.json', { paths: [path.dirname(inspectorPath)] })
-          )
-        } catch {
-          // Last resort: try resolving from current directory
-          return path.dirname(require.resolve('@dcl/asset-packs/package.json', { paths: [__dirname] }))
-        }
+        const picked = pickAssetPacks(
+          fs.existsSync(sceneOwnAssetPacks) ? readCopy(sceneOwnAssetPacks) : undefined,
+          readCopy(bundledAssetPacks)
+        )!
+        if (picked.warning) printWarning(components.logger, picked.warning)
+        return picked.dir
       })()
     },
     // convert filesystem paths into file:// to enable VSCode debugger
