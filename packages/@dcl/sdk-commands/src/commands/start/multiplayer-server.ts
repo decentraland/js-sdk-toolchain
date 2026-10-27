@@ -14,7 +14,7 @@ const HAMMURABI_PACKAGE = '@dcl/hammurabi-server'
 const HAMMURABI_VERSION = 'next'
 
 const BEVY_PACKAGE = '@dcl-regenesislabs/bevy-headless-server'
-const BEVY_VERSION = '0.1.0-38716403066.commit-7be2111'
+const BEVY_VERSION = '0.1.0-40426840234.commit-2043a68'
 
 const EXIT_UNAVAILABLE = 78
 

@@ -111,7 +111,7 @@ describe('multiplayer-server', () => {
       const args: string[] = (spawn as jest.Mock).mock.calls[0][1]
       expect(args).toEqual([
         '"--yes"',
-        '"@dcl-regenesislabs/bevy-headless-server@0.1.0-38716403066.commit-7be2111"',
+        '"@dcl-regenesislabs/bevy-headless-server@0.1.0-40426840234.commit-2043a68"',
         '"--realm=http://localhost:8000"'
       ])
     })
