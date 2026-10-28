@@ -154,6 +154,8 @@ decentraland://?realm=Localhost&position=0,0&dclenv=org&local-scene=true
 | `--https` | Use HTTPS for the wallet linker |
 | `-p, --port <number>` | Port for the linker dapp |
 | `-b, --no-browser` | Don't auto-open browser for signing |
+| `--deploy-token <token>` | Token (16+ characters) that authorizes cancelling the deployment through `DELETE /api/deploy`; random per run when omitted |
+| `--programmatic` | Resolve when the deployment completes, with the result (including `deployToken`), for callers running the CLI from code |
 
 **Deployment flow:**
 1. Reads and validates `scene.json` (parcel connectivity, file sizes ≤ 50MB, etc.)
@@ -162,8 +164,13 @@ decentraland://?realm=Localhost&position=0,0&dclenv=org&local-scene=true
 4. Creates a signed `EntityType.SCENE` deployment using `DeploymentBuilder`
 5. Opens `@dcl/linker-dapp` for wallet signing (or uses `DCL_PRIVATE_KEY` env var for CI)
 6. For World scenes: deletes previous deployment before uploading
-7. Publishes to Catalyst content server (60-minute timeout)
+7. Uploads only the content the server is missing: in one request for scenes under 50 MiB or servers without batched uploads, otherwise in batches of up to 200 MB (`POST /entities?partial=true`, ADR-325). Each request times out after 10 minutes.
 8. Logs play URL on success
+
+**Deployment resource (`/api/deploy` on the linker server):** the linker dapp and Creator Hub follow and cancel the deployment through it.
+- `POST` with `Prefer: respond-async` answers `202` with the state; without it, the request waits for the outcome. `409` while another deployment runs.
+- `GET` returns the state as JSON, or as server-sent events (`state` events) with `Accept: text/event-stream`. Phases: `awaiting-signature`, `uploading`, `undeploying`, then one of `deployed`, `failed`, `cancelled` (final).
+- `DELETE` cancels it. Requires the `X-Deploy-Token` header (`403` otherwise). The token reaches the browser only in the linker URL fragment (`/#token=...`). `409` once final and while the world's previous scenes are being removed. A cancel can end with `error.code` `DEPLOY_CANCELLED_AFTER_UNDEPLOY` (the world was left without its previous scenes) or `DEPLOY_CANCEL_OUTCOME_UNCERTAIN` (the CLI couldn't tell whether the upload got published).
 
 **Deployment environments:**
 
