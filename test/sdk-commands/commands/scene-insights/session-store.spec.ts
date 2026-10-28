@@ -9,6 +9,7 @@ import { createFsComponent } from '../../../../packages/@dcl/sdk-commands/src/co
 import { IFileSystemComponent } from '../../../../packages/@dcl/sdk-commands/src/components/fs'
 import {
   createEphemeralIdentity,
+  getInsightsSessionMessage,
   delegationFromLinkerChain
 } from '../../../../packages/@dcl/sdk-commands/src/commands/scene-insights/session'
 import {
@@ -29,7 +30,7 @@ async function createDelegation(ephemeral: EphemeralIdentity, expiration: Date):
     1000,
     async (message) => ethSign(hexToBytes(wallet.privateKey), message)
   )
-  const message = Authenticator.getEphemeralMessage(ephemeral.address, expiration)
+  const message = getInsightsSessionMessage(ephemeral.address, expiration)
   return delegationFromLinkerChain(Authenticator.signPayload(dappIdentity, message), ephemeral.address, message)
 }
 
@@ -52,6 +53,20 @@ describe('when saving and loading the session', () => {
 
   afterEach(() => {
     rmSync(directory, { recursive: true, force: true })
+  })
+
+  describe('and the saved session is a legacy full login', () => {
+    beforeEach(async () => {
+      const wallet = createEphemeralIdentity()
+      const legacy = await Authenticator.initializeAuthChain(wallet.address, ephemeral, 60, async (message) =>
+        ethSign(hexToBytes(wallet.privateKey), message)
+      )
+      await saveSession({ fs }, file, ephemeral, expiration, legacy.authChain)
+    })
+
+    it('should require a new scoped login', async () => {
+      expect(await loadSession({ fs }, file)).toBeUndefined()
+    })
   })
 
   describe('and a session was saved', () => {

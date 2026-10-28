@@ -10,6 +10,7 @@ import { createWallet } from '../../../../packages/@dcl/sdk-commands/src/logic/a
 import {
   buildSignedFetchPayload,
   createEphemeralIdentity,
+  getInsightsSessionMessage,
   createSessionFromChain,
   createSessionFromPrivateKey,
   delegationFromLinkerChain,
@@ -36,7 +37,14 @@ async function verifyRequest(headers: Record<string, string>, method: string, pa
     headers['x-identity-metadata']
   )
   const chain = chainFromHeaders(headers)
-  const result = await Authenticator.validateSignature(payload, chain, null)
+  const result = await Authenticator.authorizeSignature(payload, chain, null, {
+    service: 'insights',
+    operation: pathname.includes('metrics')
+      ? 'metrics-read'
+      : pathname.includes('executions')
+        ? 'executions-read'
+        : 'logs-read'
+  })
   return { ok: result.ok, owner: Authenticator.ownerAddress(chain).toLowerCase(), length: chain.length }
 }
 
@@ -85,6 +93,33 @@ describe('when a session is created from a private key', () => {
 
     it('should produce a three-link chain that verifies as the wallet', async () => {
       expect(await verifyRequest(headers, 'GET', '/v1/logs')).toEqual({ ok: true, owner: walletAddress, length: 3 })
+    })
+
+    it('should reject a full-login verifier', async () => {
+      const chain = chainFromHeaders(headers)
+      expect(
+        (
+          await Authenticator.validateSignature(
+            buildSignedFetchPayload('GET', '/v1/logs', headers['x-identity-timestamp'], METADATA),
+            chain,
+            null
+          )
+        ).ok
+      ).toBe(false)
+    })
+
+    it('should refuse an operation outside the explicit read grants', async () => {
+      const chain = chainFromHeaders(headers)
+      expect(
+        (
+          await Authenticator.authorizeSignature(
+            buildSignedFetchPayload('GET', '/v1/logs', headers['x-identity-timestamp'], METADATA),
+            chain,
+            null,
+            { service: 'insights', operation: 'logs-delete' }
+          )
+        ).ok
+      ).toBe(false)
     })
 
     it('should send the metadata exactly as signed', () => {
@@ -139,7 +174,7 @@ describe('when the linker dApp returns a signature of the session message', () =
     walletAddress = wallet.address.toLowerCase()
     ephemeral = createEphemeralIdentity()
     expiration = new Date(Date.now() + 60 * 60 * 1000)
-    message = Authenticator.getEphemeralMessage(ephemeral.address, expiration)
+    message = getInsightsSessionMessage(ephemeral.address, expiration)
     dappChain = await signLikeTheLinkerDapp(walletKey, message)
   })
 
@@ -154,7 +189,7 @@ describe('when the linker dApp returns a signature of the session message', () =
       expect(delegation.map((link) => link.type)).toEqual([
         AuthLinkType.SIGNER,
         AuthLinkType.ECDSA_PERSONAL_EPHEMERAL,
-        AuthLinkType.ECDSA_PERSONAL_EPHEMERAL
+        'ECDSA_SCOPED_EPHEMERAL'
       ])
     })
 

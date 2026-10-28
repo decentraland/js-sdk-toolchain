@@ -2,12 +2,12 @@ import { homedir } from 'os'
 import path from 'path'
 import { randomBytes } from 'crypto'
 import ignore from 'ignore'
-import { AuthChain, AuthIdentity, Authenticator } from '@dcl/crypto'
+import { AuthChain, AuthIdentity, Authenticator, isOperationGranted } from '@dcl/crypto'
 
 import { CliComponents } from '../../components'
 import { getDCLIgnorePatterns } from '../../logic/dcl-ignore'
 import { CliError } from '../../logic/error'
-import { InsightsSession, createSessionFromChain } from './session'
+import { InsightsSession, createSessionFromChain, INSIGHTS_SERVICE, INSIGHTS_OPERATIONS } from './session'
 
 /** Environment variable that moves the saved session, e.g. into a sandbox an agent can read. */
 export const SESSION_FILE_ENV = 'DCL_SCENE_INSIGHTS_SESSION_FILE'
@@ -63,8 +63,21 @@ export async function loadSession(
   const expiration = new Date(saved.expiration)
   if (!(expiration.getTime() - EXPIRY_MARGIN_MS > now)) return undefined
 
-  const check = await Authenticator.validateSignature(saved.ephemeralIdentity.address, saved.authChain, null, now)
-  if (!check.ok) return undefined
+  const check = await Authenticator.validateSignature(
+    saved.ephemeralIdentity.address.toLowerCase(),
+    saved.authChain,
+    null,
+    now,
+    { service: INSIGHTS_SERVICE }
+  )
+  if (
+    !check.ok ||
+    !check.scope ||
+    !INSIGHTS_OPERATIONS.every((operation) => isOperationGranted(check.scope, operation))
+  )
+    return undefined
+  expiration.setTime(Math.min(expiration.getTime(), check.scope.expiration))
+  if (!(expiration.getTime() - EXPIRY_MARGIN_MS > now)) return undefined
 
   return { session: createSessionFromChain(saved.ephemeralIdentity, expiration, saved.authChain), saved }
 }

@@ -1,5 +1,12 @@
 import { randomBytes } from 'crypto'
-import { AuthChain, AuthIdentity, AuthLinkType, Authenticator } from '@dcl/crypto'
+import {
+  AuthChain,
+  AuthIdentity,
+  AuthLinkType,
+  Authenticator,
+  ScopedAuthLinkType,
+  getScopedEphemeralMessage
+} from '@dcl/crypto'
 import { ethSign } from '@dcl/crypto/dist/crypto'
 import { hexToBytes } from 'eth-connect'
 
@@ -9,6 +16,16 @@ import { createAuthChainHeaders } from '../../logic/auth-chain-headers'
 
 /** How long one signature lasts; after that, `scene-insights login` signs a new session. */
 export const SESSION_MINUTES = 12 * 60
+export const INSIGHTS_SERVICE = 'insights'
+export const INSIGHTS_OPERATIONS = ['logs-read', 'metrics-read', 'executions-read'] as const
+
+export function getInsightsSessionMessage(address: string, expiration: Date): string {
+  return getScopedEphemeralMessage(
+    address,
+    expiration,
+    INSIGHTS_OPERATIONS.map((operation) => ({ service: INSIGHTS_SERVICE, operation }))
+  )
+}
 
 /**
  * Signs any number of requests after a single wallet signature.
@@ -65,11 +82,11 @@ export function createSessionFromPrivateKey(privateKey: string, now: number = Da
   const wallet = createWallet(privateKey)
   const ephemeralIdentity = createEphemeralIdentity()
   const expiration = new Date(now + SESSION_MINUTES * 60 * 1000)
-  const message = Authenticator.getEphemeralMessage(ephemeralIdentity.address, expiration)
+  const message = getInsightsSessionMessage(ephemeralIdentity.address, expiration)
   const authChain: AuthChain = [
     { type: AuthLinkType.SIGNER, payload: wallet.address, signature: '' },
     {
-      type: AuthLinkType.ECDSA_PERSONAL_EPHEMERAL,
+      type: ScopedAuthLinkType.ECDSA_PERSONAL_SCOPED_EPHEMERAL as AuthLinkType,
       payload: message,
       signature: ethSign(hexToBytes(wallet.privateKey), message)
     }
@@ -82,11 +99,11 @@ export function createSessionFromPrivateKey(privateKey: string, now: number = Da
  *
  * The dApp signs whatever it is given with its own browser-side ephemeral key, closing the chain
  * with an `ECDSA_SIGNED_ENTITY` link. Handing it our ephemeral key's login message makes that last
- * link a signature of the message by the dApp's key, which is exactly an ephemeral delegation, so
+ * link a signature of the message by the dApp's key, which is exactly a scoped delegation, so
  * it is relabeled as one: wallet → dApp key → our key.
  *
  * @throws CliError when the chain does not sign the message, or comes from a contract wallet
- *   (the service only accepts contract-wallet chains of up to three links).
+ *   (scoped contract-wallet chains require a provider rather than Catalyst validation).
  */
 export async function delegationFromLinkerChain(
   authChain: AuthChain,
@@ -111,8 +128,13 @@ export async function delegationFromLinkerChain(
     throw new CliError('SCENE_INSIGHTS_INVALID_SIGNATURE', 'The wallet did not sign the insights session')
   }
 
-  const delegation: AuthChain = [...authChain.slice(0, -1), { ...last, type: AuthLinkType.ECDSA_PERSONAL_EPHEMERAL }]
-  const result = await Authenticator.validateSignature(ephemeralAddress, delegation, null, now)
+  const delegation: AuthChain = [
+    ...authChain.slice(0, -1),
+    { ...last, type: ScopedAuthLinkType.ECDSA_PERSONAL_SCOPED_EPHEMERAL as AuthLinkType }
+  ]
+  const result = await Authenticator.validateSignature(ephemeralAddress.toLowerCase(), delegation, null, now, {
+    service: INSIGHTS_SERVICE
+  })
   if (!result.ok) {
     throw new CliError(
       'SCENE_INSIGHTS_INVALID_SIGNATURE',

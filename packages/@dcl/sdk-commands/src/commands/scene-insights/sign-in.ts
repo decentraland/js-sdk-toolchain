@@ -9,6 +9,8 @@ import { dAppOptions, runDapp } from '../../run-dapp'
 import {
   InsightsSession,
   SESSION_MINUTES,
+  INSIGHTS_SERVICE,
+  getInsightsSessionMessage,
   createEphemeralIdentity,
   createSessionFromChain,
   createSessionFromPrivateKey,
@@ -74,7 +76,7 @@ export async function getSession(
 
   const ephemeralIdentity = createEphemeralIdentity()
   const expiration = new Date(Date.now() + SESSION_MINUTES * 60 * 1000)
-  const message = Authenticator.getEphemeralMessage(ephemeralIdentity.address, expiration)
+  const message = getInsightsSessionMessage(ephemeralIdentity.address, expiration)
 
   const signed = future<AuthChain>()
   const { router: commonRouter } = setRoutes(components, {
@@ -90,7 +92,12 @@ export async function getSession(
   })
   const router = setSignInRoutes(commonRouter, ephemeralIdentity.address, message, (chain) => signed.resolve(chain))
 
-  components.logger.info(`Sign once to read scene insights for the next ${SESSION_MINUTES / 60} hours`)
+  components.logger.info(
+    `Sign read-only access to logs, metrics and executions for the next ${SESSION_MINUTES / 60} hours`
+  )
+  components.logger.info(
+    'This credential works across Insights environments sharing the insights service identifier, including .org and .zone.'
+  )
   const { program } = await runDapp(components, router, { ...options.linkOptions, uri: '/' })
 
   let authChain: AuthChain
@@ -100,6 +107,17 @@ export async function getSession(
     void program.stop()
   }
 
+  const validated = await Authenticator.validateSignature(
+    ephemeralIdentity.address.toLowerCase(),
+    authChain,
+    null,
+    Date.now(),
+    { service: INSIGHTS_SERVICE }
+  )
+  if (!validated.ok || !validated.scope) {
+    throw new CliError('SCENE_INSIGHTS_INVALID_SIGNATURE', 'The wallet did not return a valid scoped insights login')
+  }
+  expiration.setTime(Math.min(expiration.getTime(), validated.scope.expiration))
   await saveSession(components, options.file, ephemeralIdentity, expiration, authChain)
   return { session: createSessionFromChain(ephemeralIdentity, expiration, authChain), source: 'signed' }
 }
