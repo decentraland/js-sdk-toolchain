@@ -1,4 +1,5 @@
 export { EnvVar } from './env-var'
+export { Badges, IBadges } from './badges'
 export {
   Storage,
   IStorage,
