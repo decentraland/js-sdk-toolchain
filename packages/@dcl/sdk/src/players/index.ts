@@ -19,6 +19,7 @@ type GetPlayerDataRes = {
   avatar?: PBAvatarBase
   wearables: PBAvatarEquippedData['wearableUrns']
   emotes: PBAvatarEquippedData['emoteUrns']
+  forceRender: PBAvatarEquippedData['forceRender']
   position: TransformType['position'] | undefined
 }
 
@@ -97,6 +98,7 @@ export function definePlayerHelper(engine: IEngine) {
         // out the component's own frozen array would throw on any caller that writes.
         wearables: [...(wearablesData?.wearableUrns ?? [])],
         emotes: [...(wearablesData?.emoteUrns ?? [])],
+        forceRender: [...(wearablesData?.forceRender ?? [])],
         position: Transform.getOrNull(userEntity)?.position
       }
     }

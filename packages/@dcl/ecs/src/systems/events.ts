@@ -73,6 +73,27 @@ export interface PointerEventsSystem {
 
   /**
    * @public
+   * Remove the callback for onPointerDrag event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerDrag(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onPointerDragLocked event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerDragLocked(entity: Entity): void
+
+  /**
+   * @public
+   * Remove the callback for onPointerDragEnd event
+   * @param entity - Entity where the callback was attached
+   */
+  removeOnPointerDragEnd(entity: Entity): void
+
+  /**
+   * @public
    * Remove the callback for onProximityDown event
    * @param entity - Entity where the callback was attached
    */
@@ -160,6 +181,33 @@ export interface PointerEventsSystem {
 
   /**
    * @public
+   * Execute callback while the user holds the button pressed and moves the pointer, having pressed it on the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute on every drag update
+   */
+  onPointerDrag(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+
+  /**
+   * @public
+   * Same as onPointerDrag, but the cursor is locked in place for the duration of the drag
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute on every drag update
+   */
+  onPointerDragLocked(
+    pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> },
+    cb: EventSystemCallback
+  ): void
+
+  /**
+   * @public
+   * Execute callback when the user releases the button after a drag that started on the entity
+   * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
+   * @param cb - Function to execute when the drag ends
+   */
+  onPointerDragEnd(pointerData: { entity: Entity; opts?: Partial<EventSystemOptions> }, cb: EventSystemCallback): void
+
+  /**
+   * @public
    * Execute callback when the user presses the proximity button on the entity
    * @param pointerData - Entity to attach the callback - Opts to trigger Feedback and Button
    * @param cb - Function to execute when click fires
@@ -205,7 +253,10 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     HoverEnter,
     HoverLeave,
     ProximityEnter,
-    ProximityLeave
+    ProximityLeave,
+    Drag,
+    DragLocked,
+    DragEnd
   }
   type EventMapType = Map<string, { cb: EventSystemCallback; opts: EventSystemOptions; eventType: EventType }>
 
@@ -301,6 +352,12 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       return PointerEventType.PET_PROXIMITY_ENTER
     } else if (eventType === EventType.ProximityLeave) {
       return PointerEventType.PET_PROXIMITY_LEAVE
+    } else if (eventType === EventType.Drag) {
+      return PointerEventType.PET_DRAG
+    } else if (eventType === EventType.DragLocked) {
+      return PointerEventType.PET_DRAG_LOCKED
+    } else if (eventType === EventType.DragEnd) {
+      return PointerEventType.PET_DRAG_END
     }
     return PointerEventType.PET_DOWN
   }
@@ -341,7 +398,10 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
           eventType === EventType.HoverEnter ||
           eventType === EventType.HoverLeave ||
           eventType === EventType.ProximityEnter ||
-          eventType === EventType.ProximityLeave
+          eventType === EventType.ProximityLeave ||
+          eventType === EventType.Drag ||
+          eventType === EventType.DragLocked ||
+          eventType === EventType.DragEnd
         ) {
           const command = inputSystem.getInputCommand(opts.button, getPointerEvent(eventType), entity)
           if (command) {
@@ -392,6 +452,33 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     removeEvent(entity, EventType.HoverLeave)
     setEvent(entity, EventType.HoverLeave, cb, options)
     setPointerEvent(entity, PointerEventType.PET_HOVER_LEAVE, options)
+  }
+
+  const onPointerDrag: PointerEventsSystem['onPointerDrag'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.Drag)
+    setEvent(entity, EventType.Drag, cb, options)
+    setPointerEvent(entity, PointerEventType.PET_DRAG, options)
+  }
+
+  const onPointerDragLocked: PointerEventsSystem['onPointerDragLocked'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.DragLocked)
+    setEvent(entity, EventType.DragLocked, cb, options)
+    setPointerEvent(entity, PointerEventType.PET_DRAG_LOCKED, options)
+  }
+
+  const onPointerDragEnd: PointerEventsSystem['onPointerDragEnd'] = (...args) => {
+    const [data, cb] = args
+    const { entity, opts } = data
+    const options = getDefaultOpts(opts)
+    removeEvent(entity, EventType.DragEnd)
+    setEvent(entity, EventType.DragEnd, cb, options)
+    setPointerEvent(entity, PointerEventType.PET_DRAG_END, options)
   }
 
   const onProximityDown: PointerEventsSystem['onProximityDown'] = (...args) => {
@@ -451,6 +538,18 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
       removeEvent(entity, EventType.HoverLeave)
     },
 
+    removeOnPointerDrag(entity: Entity) {
+      removeEvent(entity, EventType.Drag)
+    },
+
+    removeOnPointerDragLocked(entity: Entity) {
+      removeEvent(entity, EventType.DragLocked)
+    },
+
+    removeOnPointerDragEnd(entity: Entity) {
+      removeEvent(entity, EventType.DragEnd)
+    },
+
     removeOnProximityDown(entity: Entity) {
       removeEvent(entity, EventType.Down, InteractionType.PROXIMITY)
     },
@@ -482,6 +581,9 @@ export function createPointerEventsSystem(engine: IEngine, inputSystem: IInputSy
     onPointerUp,
     onPointerHoverEnter,
     onPointerHoverLeave,
+    onPointerDrag,
+    onPointerDragLocked,
+    onPointerDragEnd,
     onProximityDown,
     onProximityUp,
     onProximityEnter,

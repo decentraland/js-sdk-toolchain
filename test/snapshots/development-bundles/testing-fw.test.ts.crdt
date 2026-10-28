@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=635k bytes
+SCENE_COMPILED_JS_SIZE_PROD=688.2k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -9,9 +9,9 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
-  OPCODES ~= 68k
-  MALLOC_COUNT = 17607
-  ALIVE_OBJS_DELTA ~= 3.46k
+  OPCODES ~= 73k
+  MALLOC_COUNT = 18756
+  ALIVE_OBJS_DELTA ~= 3.71k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
@@ -28,7 +28,6 @@ CALL onUpdate(0.1)
   LOG: ["🧪 Running test two way communication"]
   LOG: ["✅ RootEntity has a transform"]
   LOG: ["✅ RootEntity has the correct scale"]
-  LOG: ["⏱️ yield"]
   Scene: PUT_COMPONENT e=0x0 c=1 t=2 data={"position":{"x":1,"y":1,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=0"]
@@ -36,7 +35,6 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = 67
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
-  LOG: ["⏱️ yield"]
   Scene: DELETE_COMPONENT e=0x200 c=1 t=2 data=null
   Scene: DELETE_COMPONENT e=0x0 c=1 t=3 data=null
   Scene: DELETE_ENTITY e=0x200
@@ -45,7 +43,6 @@ CALL onUpdate(0.1)
   MALLOC_COUNT = -42
   ALIVE_OBJS_DELTA ~= -0.01k
 CALL onUpdate(0.1)
-  LOG: ["⏱️ yield"]
   Scene: PUT_COMPONENT e=0x0 c=1 t=4 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   LOG: ["Adding one to position.y=0"]
   OPCODES ~= 6k
@@ -60,4 +57,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 5k
   MALLOC_COUNT = -40
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1569.54k bytes
+  MEMORY_USAGE_COUNT ~= 1665.75k bytes
