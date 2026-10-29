@@ -14,7 +14,7 @@
     "@dcl/inspector": "7.36.3",
     "@dcl/linker-dapp": "0.16.0",
     "@dcl/mini-comms": "1.0.1-20230216163137.commit-a4c75be",
-    "@dcl/protocol": "1.0.0-39771882714.commit-70f2654",
+    "@dcl/protocol": "1.0.0-40563911091.commit-694568d",
     "@dcl/quests-client": "^1.0.3",
     "@dcl/quests-manager": "^0.1.4",
     "@dcl/rpc": "^1.1.1",
