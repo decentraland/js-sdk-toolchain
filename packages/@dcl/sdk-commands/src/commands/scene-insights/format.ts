@@ -4,6 +4,14 @@ import { ExecutionsResult, GaugePoint, LogEntry, MetricNamesResult, MetricSeries
 const SPARK = '▁▂▃▄▅▆▇█'
 const identity = (text: string | number) => String(text)
 
+/** C0 and C1 control characters except tab and newline: escape sequences a terminal would act on. */
+const CONTROL_CHARACTERS = /[\u0000-\u0008\u000b-\u001f\u007f-\u009f]/g
+
+/** Removes what a terminal would interpret (cursor moves, OSC 8 links, OSC 52 clipboard writes) from service text. */
+export function stripControlCharacters(text: string): string {
+  return text.replace(CONTROL_CHARACTERS, '')
+}
+
 /** `2026-10-12T14:13:02.166Z` → `2026-10-12 14:13:02.166Z`; anything unparseable is returned as is. */
 export function formatTimestamp(iso: string): string {
   const time = Date.parse(iso)
@@ -24,11 +32,13 @@ export function formatLogEntry(entry: LogEntry, color: boolean): string {
     }[entry.level] ?? identity
   const dim = color ? colors.dim : identity
 
-  const time = formatTimestamp(entry.timestamp)
-  const level = entry.level.toUpperCase().padEnd(5)
-  const source = entry.source === 'scene' ? '' : `[${entry.source}] `
+  const time = stripControlCharacters(formatTimestamp(entry.timestamp))
+  const level = stripControlCharacters(entry.level.toUpperCase()).padEnd(5)
+  const source = entry.source === 'scene' ? '' : `[${stripControlCharacters(entry.source)}] `
   const prefix = `${time} ${level} `
-  const message = entry.message.split('\n').join('\n' + ' '.repeat(prefix.length))
+  const message = stripControlCharacters(entry.message)
+    .split('\n')
+    .join('\n' + ' '.repeat(prefix.length))
   const truncated = entry.truncated ? dim(' … (truncated)') : ''
 
   return `${dim(time)} ${paint(level)} ${dim(source)}${paint(message)}${truncated}`
@@ -73,7 +83,8 @@ export function sparkline(values: Array<number | null>): string {
 }
 
 /** Left-aligned columns separated by two spaces. */
-export function formatTable(header: string[], rows: string[][]): string[] {
+export function formatTable(header: string[], rawRows: string[][]): string[] {
+  const rows = rawRows.map((row) => row.map(stripControlCharacters))
   const widths = header.map((title, column) => Math.max(title.length, ...rows.map((row) => row[column].length)))
   const line = (cells: string[]) =>
     cells
@@ -85,7 +96,7 @@ export function formatTable(header: string[], rows: string[][]): string[] {
 
 export function formatMetricNames(result: MetricNamesResult): string[] {
   if (result.metrics.length === 0) {
-    return [`No metrics for ${result.sceneKey} between ${result.from} and ${result.to}`]
+    return [stripControlCharacters(`No metrics for ${result.sceneKey} between ${result.from} and ${result.to}`)]
   }
   return formatTable(
     ['METRIC', 'TYPE', 'UNIT'],
@@ -98,7 +109,9 @@ export function formatMetricNames(result: MetricNamesResult): string[] {
  * maximum; sums show the bucket total and its rate per second.
  */
 export function formatMetricSeries(series: MetricSeries): string[] {
-  const head = `${series.metric} (${series.type ?? 'no data'}, ${series.unit}) every ${series.stepSeconds}s, ${formatTimestamp(series.from)} → ${formatTimestamp(series.to)}`
+  const head = stripControlCharacters(
+    `${series.metric} (${series.type ?? 'no data'}, ${series.unit}) every ${series.stepSeconds}s, ${formatTimestamp(series.from)} → ${formatTimestamp(series.to)}`
+  )
   if (series.type === null || series.points.length === 0) {
     return [head, 'No data in this range']
   }
@@ -131,7 +144,7 @@ export function formatMetricSeries(series: MetricSeries): string[] {
 
 export function formatExecutions(result: ExecutionsResult): string[] {
   if (result.executions.length === 0) {
-    return [`No executions of ${result.sceneKey} in this range`]
+    return [stripControlCharacters(`No executions of ${result.sceneKey} in this range`)]
   }
   return formatTable(
     ['EXECUTION', 'ENTITY', 'FIRST SEEN', 'LAST SEEN', 'LINES', 'INSTANCE'],

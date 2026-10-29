@@ -1,5 +1,6 @@
 import { CliComponents } from '../../components'
 import { CliError, CliErrorName } from '../../logic/error'
+import { stripControlCharacters } from './format'
 import { InsightsSession } from './session'
 import { ExecutionsResult, LogEntry, LogSearchResult, MetricNamesResult, MetricSeries } from './types'
 
@@ -134,6 +135,7 @@ export async function errorFromResponse(response: Response): Promise<CliError<Cl
   } catch {
     // keep the status alone
   }
+  reason = stripControlCharacters(reason)
 
   const { name, hint } = ERRORS_BY_STATUS[response.status] ?? { name: 'SCENE_INSIGHTS_REQUEST_FAILED' }
   const message = `The insights service answered ${response.status}${reason ? `: ${reason}` : ''}${hint ? ` (${hint})` : ''}`
@@ -144,6 +146,19 @@ export async function errorFromResponse(response: Response): Promise<CliError<Cl
 function unreachable(baseUrl: string, error: unknown): CliError<'SCENE_INSIGHTS_UNAVAILABLE'> {
   const cause = (error as { cause?: { code?: string } })?.cause?.code ?? (error as Error)?.message
   return new CliError('SCENE_INSIGHTS_UNAVAILABLE', `Could not reach ${baseUrl}${cause ? ` (${cause})` : ''}`)
+}
+
+/** Whether a parsed `log` event has the fields the tail prints and filters on. */
+function isLogEntry(value: unknown): value is LogEntry {
+  const entry = value as Partial<LogEntry> | null
+  return (
+    typeof entry === 'object' &&
+    entry !== null &&
+    typeof entry.message === 'string' &&
+    typeof entry.level === 'string' &&
+    typeof entry.source === 'string' &&
+    typeof entry.timestamp === 'string'
+  )
 }
 
 const sleep = (ms: number, signal?: AbortSignal) =>
@@ -189,15 +204,34 @@ export function createInsightsClient(
         throw unreachable(base, error)
       }
       if (response.ok) {
-        return (await response.json()) as T
+        return readJson<T>(response)
       }
       if ((response.status === 429 || response.status === 503) && attempt < MAX_BUSY_RETRIES) {
         const delay = retryAfterMs(response)
+        // an unread body keeps its socket until it is garbage collected
+        await response.body?.cancel()
         logger.log(`The insights service is busy (${response.status}); retrying in ${Math.ceil(delay / 1000)}s`)
         await sleep(delay)
         continue
       }
       throw await errorFromResponse(response)
+    }
+  }
+
+  async function readJson<T>(response: Response): Promise<T> {
+    let text: string
+    try {
+      text = await response.text()
+    } catch (error) {
+      throw unreachable(base, error)
+    }
+    try {
+      return JSON.parse(text) as T
+    } catch {
+      throw new CliError(
+        'SCENE_INSIGHTS_REQUEST_FAILED',
+        `The insights service answered ${response.status} with a body that is not JSON: ${stripControlCharacters(text.slice(0, 200))}`
+      )
     }
   }
 
@@ -228,6 +262,7 @@ export function createInsightsClient(
             throw await errorFromResponse(response)
           }
           serverRetryMs = retryAfterMs(response)
+          await response.body?.cancel()
           logger.log(`The insights service is busy (${response.status}); reconnecting`)
         } else if (response.body) {
           reconnectMs = TAIL_RECONNECT_MIN_MS
@@ -240,9 +275,22 @@ export function createInsightsClient(
               } catch {
                 streamError = event.data
               }
+              streamError = stripControlCharacters(streamError)
             } else if (event.event === 'log') {
-              const entry = JSON.parse(event.data) as LogEntry
               if (event.id) lastEventId = event.id
+              // skipped rather than thrown: a throw here reads as a dropped connection and resumes at the same line
+              let entry: unknown
+              try {
+                entry = JSON.parse(event.data)
+              } catch {
+                entry = undefined
+              }
+              if (!isLogEntry(entry)) {
+                logger.log(
+                  `Skipped a malformed log line from the insights service${event.id ? ` (event ${event.id})` : ''}`
+                )
+                return
+              }
               // an empty id means the line has none: never treat it as a repeat
               if (!entry.id || seen.add(entry.id)) onLog(entry)
             }

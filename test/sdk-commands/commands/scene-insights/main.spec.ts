@@ -5,6 +5,16 @@ import { initComponents } from '../../../../packages/@dcl/sdk-commands/src/compo
 import { parseArgs } from '../../../../packages/@dcl/sdk-commands/src/logic/args'
 import { args, main } from '../../../../packages/@dcl/sdk-commands/src/commands/scene-insights'
 
+/** An event stream that stays open until the request is aborted. */
+function openStream(signal: AbortSignal): Response {
+  const body = new ReadableStream({
+    start(controller) {
+      signal.addEventListener('abort', () => controller.error(new DOMException('aborted', 'AbortError')))
+    }
+  })
+  return new Response(body, { status: 200, headers: { 'content-type': 'text/event-stream' } })
+}
+
 describe('when running scene-insights', () => {
   let directory: string
   let sessionFile: string | undefined
@@ -104,6 +114,107 @@ describe('when running scene-insights', () => {
         address: expect.stringMatching(/^0x[0-9a-fA-F]{40}$/),
         expiration: null,
         source: 'DCL_PRIVATE_KEY'
+      })
+    })
+  })
+
+  describe('and a subcommand gets a stray argument', () => {
+    beforeEach(async () => {
+      await main({ args: parseArgs(['logs', 'error', '--world', 'example', '--json'], args), components })
+    })
+
+    it('should refuse it with the invalid arguments code', () => {
+      expect({ error: JSON.parse(stderr.mock.calls[0][0]).error, exitCode: process.exitCode }).toEqual({
+        error: expect.objectContaining({ message: 'Unexpected argument "error" for logs' }),
+        exitCode: 2
+      })
+    })
+  })
+
+  describe('and a flag of another subcommand is passed', () => {
+    beforeEach(async () => {
+      await main({
+        args: parseArgs(['logs', '--for', '5m', '--step', '60', '--world', 'example', '--json'], args),
+        components
+      })
+    })
+
+    it('should refuse it instead of ignoring it', () => {
+      expect(JSON.parse(stderr.mock.calls[0][0]).error).toMatchObject({
+        message: '--for, --step do not apply to logs',
+        exitCode: 2
+      })
+    })
+  })
+
+  describe('and the target is not a Decentraland host', () => {
+    beforeEach(async () => {
+      await main({
+        args: parseArgs(
+          ['executions', '--world', 'example', '--target', 'https://insights.example.com', '--json'],
+          args
+        ),
+        components
+      })
+    })
+
+    it('should refuse it before signing anything', () => {
+      expect(JSON.parse(stderr.mock.calls[0][0]).error).toMatchObject({
+        message: expect.stringContaining('pass --trust-target'),
+        exitCode: 2
+      })
+    })
+  })
+
+  describe('and the tail is followed', () => {
+    let sigintListenersBefore: number
+    let sigintListenersDuring: number
+
+    beforeEach(() => {
+      // a throwaway key generated for the test, never a real account
+      process.env.DCL_PRIVATE_KEY = '0x' + '11'.repeat(32)
+      sigintListenersBefore = process.listenerCount('SIGINT')
+    })
+
+    describe('and it is interrupted', () => {
+      beforeEach(async () => {
+        jest.spyOn(components.fetch, 'fetch').mockImplementation(async (_url: any, init: any) => {
+          sigintListenersDuring = process.listenerCount('SIGINT')
+          const [interrupt] = process.listeners('SIGINT').slice(sigintListenersBefore)
+          setImmediate(() => (interrupt as () => void)())
+          return openStream(init.signal) as any
+        })
+        await main({ args: parseArgs(['tail', '--world', 'example', '--json'], args), components })
+      })
+
+      it('should stop, removing the SIGINT listener it added', () => {
+        expect({ during: sigintListenersDuring, after: process.listenerCount('SIGINT') }).toEqual({
+          during: sigintListenersBefore + 1,
+          after: sigintListenersBefore
+        })
+      })
+    })
+
+    describe('and it is limited with --for', () => {
+      let startedAt: number
+      let elapsed: number
+
+      beforeEach(async () => {
+        jest
+          .spyOn(components.fetch, 'fetch')
+          .mockImplementation(async (_url: any, init: any) => openStream(init.signal) as any)
+        startedAt = Date.now()
+        await main({ args: parseArgs(['tail', '--world', 'example', '--for', '1s', '--json'], args), components })
+        elapsed = Date.now() - startedAt
+      })
+
+      it('should stop after that long and remove its SIGINT listener', () => {
+        expect({ stoppedInTime: elapsed >= 900 && elapsed < 3000, listeners: process.listenerCount('SIGINT') }).toEqual(
+          {
+            stoppedInTime: true,
+            listeners: sigintListenersBefore
+          }
+        )
       })
     })
   })

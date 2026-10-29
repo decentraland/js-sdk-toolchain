@@ -122,14 +122,36 @@ export async function getSession(
   return { session: createSessionFromChain(ephemeralIdentity, expiration, authChain), source: 'signed' }
 }
 
-/** The linker dApp posts `view-logs` signatures to `/api/logs`. */
-function setSignInRoutes(
+const LOOPBACK_HOSTNAMES = ['localhost', '127.0.0.1', '[::1]']
+
+/**
+ * Whether a request comes from the linker dApp's own page. The browser sets Origin and Host, so
+ * another page open in it (or a rebinding domain) can't pass for the dApp.
+ */
+export function isLinkerOrigin(origin: string | null, host: string | null): boolean {
+  if (!origin || !host) return false
+  try {
+    const url = new URL(origin)
+    return url.host === host && LOOPBACK_HOSTNAMES.includes(url.hostname)
+  } catch {
+    return false
+  }
+}
+
+/**
+ * The linker dApp posts `view-logs` signatures to `/api/logs`. Only its own page is accepted: any
+ * other page could sign the message with its own wallet and sign the CLI in as that address.
+ */
+export function setSignInRoutes(
   router: Router<object>,
   ephemeralAddress: string,
   message: string,
   onSigned: (delegation: AuthChain) => void
 ): Router<object> {
   router.post('/api/logs', async (ctx) => {
+    if (!isLinkerOrigin(ctx.request.headers.get('origin'), ctx.request.headers.get('host'))) {
+      return { status: 403, body: { success: false, error: 'Sign from the page the CLI opened on localhost' } }
+    }
     const value = (await ctx.request.json()) as LinkerResponse
     try {
       if (!value.address || !Array.isArray(value.authChain)) {

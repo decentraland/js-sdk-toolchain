@@ -8,6 +8,7 @@ import {
 import { InsightsClient } from '../../../../packages/@dcl/sdk-commands/src/commands/scene-insights/client'
 import {
   formatLogEntry,
+  formatTable,
   formatValue,
   sparkline
 } from '../../../../packages/@dcl/sdk-commands/src/commands/scene-insights/format'
@@ -112,6 +113,17 @@ describe('when running the logs subcommand', () => {
 
     it('should print no text', () => {
       expect({ written, notes }).toEqual({ written: [], notes: [] })
+    })
+  })
+
+  describe('and a page comes back empty with a cursor', () => {
+    beforeEach(async () => {
+      searchLogs.mockResolvedValue(page([], 'cursor-again'))
+      await runLogs(client, { limit: 100, order: 'desc' }, output)
+    })
+
+    it('should stop paging', () => {
+      expect(searchLogs).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -268,6 +280,25 @@ describe('when formatting a log entry without color', () => {
         '2026-10-12 14:00:00.000Z INFO  long … (truncated)'
       )
     })
+  })
+
+  describe('and it contains terminal escape sequences', () => {
+    it('should remove the control characters but keep tabs and line breaks', () => {
+      expect(
+        formatLogEntry(
+          logEntry('1', '\u001b]8;;https://example.com\u0007link\u001b[2J\r\ta\nb\u009b', { source: 'x\u001b[1A' }),
+          false
+        )
+      ).toBe(
+        '2026-10-12 14:00:00.000Z INFO  [x[1A] ]8;;https://example.comlink[2J\ta\n                               b'
+      )
+    })
+  })
+})
+
+describe('when formatting a table with service values', () => {
+  it('should remove the control characters from the cells', () => {
+    expect(formatTable(['NAME'], [['a\u001b]52;c;aGk=\u0007b']])).toEqual(['NAME', 'a]52;c;aGk=b'])
   })
 })
 

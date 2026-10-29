@@ -29,6 +29,11 @@ const DURATION_UNITS_MS: Record<string, number> = {
   h: 60 * 60 * 1000,
   d: 24 * 60 * 60 * 1000
 }
+/** setTimeout fires at once past 2^31-1 ms (about 24.8 days). */
+const MAX_DURATION_DAYS = 24
+
+/** The hosts a session is meant for; the signature doesn't cover the host, so anywhere else could replay it. */
+const TRUSTED_TARGET_DOMAINS = ['decentraland.org', 'decentraland.zone']
 
 /**
  * Normalizes a World name the way creators type it: `foo`, `foo.dcl.eth` or any other ENS name
@@ -113,7 +118,7 @@ export function parseTime(raw: string, flag: string, now: number = Date.now()): 
   return new Date(parsed).toISOString()
 }
 
-/** Parses a duration (`30s`, `5m`, `2h`, `1d`) into milliseconds. */
+/** Parses a duration (`30s`, `5m`, `2h`, `1d`, up to 24 days) into milliseconds. */
 export function parseDuration(raw: string, flag: string): number {
   const duration = raw.trim().match(/^(\d+)([smhd])$/)
   const ms = duration ? parseInt(duration[1], 10) * DURATION_UNITS_MS[duration[2]] : 0
@@ -123,7 +128,38 @@ export function parseDuration(raw: string, flag: string): number {
       `Invalid ${flag} "${raw}"; use a duration such as 30s, 5m or 2h`
     )
   }
+  if (ms > MAX_DURATION_DAYS * DURATION_UNITS_MS.d) {
+    throw new CliError('SCENE_INSIGHTS_INVALID_ARGUMENT', `${flag} must be at most ${MAX_DURATION_DAYS}d`)
+  }
   return ms
+}
+
+/**
+ * Validates a `--target` URL. Without `trustAny`, only https Decentraland hosts are accepted: the
+ * signed headers don't name the host, so another server receiving them could replay them.
+ */
+export function parseTarget(raw: string, trustAny: boolean): string {
+  let url: URL | undefined
+  try {
+    url = new URL(raw)
+  } catch {
+    url = undefined
+  }
+  if (!url || !['http:', 'https:'].includes(url.protocol) || url.search || url.hash || url.username || url.password) {
+    throw new CliError('SCENE_INSIGHTS_INVALID_ARGUMENT', `Invalid --target "${raw}"; expected an http(s) URL`)
+  }
+  const hostname = url.hostname
+  const trusted =
+    url.protocol === 'https:' &&
+    TRUSTED_TARGET_DOMAINS.some((domain) => hostname === domain || hostname.endsWith(`.${domain}`))
+  if (!trusted && !trustAny) {
+    throw new CliError(
+      'SCENE_INSIGHTS_INVALID_ARGUMENT',
+      `--target "${raw}" is not an https host under ${TRUSTED_TARGET_DOMAINS.join(' or ')}. It would receive signed ` +
+        'headers it could replay against the real service; pass --trust-target to send them anyway'
+    )
+  }
+  return raw
 }
 
 /** Validates a `--level` value. */

@@ -113,7 +113,9 @@ For detailed documentation on using the CLI tools, visit:
 sessions use these same explicit grants. They cover scenes the wallet already has
 permission to read; the credential is not restricted to a single scene. No wildcard
 or write operation is granted. Environments sharing the `insights` service identifier
-(including `.org` and `.zone`) accept the same credential.
+(including `.org` and `.zone`) accept the same credential. The signed headers don't
+name the host, so `--target` only accepts https hosts under `decentraland.org` or
+`decentraland.zone` unless `--trust-target` is passed.
 
 Previously saved full-login sessions require signing in again. A saved scoped
 session expires no later than its parent delegation. Deploy the scoped-login

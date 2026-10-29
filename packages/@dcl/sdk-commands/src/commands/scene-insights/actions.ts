@@ -63,7 +63,8 @@ export async function runLogs(client: InsightsClient, params: LogsParams, output
     })
     sceneKey = page.sceneKey
     entries.push(...page.logs)
-    cursor = page.nextCursor ?? undefined
+    // an empty page with a cursor would otherwise be requested forever
+    cursor = page.logs.length > 0 ? (page.nextCursor ?? undefined) : undefined
     more = !!cursor
   } while (cursor && entries.length < params.limit)
 

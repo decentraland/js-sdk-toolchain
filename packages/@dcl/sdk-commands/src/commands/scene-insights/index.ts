@@ -18,6 +18,7 @@ import {
   parseDuration,
   parseInteger,
   parseLevel,
+  parseTarget,
   parseTime
 } from './inputs'
 import { SESSION_DIR_ENV, deleteSession, getSessionFilePath, loadSession } from './session-store'
@@ -37,6 +38,7 @@ export const args = declareArgs({
   '--position': String,
   '--target': String,
   '-t': '--target',
+  '--trust-target': Boolean,
   '--port': Number,
   '-p': '--port',
   '--https': Boolean,
@@ -62,6 +64,20 @@ export const args = declareArgs({
 const DEFAULT_SERVER = 'https://multiplayer-scenes-insights-service.decentraland.org'
 const QUERY_SUBCOMMANDS = ['logs', 'tail', 'metrics', 'executions']
 const SESSION_SUBCOMMANDS = ['login', 'logout', 'session']
+
+const TARGET_FLAGS = ['--target', '--trust-target']
+const SIGN_IN_FLAGS = ['--port', '--no-browser', '--https']
+const SCENE_FLAGS = [...TARGET_FLAGS, ...SIGN_IN_FLAGS, '--world', '--position', '--dir']
+/** The flags each subcommand reads, besides --help and --json; any other is refused rather than ignored. */
+const FLAGS_BY_SUBCOMMAND: Record<string, string[]> = {
+  login: [...TARGET_FLAGS, ...SIGN_IN_FLAGS],
+  logout: [],
+  session: [],
+  logs: [...SCENE_FLAGS, '--from', '--to', '--level', '--source', '--query', '--execution', '--limit', '--order'],
+  tail: [...SCENE_FLAGS, '--for', '--lines', '--level', '--query'],
+  metrics: [...SCENE_FLAGS, '--from', '--to', '--step', '--execution'],
+  executions: [...SCENE_FLAGS, '--from', '--to']
+}
 
 /**
  * Exit codes, so a script or an agent can tell what to do next without parsing messages:
@@ -129,7 +145,7 @@ export function help(options: Options) {
       --order           [order] desc (default) prints the newest lines, asc the oldest
 
     tail:
-      --for             [time]  Stop after this long (30s, 5m); default: until CTRL+C
+      --for             [time]  Stop after this long (30s, 5m, at most 24d); default: until CTRL+C
       --lines           [n]     Replay the newest n lines first, 0-1000 (default 0)
       -l, --level, -q, --query  Filter the followed lines
 
@@ -140,7 +156,9 @@ export function help(options: Options) {
     Other options:
       --json                    Print JSON to stdout (one object per log line), and errors as
                                 {"error":{"code","message","exitCode"}} on stderr
-      -t, --target      [URL]   Insights service URL (default: ${DEFAULT_SERVER})
+      -t, --target      [URL]   Insights service URL (default: ${DEFAULT_SERVER}); only
+                                https hosts under decentraland.org or decentraland.zone
+      --trust-target            Allow any --target. It receives signed requests it could replay
       -p, --port        [port]  Select a custom port for the linker dApp
       -b, --no-browser          Do not open a new browser window
       --https                   Use HTTPS for the linker dApp
@@ -211,7 +229,7 @@ async function run(options: Options): Promise<unknown> {
   const { components } = options
   const a = options.args
 
-  const [subcommand, positional] = a._.filter((arg) => !arg.startsWith('-'))
+  const [subcommand, ...positionals] = a._.filter((arg) => !arg.startsWith('-'))
   if (!subcommand || ![...QUERY_SUBCOMMANDS, ...SESSION_SUBCOMMANDS].includes(subcommand)) {
     throw new CliError(
       'SCENE_INSIGHTS_INVALID_ARGUMENT',
@@ -220,8 +238,24 @@ async function run(options: Options): Promise<unknown> {
         'Run "sdk-commands scene-insights --help" for more information.'
     )
   }
+  const maxPositionals = subcommand === 'metrics' ? 1 : 0
+  if (positionals.length > maxPositionals) {
+    throw new CliError(
+      'SCENE_INSIGHTS_INVALID_ARGUMENT',
+      `Unexpected argument "${positionals[maxPositionals]}" for ${subcommand}`
+    )
+  }
+  const allowed = new Set(['--help', '--json', ...FLAGS_BY_SUBCOMMAND[subcommand]])
+  const unused = Object.keys(a).filter((flag) => flag !== '_' && !allowed.has(flag))
+  if (unused.length > 0) {
+    throw new CliError(
+      'SCENE_INSIGHTS_INVALID_ARGUMENT',
+      `${unused.join(', ')} ${unused.length === 1 ? 'does' : 'do'} not apply to ${subcommand}`
+    )
+  }
+  const [positional] = positionals
 
-  const baseUrl = a['--target'] || DEFAULT_SERVER
+  const baseUrl = a['--target'] ? parseTarget(a['--target'], !!a['--trust-target']) : DEFAULT_SERVER
   const file = getSessionFilePath()
   const write = (line: string) => process.stdout.write(line + '\n')
   const sessionOptions: SessionOptions = {
@@ -310,12 +344,14 @@ async function run(options: Options): Promise<unknown> {
       )
     case 'tail': {
       const controller = new AbortController()
-      process.once('SIGINT', () => controller.abort())
-      const timer = followFor !== undefined ? setTimeout(() => controller.abort(), followFor) : undefined
+      const stop = () => controller.abort()
+      process.on('SIGINT', stop)
+      const timer = followFor !== undefined ? setTimeout(stop, followFor) : undefined
       try {
         return await runTail(client, { lines, level, query, signal: controller.signal }, output)
       } finally {
         clearTimeout(timer)
+        process.off('SIGINT', stop)
       }
     }
     case 'metrics':

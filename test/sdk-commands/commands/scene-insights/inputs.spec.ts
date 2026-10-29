@@ -6,6 +6,7 @@ import {
   parseDuration,
   parseInteger,
   parseLevel,
+  parseTarget,
   parseTime
 } from '../../../../packages/@dcl/sdk-commands/src/commands/scene-insights/inputs'
 
@@ -286,6 +287,48 @@ describe('when parsing a duration', () => {
   describe('and it has no unit', () => {
     it('should throw an invalid argument error naming the flag', () => {
       expect(() => parseDuration('30', '--for')).toThrow(/Invalid --for "30"/)
+    })
+  })
+
+  describe('and it is longer than a timer can wait', () => {
+    it('should throw an invalid argument error with the maximum', () => {
+      expect(() => parseDuration('25d', '--for')).toThrow('--for must be at most 24d')
+    })
+  })
+})
+
+describe('when validating a target', () => {
+  describe('and it is an https Decentraland host', () => {
+    it('should return it', () => {
+      expect(parseTarget('https://multiplayer-scenes-insights-service.decentraland.zone', false)).toBe(
+        'https://multiplayer-scenes-insights-service.decentraland.zone'
+      )
+    })
+  })
+
+  describe('and it is a Decentraland host over http', () => {
+    it('should throw an invalid argument error pointing to --trust-target', () => {
+      expect(() => parseTarget('http://insights.decentraland.org', false)).toThrow(/pass --trust-target/)
+    })
+  })
+
+  describe('and it only ends like a Decentraland host', () => {
+    it('should throw an invalid argument error', () => {
+      expect(() => parseTarget('https://evildecentraland.org', false)).toThrow(
+        expect.objectContaining({ name: 'SCENE_INSIGHTS_INVALID_ARGUMENT' })
+      )
+    })
+  })
+
+  describe('and another host is trusted explicitly', () => {
+    it('should return it', () => {
+      expect(parseTarget('http://localhost:5000', true)).toBe('http://localhost:5000')
+    })
+  })
+
+  describe('and it is not an http(s) URL', () => {
+    it('should throw an invalid argument error even when trusted', () => {
+      expect(() => parseTarget('file:///etc/hosts', true)).toThrow(/expected an http\(s\) URL/)
     })
   })
 })

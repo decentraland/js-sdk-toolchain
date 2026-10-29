@@ -182,11 +182,13 @@ describe('when using the insights client', () => {
   })
 
   describe('and the service is busy once', () => {
+    let busy: Response
     let result: unknown
 
     beforeEach(async () => {
+      busy = new Response('{"error":"busy"}', { status: 429, headers: { 'retry-after': '0.01' } })
       fetchMock
-        .mockResolvedValueOnce(new Response('{"error":"busy"}', { status: 429, headers: { 'retry-after': '0.01' } }))
+        .mockResolvedValueOnce(busy)
         .mockResolvedValueOnce(Response.json({ sceneKey: 'k', executions: [], retentionStart: 'x' }))
       result = await client.listExecutions({})
     })
@@ -196,6 +198,48 @@ describe('when using the insights client', () => {
         result: { sceneKey: 'k', executions: [], retentionStart: 'x' },
         calls: 2,
         signatures: 2
+      })
+    })
+
+    it('should release the busy response body before retrying', () => {
+      expect(busy.bodyUsed).toBe(true)
+    })
+  })
+
+  describe('and the service stays busy past the retries', () => {
+    beforeEach(() => {
+      fetchMock.mockImplementation(
+        async () => new Response('{"error":"busy"}', { status: 503, headers: { 'retry-after': '0.01' } })
+      )
+    })
+
+    it('should give up after three retries with an unavailable error', async () => {
+      await expect(client.listExecutions({})).rejects.toMatchObject({ name: 'SCENE_INSIGHTS_UNAVAILABLE' })
+      expect(fetchMock).toHaveBeenCalledTimes(4)
+    })
+  })
+
+  describe('and a successful answer is not JSON', () => {
+    beforeEach(() => {
+      fetchMock.mockResolvedValueOnce(new Response('<html>proxy error</html>', { status: 200 }))
+    })
+
+    it('should throw a request error quoting the body', async () => {
+      await expect(client.listExecutions({})).rejects.toMatchObject({
+        name: 'SCENE_INSIGHTS_REQUEST_FAILED',
+        message: 'The insights service answered 200 with a body that is not JSON: <html>proxy error</html>'
+      })
+    })
+  })
+
+  describe('and the error reason contains terminal escape sequences', () => {
+    beforeEach(() => {
+      fetchMock.mockResolvedValueOnce(new Response('{"error":"bad \\u001b]52;c;aGk=\\u0007input"}', { status: 400 }))
+    })
+
+    it('should remove the control characters from the message', async () => {
+      await expect(client.listExecutions({})).rejects.toMatchObject({
+        message: 'The insights service answered 400: bad ]52;c;aGk=input'
       })
     })
   })
@@ -351,6 +395,80 @@ describe('when using the insights client', () => {
 
       it('should stop without reconnecting', () => {
         expect(fetchMock).toHaveBeenCalledTimes(1)
+      })
+    })
+
+    describe('and the service is busy before the stream', () => {
+      let busy: Response
+
+      beforeEach(async () => {
+        busy = new Response('{"error":"busy"}', { status: 503, headers: { 'retry-after': '0.01' } })
+        fetchMock
+          .mockResolvedValueOnce(busy)
+          .mockResolvedValueOnce(sse(logFrame(logEntry('e1', 'one'), 'c1'), 'event: error\ndata: {"error":"done"}\n\n'))
+        await client.tail({ onLog: (entry) => received.push(entry.message) }).catch(() => undefined)
+      })
+
+      it('should release the busy response body', () => {
+        expect(busy.bodyUsed).toBe(true)
+      })
+
+      it('should reconnect and deliver the line', () => {
+        expect(received).toEqual(['one'])
+      })
+    })
+
+    describe('and the server announces the reconnect delay', () => {
+      let setTimeoutSpy: jest.SpyInstance
+
+      beforeEach(async () => {
+        setTimeoutSpy = jest.spyOn(global, 'setTimeout')
+        fetchMock
+          .mockResolvedValueOnce(sse('retry: 7\n\n'))
+          .mockResolvedValueOnce(sse('event: error\ndata: {"error":"done"}\n\n'))
+        await client.tail({ onLog: (entry) => received.push(entry.message) }).catch(() => undefined)
+      })
+
+      afterEach(() => {
+        setTimeoutSpy.mockRestore()
+      })
+
+      it('should wait that long instead of its own backoff', () => {
+        expect(setTimeoutSpy).toHaveBeenCalledWith(expect.any(Function), 7)
+      })
+    })
+
+    describe('and a log event is malformed', () => {
+      let error: unknown
+
+      beforeEach(async () => {
+        fetchMock.mockResolvedValueOnce(
+          sse(
+            'id: c1\nevent: log\ndata: {not json\n\n',
+            'id: c2\nevent: log\ndata: {"message":42}\n\n',
+            logFrame(logEntry('e3', 'three'), 'c3'),
+            'event: error\ndata: {"error":"done"}\n\n'
+          )
+        )
+        error = await client.tail({ onLog: (entry) => received.push(entry.message) }).catch((e: unknown) => e)
+      })
+
+      it('should skip it and keep delivering the stream', () => {
+        expect(received).toEqual(['three'])
+      })
+
+      it('should not treat it as a dropped connection', () => {
+        expect({ calls: fetchMock.mock.calls.length, error }).toMatchObject({
+          calls: 1,
+          error: { name: 'SCENE_INSIGHTS_STREAM_ENDED' }
+        })
+      })
+
+      it('should note each skipped line', () => {
+        expect(logMock.mock.calls.map((call) => call[0])).toEqual([
+          'Skipped a malformed log line from the insights service (event c1)',
+          'Skipped a malformed log line from the insights service (event c2)'
+        ])
       })
     })
 
