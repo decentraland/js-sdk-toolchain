@@ -2647,6 +2647,7 @@ export interface PBAvatarBase {
     name: string;
     // (undocumented)
     skinColor: PBColor3 | undefined;
+    talking?: boolean | undefined;
 }
 
 // @public (undocumented)
@@ -3834,6 +3835,7 @@ export interface PBTextShape {
     font?: Font | undefined;
     fontAutoSize?: boolean | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     height?: number | undefined;
     lineCount?: number | undefined;
     lineSpacing?: number | undefined;
@@ -4065,6 +4067,7 @@ export interface PBUiDropdown {
     emptyLabel?: string | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     // (undocumented)
     options: string[];
     selectedIndex?: number | undefined;
@@ -4100,6 +4103,7 @@ export interface PBUiInput {
     disabled: boolean;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     // (undocumented)
     placeholder: string;
     placeholderColor?: PBColor4 | undefined;
@@ -4149,6 +4153,7 @@ export interface PBUiText {
     color?: PBColor4 | undefined;
     font?: Font | undefined;
     fontSize?: number | undefined;
+    fontSrc?: string | undefined;
     textAlign?: TextAlignMode | undefined;
     textWrap?: TextWrap | undefined;
     value: string;
@@ -5650,6 +5655,7 @@ export interface UiLabelProps {
     color?: PBColor4 | undefined;
     font?: UiFontType | undefined;
     fontSize?: ScaleUnit | undefined;
+    fontSrc?: string | undefined;
     textAlign?: TextAlignType | undefined;
     textWrap?: UiTextWrapType | undefined;
     value: string;

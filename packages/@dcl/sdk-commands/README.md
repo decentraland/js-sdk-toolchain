@@ -46,6 +46,8 @@ npx @dcl/sdk-commands build
 npx @dcl/sdk-commands deploy
 ```
 
+Large scenes upload in batches when the target server supports it. While deploying, the linker server exposes the deployment at `/api/deploy`: `GET` returns its state (JSON, or server-sent events with `Accept: text/event-stream`) and `DELETE` cancels it. Cancelling needs the `X-Deploy-Token` header, set with `--deploy-token <token>` (16+ characters) or random per run; the browser gets it in the linker URL fragment (`/#token=...`).
+
 ### Export Static Content
 
 ```bash

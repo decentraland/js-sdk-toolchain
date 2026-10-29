@@ -136,3 +136,19 @@ describe('Ui Listeners React Ecs', () => {
     expect(onChange).toHaveBeenCalledTimes(0)
   })
 })
+
+describe('Ui Input fontSrc', () => {
+  it('should pass fontSrc through to UiInput', async () => {
+    const { engine, uiRenderer } = setupEngine()
+    const UiInput = components.UiInput(engine)
+    const uiEntity = ((engine.addEntity() as number) + 1) as Entity
+
+    const ui = () => (
+      <Input uiTransform={{ width: 100 }} placeholder="type here" fontSrc="fonts/BungeeShade-Regular.ttf" />
+    )
+    uiRenderer.setUiRenderer(ui)
+    await engine.update(1)
+
+    expect(UiInput.get(uiEntity).fontSrc).toBe('fonts/BungeeShade-Regular.ttf')
+  })
+})
