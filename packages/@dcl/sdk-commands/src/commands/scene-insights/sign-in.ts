@@ -16,7 +16,7 @@ import {
   createSessionFromPrivateKey,
   delegationFromLinkerChain
 } from './session'
-import { assertSessionFileIsNotDeployed, loadSession, saveSession } from './session-store'
+import { assertSessionFileIsNotTracked, loadSession, saveSession } from './session-store'
 
 /** What the linker dApp shows while signing. */
 export interface SignInLabel {
@@ -47,8 +47,8 @@ export type SessionSource = 'private-key' | 'saved' | 'signed'
  *
  * @throws CliError `SCENE_INSIGHTS_SESSION_REQUIRED` when it would have to open the browser but
  *   nobody is there to sign (an agent or script): `scene-insights login` has to be run first.
- * @throws CliError `SCENE_INSIGHTS_UNSAFE_SESSION_FILE` when a deploy would upload the session
- *   file, before asking for a signature.
+ * @throws CliError `SCENE_INSIGHTS_UNSAFE_SESSION_FILE` when git tracks the session file, before
+ *   asking for a signature.
  */
 export async function getSession(
   components: Pick<CliComponents, 'fs' | 'logger' | 'fetch' | 'config'>,
@@ -72,7 +72,7 @@ export async function getSession(
   }
 
   // before the browser opens: nobody should sign a session that can't be saved
-  await assertSessionFileIsNotDeployed(components, options.file)
+  await assertSessionFileIsNotTracked(options.file)
 
   const ephemeralIdentity = createEphemeralIdentity()
   const expiration = new Date(Date.now() + SESSION_MINUTES * 60 * 1000)

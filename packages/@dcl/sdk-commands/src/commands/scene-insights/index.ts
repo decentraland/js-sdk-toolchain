@@ -20,7 +20,7 @@ import {
   parseLevel,
   parseTime
 } from './inputs'
-import { SESSION_FILE_ENV, deleteSession, getSessionFilePath, loadSession } from './session-store'
+import { SESSION_DIR_ENV, deleteSession, getSessionFilePath, loadSession } from './session-store'
 import { SessionOptions, getSession } from './sign-in'
 
 interface Options {
@@ -89,10 +89,9 @@ export function help(options: Options) {
     logsPermissions, or be the World's owner or a deployer.
 
     Sign in once with "login": it opens the browser for your wallet to sign, and the session is
-    saved for 12 hours (${getSessionFilePath()}, or ${SESSION_FILE_ENV}).
+    saved for 12 hours in ${getSessionFilePath()} (or in the .dcl folder of ${SESSION_DIR_ENV}).
     Until it expires it can sign Decentraland requests as your address; "logout" removes it.
-    Keep it out of scene projects: a session file that a deploy would upload is refused, and its
-    folder's .gitignore lists it so it is never committed.
+    The .dcl folder is never deployed and ignores itself in git, so the session is never published.
     With DCL_PRIVATE_KEY set, requests are signed with that key and nothing is saved.
     Without a terminal (scripts, AI agents) a missing session is an error, never a browser prompt.
 

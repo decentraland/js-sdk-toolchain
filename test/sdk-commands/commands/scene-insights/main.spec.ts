@@ -15,10 +15,10 @@ describe('when running scene-insights', () => {
 
   beforeEach(async () => {
     directory = mkdtempSync(path.join(tmpdir(), 'scene-insights-'))
-    sessionFile = process.env.DCL_SCENE_INSIGHTS_SESSION_FILE
+    sessionFile = process.env.DCL_SCENE_INSIGHTS_SESSION_DIR
     privateKey = process.env.DCL_PRIVATE_KEY
     stdinIsTTY = process.stdin.isTTY
-    process.env.DCL_SCENE_INSIGHTS_SESSION_FILE = path.join(directory, 'session.json')
+    process.env.DCL_SCENE_INSIGHTS_SESSION_DIR = directory
     delete process.env.DCL_PRIVATE_KEY
     process.stdin.isTTY = false as any
     stderr = jest.spyOn(process.stderr, 'write').mockImplementation(() => true)
@@ -30,8 +30,8 @@ describe('when running scene-insights', () => {
     process.exitCode = undefined
     process.stdin.isTTY = stdinIsTTY as any
     rmSync(directory, { recursive: true, force: true })
-    if (sessionFile === undefined) delete process.env.DCL_SCENE_INSIGHTS_SESSION_FILE
-    else process.env.DCL_SCENE_INSIGHTS_SESSION_FILE = sessionFile
+    if (sessionFile === undefined) delete process.env.DCL_SCENE_INSIGHTS_SESSION_DIR
+    else process.env.DCL_SCENE_INSIGHTS_SESSION_DIR = sessionFile
     if (privateKey === undefined) delete process.env.DCL_PRIVATE_KEY
     else process.env.DCL_PRIVATE_KEY = privateKey
   })
@@ -118,7 +118,7 @@ describe('when running scene-insights', () => {
     it('should report that nothing was removed', () => {
       expect(result).toEqual({
         removed: false,
-        file: path.join(directory, 'session.json')
+        file: path.join(directory, '.dcl', 'scene-insights-session.json')
       })
     })
   })

@@ -1,16 +1,21 @@
 import { homedir } from 'os'
 import path from 'path'
 import { randomBytes } from 'crypto'
-import ignore from 'ignore'
+import { execFile } from 'child_process'
 import { AuthChain, AuthIdentity, Authenticator, isOperationGranted } from '@dcl/crypto'
 
 import { CliComponents } from '../../components'
-import { getDCLIgnorePatterns } from '../../logic/dcl-ignore'
 import { CliError } from '../../logic/error'
 import { InsightsSession, createSessionFromChain, INSIGHTS_SERVICE, INSIGHTS_OPERATIONS } from './session'
 
-/** Environment variable that moves the saved session, e.g. into a sandbox an agent can read. */
-export const SESSION_FILE_ENV = 'DCL_SCENE_INSIGHTS_SESSION_FILE'
+/** Environment variable naming the folder whose .dcl/ holds the session, e.g. a sandbox an agent can read. */
+export const SESSION_DIR_ENV = 'DCL_SCENE_INSIGHTS_SESSION_DIR'
+
+/**
+ * Sessions are only saved in a .dcl folder: a dot folder is never deployed (whatever .dclignore
+ * says), and its own `*` .gitignore keeps git from adding anything in it.
+ */
+const SESSION_FOLDER = '.dcl'
 
 /** A saved session is not used in its last minute, so a request never races its expiry. */
 const EXPIRY_MARGIN_MS = 60 * 1000
@@ -28,8 +33,8 @@ export interface SavedSession {
   authChain: AuthChain
 }
 
-export function getSessionFilePath(): string {
-  return process.env[SESSION_FILE_ENV] || path.resolve(homedir(), '.dcl', 'scene-insights-session.json')
+export function getSessionFilePath(base: string = process.env[SESSION_DIR_ENV] || homedir()): string {
+  return path.resolve(base, SESSION_FOLDER, 'scene-insights-session.json')
 }
 
 /**
@@ -82,68 +87,48 @@ export async function loadSession(
   return { session: createSessionFromChain(saved.ephemeralIdentity, expiration, saved.authChain), saved }
 }
 
+/** Whether git tracks the file, so a .gitignore no longer keeps it out of commits. */
+function isTrackedByGit(file: string): Promise<boolean> {
+  // exits 0 only for a tracked file; untracked, outside a repository or without git, it fails
+  return new Promise((resolve) => {
+    execFile('git', ['ls-files', '--error-unmatch', '--', path.basename(file)], { cwd: path.dirname(file) }, (error) =>
+      resolve(!error)
+    )
+  })
+}
+
 /**
- * Refuses a session file that a deploy would upload, publicly, with a scene: one inside a scene
- * project (the nearest folder above it with a scene.json) that the project's deploy rules don't
- * ignore. The default file is in the home directory; this catches SESSION_FILE_ENV pointing into a
- * project, e.g. ./creds/session.json. Dot folders such as ./.dcl/ are never deployed.
+ * Refuses a session file git already tracks, e.g. a .dcl folder committed before it ignored
+ * itself: its .gitignore doesn't stop a tracked file being committed again.
  *
- * @throws CliError `SCENE_INSIGHTS_UNSAFE_SESSION_FILE` when a deploy would upload it.
+ * @throws CliError `SCENE_INSIGHTS_UNSAFE_SESSION_FILE` when git tracks it.
  */
-export async function assertSessionFileIsNotDeployed(
-  components: Pick<CliComponents, 'fs'>,
-  file: string
-): Promise<void> {
-  const { fs } = components
+export async function assertSessionFileIsNotTracked(file: string): Promise<void> {
   const resolved = path.resolve(file)
-  let directory = path.dirname(resolved)
-  for (;;) {
-    if (await fs.fileExists(path.join(directory, 'scene.json'))) {
-      const relative = path.relative(directory, resolved).split(path.sep).join('/')
-      const deployRules = ignore().add(await getDCLIgnorePatterns(components, directory))
-      if (!deployRules.ignores(relative)) {
-        throw new CliError(
-          'SCENE_INSIGHTS_UNSAFE_SESSION_FILE',
-          `The session file ${resolved} is inside the scene project at ${directory}, and deploying the scene ` +
-            `would publish it. Set ${SESSION_FILE_ENV} to a path outside the project, or inside a dot folder ` +
-            'such as .dcl/'
-        )
-      }
-      return
-    }
-    const parent = path.dirname(directory)
-    if (parent === directory) return
-    directory = parent
+  if (await isTrackedByGit(resolved)) {
+    throw new CliError(
+      'SCENE_INSIGHTS_UNSAFE_SESSION_FILE',
+      `The session file ${resolved} is tracked by git, so it would be committed. Remove it from the repository ` +
+        `(git rm --cached) or set ${SESSION_DIR_ENV} to a folder outside it`
+    )
   }
 }
 
-/** Escapes a file name for a .gitignore pattern. */
-function gitignorePattern(name: string): string {
-  return name.replace(/[\\*?[\]!# ]/g, '\\$&')
-}
-
-/**
- * Lists the session file (and its temporary copies) in a .gitignore in its own folder, created if
- * missing, so git never commits it, whichever repository that folder is in.
- */
-async function ignoreSessionInGit(components: Pick<CliComponents, 'fs'>, file: string): Promise<void> {
+/** Makes the session's folder ignore everything in it, so git never adds the session or its temporary copies. */
+async function ignoreFolderInGit(components: Pick<CliComponents, 'fs'>, folder: string): Promise<void> {
   const { fs } = components
-  const gitignore = path.join(path.dirname(file), '.gitignore')
-  const name = gitignorePattern(path.basename(file))
-  const entries = [`/${name}`, `/${name}.*.tmp`]
+  const gitignore = path.join(folder, '.gitignore')
   const existing = (await fs.fileExists(gitignore)) ? await fs.readFile(gitignore, 'utf8') : ''
-  const lines = existing.split(/\r?\n/)
-  const missing = entries.filter((entry) => !lines.includes(entry))
-  if (missing.length === 0) return
+  if (existing.split(/\r?\n/).includes('*')) return
   const separator = existing && !existing.endsWith('\n') ? '\n' : ''
-  await fs.appendFile(gitignore, separator + missing.join('\n') + '\n')
+  await fs.appendFile(gitignore, separator + '*\n')
 }
 
 /**
  * Saves the session readable only by the user (0600, in a 0700 directory), replacing any other.
- * Its folder's .gitignore lists it, so git never commits it.
+ * Its folder's .gitignore ignores everything in it, so git never commits it.
  *
- * @throws CliError `SCENE_INSIGHTS_UNSAFE_SESSION_FILE` when a deploy would upload the file.
+ * @throws CliError `SCENE_INSIGHTS_UNSAFE_SESSION_FILE` when git tracks the file.
  */
 export async function saveSession(
   components: Pick<CliComponents, 'fs'>,
@@ -164,9 +149,9 @@ export async function saveSession(
     },
     authChain
   }
-  await assertSessionFileIsNotDeployed(components, file)
+  await assertSessionFileIsNotTracked(file)
   await fs.mkdir(path.dirname(file), { recursive: true, mode: 0o700 })
-  await ignoreSessionInGit(components, file)
+  await ignoreFolderInGit(components, path.dirname(file))
   // a fresh file always gets the mode, unlike rewriting an existing one; rename makes it atomic
   const temporary = `${file}.${randomBytes(6).toString('hex')}.tmp`
   await fs.writeFile(temporary, JSON.stringify(saved, null, 2), { mode: 0o600 })
