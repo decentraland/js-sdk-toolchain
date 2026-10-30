@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=278.9k bytes
+SCENE_COMPILED_JS_SIZE_PROD=280.2k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -7,18 +7,19 @@ EVAL test/snapshots/production-bundles/cube-deleted.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
-  OPCODES ~= 81k
-  MALLOC_COUNT = 15488
-  ALIVE_OBJS_DELTA ~= 3.45k
+  OPCODES ~= 82k
+  MALLOC_COUNT = 15711
+  ALIVE_OBJS_DELTA ~= 3.50k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 6
-  ALIVE_OBJS_DELTA ~= 0.00k
+  MALLOC_COUNT = 37
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1019 t=1 data={"mesh":{"$case":"box","box":{}}}
-  OPCODES ~= 5k
-  MALLOC_COUNT = 68
+  Scene: PUT_COMPONENT e=0x0 c=1218 t=1 data={"touchInputs":[{"inputAction":2,"hide":true},{"inputAction":10,"hide":true},{"inputAction":11,"hide":true},{"inputAction":12,"hide":true},{"inputAction":13,"hide":true}],"hideJoystick":false,"hideCrosshair":false}
+  OPCODES ~= 10k
+  MALLOC_COUNT = 64
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0.1)
   Scene: DELETE_COMPONENT e=0x201 c=1019 t=2 data=null
@@ -41,4 +42,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 7k
   MALLOC_COUNT = 1
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1141.79k bytes
+  MEMORY_USAGE_COUNT ~= 1153.18k bytes
