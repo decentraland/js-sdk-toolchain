@@ -1,4 +1,5 @@
 import {
+  AvatarAnchorPointType,
   cyclicParentingChecker,
   getComponentEntityTree,
   getEntitiesWithParent,
@@ -641,6 +642,51 @@ describe('Engine tests', () => {
     expect(MeshCollider.getOrNull(e_A3)).toBeNull()
     expect(MeshCollider.getOrNull(e_A)).toBeNull()
     expect(MeshCollider.getOrNull(e_recursive)).toBeNull()
+  })
+
+  it('should remove a root without Transform together with its children', () => {
+    const engine = Engine()
+    const Transform = components.Transform(engine)
+    const AvatarAttach = components.AvatarAttach(engine)
+    const MeshCollider = components.MeshCollider(engine)
+
+    const root = engine.addEntity()
+    AvatarAttach.create(root, { anchorPointId: AvatarAnchorPointType.AAPT_RIGHT_HAND })
+    const child = engine.addEntity()
+    Transform.create(child, { parent: root })
+    MeshCollider.create(child, { mesh: { $case: 'box', box: {} } })
+    const grandchild = engine.addEntity()
+    Transform.create(grandchild, { parent: child })
+    MeshCollider.create(grandchild, { mesh: { $case: 'box', box: {} } })
+
+    engine.removeEntityWithChildren(root)
+
+    expect(AvatarAttach.getOrNull(root)).toBeNull()
+    expect(Transform.getOrNull(child)).toBeNull()
+    expect(MeshCollider.getOrNull(child)).toBeNull()
+    expect(MeshCollider.getOrNull(grandchild)).toBeNull()
+  })
+
+  it('should remove a root without Transform that has no children', () => {
+    const engine = Engine()
+    const MeshCollider = components.MeshCollider(engine)
+    const entity = engine.addEntity()
+    MeshCollider.create(entity, { mesh: { $case: 'box', box: {} } })
+
+    engine.removeEntityWithChildren(entity)
+
+    expect(MeshCollider.getOrNull(entity)).toBeNull()
+  })
+
+  it('should leave the scene in place when called on RootEntity', () => {
+    const engine = Engine()
+    const Transform = components.Transform(engine)
+    const entity = engine.addEntity()
+    Transform.create(entity, { position: { x: 1, y: 0, z: 0 } })
+
+    engine.removeEntityWithChildren(engine.RootEntity)
+
+    expect(Transform.getOrNull(entity)).not.toBeNull()
   })
 
   it('should return all entities as a tree (or the provided entity if there is no valid tree)', () => {
