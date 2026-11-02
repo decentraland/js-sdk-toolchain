@@ -2,7 +2,7 @@ import { execFileSync } from 'child_process'
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'fs'
 import { tmpdir } from 'os'
 import path from 'path'
-import { AuthChain, Authenticator } from '../../../../packages/@dcl/sdk-commands/node_modules/@dcl/crypto'
+import { AuthChain, Authenticator, AuthLinkType } from '../../../../packages/@dcl/sdk-commands/node_modules/@dcl/crypto'
 import { ethSign } from '../../../../packages/@dcl/sdk-commands/node_modules/@dcl/crypto/dist/crypto'
 import { hexToBytes } from '../../../../packages/@dcl/sdk-commands/node_modules/eth-connect'
 import { createFsComponent } from '../../../../packages/@dcl/sdk-commands/src/components/fs'
@@ -55,6 +55,38 @@ describe('when saving and loading the session', () => {
 
   afterEach(() => {
     rmSync(directory, { recursive: true, force: true })
+  })
+
+  describe('and a contract-wallet session is saved', () => {
+    let provider: import('../../../../packages/@dcl/sdk-commands/node_modules/@dcl/crypto-middleware').AuthChainProvider
+    beforeEach(async () => {
+      delegation = delegation.map((link) =>
+        link.type === AuthLinkType.ECDSA_PERSONAL_EPHEMERAL
+          ? { ...link, type: AuthLinkType.ECDSA_EIP_1654_EPHEMERAL, signature: '0x1234' }
+          : link
+      )
+      provider = {
+        sendAsync: jest.fn((payload, callback) =>
+          callback(null, { jsonrpc: '2.0', id: payload.id, result: '0x1626ba7e' + '0'.repeat(56) })
+        )
+      }
+      await saveSession({ fs }, file, ephemeral, expiration, delegation)
+    })
+    it('should load the persisted session after validating its contract signature', async () => {
+      expect((await loadSession({ fs }, file, Date.now(), provider))?.session.address).toBe(
+        Authenticator.ownerAddress(delegation)
+      )
+    })
+    describe('and RPC is unavailable', () => {
+      beforeEach(() => {
+        provider.sendAsync = jest.fn((_payload, callback) => callback(new Error('offline')))
+      })
+      it('should report a retryable outage instead of asking for a new login', async () => {
+        await expect(loadSession({ fs }, file, Date.now(), provider)).rejects.toMatchObject({
+          name: 'SCENE_INSIGHTS_UNAVAILABLE'
+        })
+      })
+    })
   })
 
   describe('and the saved session is a legacy full login', () => {

@@ -1,5 +1,7 @@
 import future from 'fp-future'
-import { AuthChain, Authenticator } from '@dcl/crypto'
+import { AuthChain } from '@dcl/crypto'
+import type { AuthChainProvider } from '@dcl/crypto-middleware'
+import { createInsightsProvider, validateInsightsSignature } from './signature-validation'
 import { Router } from '@well-known-components/http-server'
 
 import { CliComponents } from '../../components'
@@ -9,7 +11,6 @@ import { dAppOptions, runDapp } from '../../run-dapp'
 import {
   InsightsSession,
   SESSION_MINUTES,
-  INSIGHTS_SERVICE,
   getInsightsSessionMessage,
   createEphemeralIdentity,
   createSessionFromChain,
@@ -59,8 +60,9 @@ export async function getSession(
     return { session: createSessionFromPrivateKey(process.env.DCL_PRIVATE_KEY), source: 'private-key' }
   }
 
+  const provider = createInsightsProvider(options.targetUrl)
   if (!options.forceNew) {
-    const saved = await loadSession(components, options.file)
+    const saved = await loadSession(components, options.file, Date.now(), provider)
     if (saved) return { session: saved.session, source: 'saved' }
 
     if (!options.interactive) {
@@ -90,13 +92,19 @@ export async function getSession(
     targetUrl: options.targetUrl,
     action: 'view-logs'
   })
-  const router = setSignInRoutes(commonRouter, ephemeralIdentity.address, message, (chain) => signed.resolve(chain))
+  const router = setSignInRoutes(
+    commonRouter,
+    ephemeralIdentity.address,
+    message,
+    (chain) => signed.resolve(chain),
+    provider
+  )
 
   components.logger.info(
     `Sign read-only access to logs, metrics and executions for the next ${SESSION_MINUTES / 60} hours`
   )
   components.logger.info(
-    'This credential works across Insights environments sharing the insights service identifier, including .org and .zone.'
+    'This credential works across Insights environments sharing the insights service identifier where the wallet signatures verify on the configured network.'
   )
   const { program } = await runDapp(components, router, { ...options.linkOptions, uri: '/' })
 
@@ -107,12 +115,11 @@ export async function getSession(
     void program.stop()
   }
 
-  const validated = await Authenticator.validateSignature(
+  const validated = await validateInsightsSignature(
     ephemeralIdentity.address.toLowerCase(),
     authChain,
-    null,
     Date.now(),
-    { service: INSIGHTS_SERVICE }
+    provider
   )
   if (!validated.ok || !validated.scope) {
     throw new CliError('SCENE_INSIGHTS_INVALID_SIGNATURE', 'The wallet did not return a valid scoped insights login')
@@ -146,7 +153,8 @@ export function setSignInRoutes(
   router: Router<object>,
   ephemeralAddress: string,
   message: string,
-  onSigned: (delegation: AuthChain) => void
+  onSigned: (delegation: AuthChain) => void,
+  provider?: AuthChainProvider
 ): Router<object> {
   router.post('/api/logs', async (ctx) => {
     if (!isLinkerOrigin(ctx.request.headers.get('origin'), ctx.request.headers.get('host'))) {
@@ -157,7 +165,13 @@ export function setSignInRoutes(
       if (!value.address || !Array.isArray(value.authChain)) {
         throw new CliError('SCENE_INSIGHTS_INVALID_SIGNATURE', 'The wallet did not sign the insights session')
       }
-      const delegation = await delegationFromLinkerChain(value.authChain, ephemeralAddress, message)
+      const delegation = await delegationFromLinkerChain(
+        value.authChain,
+        ephemeralAddress,
+        message,
+        Date.now(),
+        provider
+      )
       // answer the dApp before its server is stopped
       setTimeout(() => onSigned(delegation), 100)
       return { body: { success: true } }

@@ -23,6 +23,7 @@ import {
 } from './inputs'
 import { SESSION_DIR_ENV, deleteSession, getSessionFilePath, loadSession } from './session-store'
 import { SessionOptions, getSession } from './sign-in'
+import { createInsightsProvider } from './signature-validation'
 
 interface Options {
   args: Result<typeof args>
@@ -72,7 +73,7 @@ const SCENE_FLAGS = [...TARGET_FLAGS, ...SIGN_IN_FLAGS, '--world', '--position',
 const FLAGS_BY_SUBCOMMAND: Record<string, string[]> = {
   login: [...TARGET_FLAGS, ...SIGN_IN_FLAGS],
   logout: [],
-  session: [],
+  session: [...TARGET_FLAGS],
   logs: [...SCENE_FLAGS, '--from', '--to', '--level', '--source', '--query', '--execution', '--limit', '--order'],
   tail: [...SCENE_FLAGS, '--for', '--lines', '--level', '--query'],
   metrics: [...SCENE_FLAGS, '--from', '--to', '--step', '--execution'],
@@ -109,6 +110,8 @@ export function help(options: Options) {
     Until it expires it can sign Decentraland requests as your address; "logout" removes it.
     The .dcl folder is never deployed and ignores itself in git, so the session is never published.
     With DCL_PRIVATE_KEY set, requests are signed with that key and nothing is saved.
+    Contract wallets use Ethereum RPC: Mainnet for .org, Sepolia for .zone. Use the same --target
+    for login, session and reads. Set DCL_SCENE_INSIGHTS_RPC_URL for a custom target's network.
     Without a terminal (scripts, AI agents) a missing session is an error, never a browser prompt.
 
     Runs from any directory with --world and/or --position; otherwise reads scene.json
@@ -277,7 +280,7 @@ async function run(options: Options): Promise<unknown> {
       if (!a['--json']) write(`Signing as ${address} with DCL_PRIVATE_KEY`)
       return { address, expiration: null, source: 'DCL_PRIVATE_KEY' }
     }
-    const saved = await loadSession(components, file)
+    const saved = await loadSession(components, file, Date.now(), createInsightsProvider(baseUrl))
     if (!saved) {
       throw new CliError('SCENE_INSIGHTS_SESSION_REQUIRED', 'Not signed in; run "sdk-commands scene-insights login"')
     }
