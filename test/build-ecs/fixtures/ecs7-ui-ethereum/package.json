@@ -12,7 +12,7 @@
     "build": "sdk-commands build",
     "build-prod": "sdk-commands build --production",
     "watch": "sdk-commands build --watch",
-    "server-logs": "sdk-commands sdk-server-logs"
+    "server-logs": "sdk-commands scene-insights tail"
   },
   "devDependencies": {
     "@dcl/js-runtime": "file:../../../../packages/@dcl/js-runtime",

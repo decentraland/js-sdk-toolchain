@@ -134,7 +134,7 @@ async function ensureJsonKey(
     await components.fs.writeFile(filePath, JSON.stringify(parsed, null, 2))
     printProgressInfo(
       components.logger,
-      `${existing === undefined ? 'Added' : 'Updated'} ${colors.bold(`${keyPath}: ${JSON.stringify(value)}`)} to ${path.basename(filePath)}`
+      `${existing === undefined ? 'Added' : 'Updated'} ${colors.bold(`${keyPath}: ${JSON.stringify(value)}`)} in ${path.basename(filePath)}`
     )
   } catch (_) {
     // read/write failed — skip silently

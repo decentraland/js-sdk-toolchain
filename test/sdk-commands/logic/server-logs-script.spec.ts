@@ -1,15 +1,12 @@
+import { stripVTControlCharacters } from 'util'
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
-import esbuild from '../../../../packages/@dcl/sdk-commands/node_modules/esbuild'
-import { createFsComponent } from '../../../../packages/@dcl/sdk-commands/src/components/fs'
-import {
-  bundleProject,
-  BundleComponents,
-  CompileOptions
-} from '../../../../packages/@dcl/sdk-commands/src/logic/bundle'
+import esbuild from '../../../packages/@dcl/sdk-commands/node_modules/esbuild'
+import { createFsComponent } from '../../../packages/@dcl/sdk-commands/src/components/fs'
+import { bundleProject, BundleComponents, CompileOptions } from '../../../packages/@dcl/sdk-commands/src/logic/bundle'
 
-jest.mock('../../../../packages/@dcl/sdk-commands/node_modules/esbuild', () => ({ context: jest.fn() }))
+jest.mock('../../../packages/@dcl/sdk-commands/node_modules/esbuild', () => ({ context: jest.fn() }))
 
 // Stop at the compiler boundary: these tests exercise the build's real JSON updates.
 describe('when a scene build configures its server logs script', () => {
@@ -66,6 +63,11 @@ describe('when a scene build configures its server logs script', () => {
 
     it('should use Insights and retain the other package and scene settings', async () => {
       await build()
+      expect(
+        jest.mocked(components.logger.log).mock.calls.map(([message]) => stripVTControlCharacters(message))
+      ).toContain(
+        `${previous === undefined ? 'Added' : 'Updated'} scripts.server-logs: "sdk-commands scene-insights tail" in package.json`
+      )
       expect(JSON.parse(fs.readFileSync(packageFile, 'utf8'))).toEqual({
         name: 'scene',
         scripts: { build: 'sdk-commands build', 'server-logs': 'sdk-commands scene-insights tail' }

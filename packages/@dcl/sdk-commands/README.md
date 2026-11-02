@@ -108,7 +108,8 @@ For detailed documentation on using the CLI tools, visit:
 
 ### Server logs package script
 
-Scene builds and previews add `scripts.server-logs: "sdk-commands scene-insights tail"`
+Full project builds (including previews unless `--skip-build` is set, and
+`code-to-composite`) add `scripts.server-logs: "sdk-commands scene-insights tail"`
 to `package.json` when missing. An existing script equal to
 `"sdk-commands sdk-server-logs"` is migrated on the next build; custom commands
 and commands with additional arguments are preserved. Single-file builds do not
@@ -116,7 +117,9 @@ change package scripts.
 
 Run `npm run server-logs -- --for 30s --lines 20 --json` for a bounded tail.
 Without `--for`, the tail follows until interrupted. Insights uses the scoped
-session described below and requires access to the deployed scene.
+session described below and requires access to the deployed scene. Migrated scripts
+read persisted Insights logs; `--target` now names the Insights service, not the
+multiplayer server. Custom targets require an explicit `--trust-target` decision.
 
 ### Scene Insights scoped sessions
 
