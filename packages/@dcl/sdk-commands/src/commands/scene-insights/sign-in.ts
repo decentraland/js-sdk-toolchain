@@ -115,7 +115,8 @@ export async function getSession(
   try {
     validated = await signed
   } finally {
-    await program.stop()
+    // Cleanup must not replace a signature validation error.
+    await program.stop().catch(() => undefined)
   }
 
   const { authChain, scope } = validated

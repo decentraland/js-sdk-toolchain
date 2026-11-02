@@ -118,5 +118,20 @@ describe('when signing in through the browser linker', () => {
       expect(stop).toHaveBeenCalledTimes(1)
       expect(readFileSync(file, 'utf8')).toBe('previous credential fixture')
     })
+    describe('and linker shutdown also fails', () => {
+      beforeEach(() => {
+        stop.mockRejectedValueOnce(new Error('Linker shutdown failed'))
+      })
+
+      it('should preserve the retryable RPC error and saved credential', async () => {
+        await main({ args: parseArgs(['login', '--json'], args), components })
+        expect(process.exitCode).toBe(6)
+        expect(JSON.parse(stderr.mock.calls[stderr.mock.calls.length - 1][0])).toMatchObject({
+          error: { code: 'SCENE_INSIGHTS_UNAVAILABLE', exitCode: 6 }
+        })
+        expect(stop).toHaveBeenCalledTimes(1)
+        expect(readFileSync(file, 'utf8')).toBe('previous credential fixture')
+      })
+    })
   })
 })
