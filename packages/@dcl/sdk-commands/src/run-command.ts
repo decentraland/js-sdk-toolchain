@@ -71,8 +71,9 @@ export async function runSdkCommand(components: CliComponents, command: string, 
       printCommand(components.logger, command)
 
       const ret = await cmd.main({ args, components })
-      // print the result of the evaluation as json in the standard output
-      if (needsJson) {
+      // print the result of the evaluation as json in the standard output; a command that wrote
+      // its own JSON (a stream, or an error) returns nothing
+      if (needsJson && ret !== undefined) {
         process.stdout.write(JSON.stringify(ret, null, 2))
       }
 

@@ -7,7 +7,7 @@
     "sdk-commands": "./dist/index.js"
   },
   "dependencies": {
-    "@dcl/crypto": "^3.4.4",
+    "@dcl/crypto": "^3.9.0",
     "@dcl/ecs": "file:../ecs",
     "@dcl/gltf-validator-ts": "1.0.14",
     "@dcl/hashing": "1.1.3",
