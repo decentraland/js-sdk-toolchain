@@ -7,6 +7,7 @@ import {
   AuthLinkType,
   Authenticator,
   ScopedAuthLinkType,
+  ScopedLoginScope,
   getScopedEphemeralMessage
 } from '@dcl/crypto'
 import { ethSign } from '@dcl/crypto/dist/crypto'
@@ -96,6 +97,11 @@ export function createSessionFromPrivateKey(privateKey: string, now: number = Da
   return createSessionFromChain(ephemeralIdentity, expiration, authChain)
 }
 
+export interface ValidatedInsightsDelegation {
+  authChain: AuthChain
+  scope: ScopedLoginScope
+}
+
 /**
  * Turns what the linker dApp returns into a delegation to our ephemeral key.
  *
@@ -112,7 +118,7 @@ export async function delegationFromLinkerChain(
   message: string,
   now: number = Date.now(),
   provider?: AuthChainProvider
-): Promise<AuthChain> {
+): Promise<ValidatedInsightsDelegation> {
   const last = authChain[authChain.length - 1]
   if (
     authChain.length < 2 ||
@@ -128,11 +134,11 @@ export async function delegationFromLinkerChain(
     { ...last, type: ScopedAuthLinkType.ECDSA_PERSONAL_SCOPED_EPHEMERAL as AuthLinkType }
   ]
   const result = await validateInsightsSignature(ephemeralAddress.toLowerCase(), delegation, now, provider)
-  if (!result.ok) {
+  if (!result.ok || !result.scope) {
     throw new CliError(
       'SCENE_INSIGHTS_INVALID_SIGNATURE',
       `The insights session signature is invalid: ${result.message}`
     )
   }
-  return delegation
+  return { authChain: delegation, scope: result.scope }
 }

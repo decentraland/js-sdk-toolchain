@@ -33,7 +33,8 @@ async function createDelegation(ephemeral: EphemeralIdentity, expiration: Date):
     async (message) => ethSign(hexToBytes(wallet.privateKey), message)
   )
   const message = getInsightsSessionMessage(ephemeral.address, expiration)
-  return delegationFromLinkerChain(Authenticator.signPayload(dappIdentity, message), ephemeral.address, message)
+  return (await delegationFromLinkerChain(Authenticator.signPayload(dappIdentity, message), ephemeral.address, message))
+    .authChain
 }
 
 describe('when saving and loading the session', () => {
@@ -54,6 +55,7 @@ describe('when saving and loading the session', () => {
   })
 
   afterEach(() => {
+    jest.restoreAllMocks()
     rmSync(directory, { recursive: true, force: true })
   })
 
@@ -77,6 +79,49 @@ describe('when saving and loading the session', () => {
         Authenticator.ownerAddress(delegation)
       )
     })
+    describe.each(['non-magic', 'revert'])('and the contract returns %s', (verdict) => {
+      beforeEach(() => {
+        provider.sendAsync = jest.fn((payload, callback) => {
+          if (payload.method === 'eth_call' && verdict === 'revert') {
+            callback(null, { jsonrpc: '2.0', id: payload.id, error: { code: 3, message: 'execution reverted' } })
+          } else {
+            const result =
+              payload.method === 'eth_call'
+                ? '0x'
+                : payload.method === 'eth_blockNumber'
+                  ? '0x1'
+                  : { timestamp: '0x' + Math.floor(Date.now() / 1000).toString(16) }
+            callback(null, { jsonrpc: '2.0', id: payload.id, result })
+          }
+        })
+      })
+      it('should treat the session as invalid without deleting the stored credential', async () => {
+        await expect(loadSession({ fs }, file, Date.now(), provider)).resolves.toBeUndefined()
+        expect(existsSync(file)).toBe(true)
+      })
+    })
+
+    describe('and contract verification exhausts its RPC budget', () => {
+      beforeEach(() => {
+        jest.spyOn(Authenticator, 'validateSignature').mockImplementation(async (_expected, _chain, rpc) => {
+          const sender = rpc as typeof provider
+          for (let i = 0; i < 20; i++) {
+            await new Promise<void>((resolve, reject) =>
+              sender.sendAsync({ id: i, method: 'eth_call', params: [] }, (error) =>
+                error ? reject(error) : resolve()
+              )
+            )
+          }
+          return { ok: true }
+        })
+      })
+      it('should return an invalid session after 16 calls instead of trapping every command with an exception', async () => {
+        await expect(loadSession({ fs }, file, Date.now(), provider)).resolves.toBeUndefined()
+        expect(provider.sendAsync).toHaveBeenCalledTimes(16)
+        expect(existsSync(file)).toBe(true)
+      })
+    })
+
     describe('and RPC is unavailable', () => {
       beforeEach(() => {
         provider.sendAsync = jest.fn((_payload, callback) => callback(new Error('offline')))
@@ -85,6 +130,7 @@ describe('when saving and loading the session', () => {
         await expect(loadSession({ fs }, file, Date.now(), provider)).rejects.toMatchObject({
           name: 'SCENE_INSIGHTS_UNAVAILABLE'
         })
+        expect(existsSync(file)).toBe(true)
       })
     })
   })
@@ -191,6 +237,7 @@ describe('when saving the session in its .dcl folder', () => {
   })
 
   afterEach(() => {
+    jest.restoreAllMocks()
     rmSync(directory, { recursive: true, force: true })
   })
 
@@ -307,6 +354,7 @@ describe('when getting a session to sign with', () => {
   })
 
   afterEach(() => {
+    jest.restoreAllMocks()
     rmSync(directory, { recursive: true, force: true })
     if (privateKey === undefined) delete process.env.DCL_PRIVATE_KEY
     else process.env.DCL_PRIVATE_KEY = privateKey
@@ -346,6 +394,30 @@ describe('when getting a session to sign with', () => {
       const expiration = new Date(Date.now() + 60 * 60 * 1000)
       delegation = await createDelegation(ephemeral, expiration)
       await saveSession({ fs }, file, ephemeral, expiration, delegation)
+    })
+
+    describe('and the saved wallet is a contract on the development network', () => {
+      let fetchSpy: jest.SpyInstance
+      beforeEach(async () => {
+        options.targetUrl = 'https://multiplayer-scenes-insights-service.decentraland.zone'
+        delegation = delegation.map((link) =>
+          link.type === AuthLinkType.ECDSA_PERSONAL_EPHEMERAL
+            ? { ...link, type: AuthLinkType.ECDSA_EIP_1654_EPHEMERAL, signature: '0x1234' }
+            : link
+        )
+        await saveSession({ fs }, file, ephemeral, new Date(Date.now() + 60 * 60 * 1000), delegation)
+        fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(async (_url, init) => {
+          const payload = JSON.parse(String(init?.body))
+          return new Response(JSON.stringify({ jsonrpc: '2.0', id: payload.id, result: '0x1626ba7e' + '0'.repeat(56) }))
+        })
+      })
+      it('should reuse the credential through the selected target RPC provider', async () => {
+        await expect(getSession(components, { label: 'example' }, options)).resolves.toMatchObject({ source: 'saved' })
+        expect(fetchSpy).toHaveBeenCalledWith(
+          new URL('https://rpc.decentraland.org/sepolia?project=sdk-commands'),
+          expect.any(Object)
+        )
+      })
     })
 
     it('should use it without asking for a signature', async () => {

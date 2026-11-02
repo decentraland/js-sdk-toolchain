@@ -1,4 +1,4 @@
-import { AuthChain, Authenticator } from '@dcl/crypto'
+import { AuthChain, Authenticator, ValidationResult } from '@dcl/crypto'
 import { AuthChainProvider, createSignatureRpcProvider } from '@dcl/crypto-middleware'
 import { CliError } from '../../logic/error'
 
@@ -15,9 +15,9 @@ export function createInsightsProvider(target: string): AuthChainProvider {
             : hostname === 'decentraland.org' || hostname.endsWith('.decentraland.org')
               ? 'mainnet'
               : undefined
-        const url =
-          process.env.DCL_SCENE_INSIGHTS_RPC_URL ||
-          (network && `https://rpc.decentraland.org/${network}?project=sdk-commands`)
+        const url = network
+          ? `https://rpc.decentraland.org/${network}?project=sdk-commands`
+          : process.env.DCL_SCENE_INSIGHTS_RPC_URL
         if (!url) {
           callback(
             new CliError(
@@ -54,7 +54,9 @@ export async function validateInsightsSignature(
   if (chain.length < 2 || chain.length > 10) return { ok: false, message: 'Invalid auth chain length' }
   const controller = new AbortController()
   let rejectValidation: (error: Error) => void = () => undefined
-  const interrupted = new Promise<never>((_resolve, reject) => {
+  let invalidate: (result: ValidationResult) => void = () => undefined
+  const interrupted = new Promise<ValidationResult>((resolve, reject) => {
+    invalidate = resolve
     rejectValidation = reject
   })
   const interrupt = (error: Error) => {
@@ -72,9 +74,10 @@ export async function validateInsightsSignature(
         return
       }
       if (++calls > 16) {
-        callback(
-          interrupt(new CliError('SCENE_INSIGHTS_INVALID_SIGNATURE', 'Signature validation exceeded its RPC budget'))
-        )
+        const message = 'Signature validation exceeded its RPC budget'
+        invalidate({ ok: false, message })
+        controller.abort()
+        callback(new Error(message))
         return
       }
       try {

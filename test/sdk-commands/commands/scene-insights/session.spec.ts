@@ -182,7 +182,7 @@ describe('when the linker dApp returns a signature of the session message', () =
     let delegation: AuthChain
 
     beforeEach(async () => {
-      delegation = await delegationFromLinkerChain(dappChain, ephemeral.address, message)
+      delegation = (await delegationFromLinkerChain(dappChain, ephemeral.address, message)).authChain
     })
 
     it('should relabel the last link as an ephemeral delegation to our key', () => {
@@ -263,10 +263,13 @@ describe('when the linker dApp returns a signature of the session message', () =
     it('should validate the contract delegation and retain the wallet address', async () => {
       await expect(
         delegationFromLinkerChain(contractChain, ephemeral.address, message, Date.now(), provider)
-      ).resolves.toEqual([
-        ...contractChain.slice(0, -1),
-        { ...contractChain[contractChain.length - 1], type: 'ECDSA_SCOPED_EPHEMERAL' }
-      ])
+      ).resolves.toMatchObject({
+        authChain: [
+          ...contractChain.slice(0, -1),
+          { ...contractChain[contractChain.length - 1], type: 'ECDSA_SCOPED_EPHEMERAL' }
+        ],
+        scope: { service: 'insights' }
+      })
     })
 
     describe('and RPC is unavailable', () => {

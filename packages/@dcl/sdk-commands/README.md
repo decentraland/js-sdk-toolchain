@@ -127,11 +127,14 @@ validated via Ethereum RPC during login and whenever a saved session is loaded.
 The target selects Mainnet for `.org` and Sepolia for `.zone`; pass the same
 `--target` to `login`, `session`, and read commands. For a custom target, set
 `DCL_SCENE_INSIGHTS_RPC_URL` to its trusted Ethereum RPC endpoint. The endpoint is
-local configuration, never taken from the wallet response. Normal EOA sessions
+local configuration, never taken from the wallet response, and is ignored for
+`.org`/`.zone` targets so their network mapping stays fixed. Normal EOA sessions
 remain offline during local validation.
 
 Deploy the Insights server with `ETH_RPC_URL` before releasing this CLI version.
 The server independently verifies every request against its configured network,
-read-operation grants, and scene permissions. RPC outages return exit 6 without
-removing the saved session or requesting another login. Validation is limited to
+read-operation grants, and scene permissions. RPC outages return exit 6, including during browser login, without
+removing the saved session or requesting another login. A new browser delegation is
+validated once, then saved with its validated expiration. Invalid or revoked saved
+sessions, including ones that exceed the RPC-call budget, require a new login. Validation is limited to
 10 chain links, 16 RPC calls and 15 seconds; each RPC request has a 5-second timeout.

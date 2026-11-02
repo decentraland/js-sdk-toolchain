@@ -36,6 +36,9 @@ describe('when selecting the Insights signature RPC', () => {
     ['https://multiplayer-scenes-insights-service.decentraland.org', 'mainnet'],
     ['https://multiplayer-scenes-insights-service.decentraland.zone', 'sepolia']
   ])('and the target is %s', (target, network) => {
+    beforeEach(() => {
+      process.env.DCL_SCENE_INSIGHTS_RPC_URL = 'https://rpc.example/wrong-network'
+    })
     it('should verify using the matching network', async () => {
       await expect(
         validateInsightsSignature(
