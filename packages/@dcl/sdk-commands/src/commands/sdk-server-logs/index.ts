@@ -45,6 +45,8 @@ export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands sdk-server-logs [options]'
     Streams real-time logs from the multiplayer server.
+    For persisted logs, use sdk-commands scene-insights tail --for 30s.
+    With scene-insights, --target points to the Insights service, not this server.
     Runs from any directory when --world and/or --position are provided.
     Falls back to scene.json (worldConfiguration.name) when neither is passed.
 

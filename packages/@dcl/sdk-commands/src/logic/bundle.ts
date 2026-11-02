@@ -107,13 +107,14 @@ export * from '~sdk/script-utils'
 
 /**
  * Ensures a key exists in a JSON file. Supports dot-separated paths (e.g. "scripts.server-logs").
- * Silently skips if the file can't be read/written or the key already exists.
+ * Preserves existing values unless they match the supplied previous default.
  */
 async function ensureJsonKey(
   components: BundleComponents,
   filePath: string,
   keyPath: string,
-  value: unknown
+  value: unknown,
+  previousDefault?: string
 ): Promise<void> {
   try {
     const raw = await components.fs.readFile(filePath, 'utf-8')
@@ -126,13 +127,14 @@ async function ensureJsonKey(
       target[key] = target[key] || {}
       target = target[key]
     }
-    if (target[lastKey] !== undefined) return
+    const existing = target[lastKey]
+    if (existing !== undefined && (previousDefault === undefined || existing !== previousDefault)) return
 
     target[lastKey] = value
     await components.fs.writeFile(filePath, JSON.stringify(parsed, null, 2))
     printProgressInfo(
       components.logger,
-      `Added ${colors.bold(`${keyPath}: ${JSON.stringify(value)}`)} to ${path.basename(filePath)}`
+      `${existing === undefined ? 'Added' : 'Updated'} ${colors.bold(`${keyPath}: ${JSON.stringify(value)}`)} in ${path.basename(filePath)}`
     )
   } catch (_) {
     // read/write failed — skip silently
@@ -182,6 +184,7 @@ export async function bundleProject(components: BundleComponents, options: Compi
       components,
       path.join(dir, 'package.json'),
       'scripts.server-logs',
+      'sdk-commands scene-insights tail',
       'sdk-commands sdk-server-logs'
     )
   }

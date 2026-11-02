@@ -26,7 +26,7 @@
     "build": "npm run build-playground && node_modules/.bin/api-extractor run",
     "build-local": "npm run build-playground && node_modules/.bin/api-extractor run --local --verbose --diagnostics",
     "build-playground": "./../sdk-commands/dist/index.js build --production --emitDeclaration --customEntryPoint",
-    "server-logs": "sdk-commands sdk-server-logs"
+    "server-logs": "sdk-commands scene-insights tail"
   },
   "tsdoc": {
     "tsdocFlavor": "AEDoc"
