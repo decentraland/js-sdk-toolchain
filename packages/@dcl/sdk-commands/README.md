@@ -113,10 +113,28 @@ For detailed documentation on using the CLI tools, visit:
 sessions use these same explicit grants. They cover scenes the wallet already has
 permission to read; the credential is not restricted to a single scene. No wildcard
 or write operation is granted. Environments sharing the `insights` service identifier
-(including `.org` and `.zone`) accept the same credential. The signed headers don't
+(including `.org` and `.zone`) accept the same credential when the wallet signatures
+verify on the selected network. The signed headers don't
 name the host, so `--target` only accepts https hosts under `decentraland.org` or
 `decentraland.zone` unless `--trust-target` is passed.
 
 Previously saved full-login sessions require signing in again. A saved scoped
 session expires no later than its parent delegation. Deploy the scoped-login
 Insights server before using this command version.
+
+Smart-contract wallets can sign through the browser linker. Contract signatures are
+validated via Ethereum RPC during login and whenever a saved session is loaded.
+The target selects Mainnet for `.org` and Sepolia for `.zone`; pass the same
+`--target` to `login`, `session`, and read commands. For a custom target, set
+`DCL_SCENE_INSIGHTS_RPC_URL` to its trusted Ethereum RPC endpoint. The endpoint is
+local configuration, never taken from the wallet response, and is ignored for
+`.org`/`.zone` targets so their network mapping stays fixed. Normal EOA sessions
+remain offline during local validation.
+
+Deploy the Insights server with `ETH_RPC_URL` before releasing this CLI version.
+The server independently verifies every request against its configured network,
+read-operation grants, and scene permissions. RPC outages return exit 6, including during browser login, without
+removing the saved session or requesting another login. A new browser delegation is
+validated once, then saved with its validated expiration. Invalid or revoked saved
+sessions, including ones that exceed the RPC-call budget, require a new login. Validation is limited to
+10 chain links, 16 RPC calls and 15 seconds; each RPC request has a 5-second timeout.

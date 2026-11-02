@@ -5,6 +5,16 @@ import { initComponents } from '../../../../packages/@dcl/sdk-commands/src/compo
 import { parseArgs } from '../../../../packages/@dcl/sdk-commands/src/logic/args'
 import { args, main } from '../../../../packages/@dcl/sdk-commands/src/commands/scene-insights'
 
+import { Authenticator } from '../../../../packages/@dcl/sdk-commands/node_modules/@dcl/crypto'
+import {
+  createEphemeralIdentity,
+  INSIGHTS_OPERATIONS
+} from '../../../../packages/@dcl/sdk-commands/src/commands/scene-insights/session'
+import {
+  getSessionFilePath,
+  saveSession
+} from '../../../../packages/@dcl/sdk-commands/src/commands/scene-insights/session-store'
+
 /** An event stream that stays open until the request is aborted. */
 function openStream(signal: AbortSignal): Response {
   const body = new ReadableStream({
@@ -97,6 +107,47 @@ describe('when running scene-insights', () => {
 
     it('should exit with the sign-in needed code', () => {
       expect(process.exitCode).toBe(3)
+    })
+  })
+
+  describe('and a contract session is checked with a development target', () => {
+    let fetchSpy: jest.SpyInstance
+    let address: string
+    beforeEach(async () => {
+      address = '0x1111111111111111111111111111111111111111'
+      const identity = await Authenticator.initializeScopedAuthChain(
+        address,
+        createEphemeralIdentity(),
+        60,
+        INSIGHTS_OPERATIONS.map((operation) => ({ service: 'insights', operation })),
+        async () => '0x1234'
+      )
+      await saveSession(
+        components,
+        getSessionFilePath(directory),
+        identity.ephemeralIdentity,
+        identity.expiration,
+        identity.authChain
+      )
+      fetchSpy = jest.spyOn(globalThis, 'fetch').mockImplementation(async (_url, init) => {
+        const payload = JSON.parse(String(init?.body))
+        return new Response(JSON.stringify({ jsonrpc: '2.0', id: payload.id, result: '0x1626ba7e' + '0'.repeat(56) }))
+      })
+    })
+    it('should validate with Sepolia and return the contract address', async () => {
+      await expect(
+        main({
+          args: parseArgs(
+            ['session', '--target', 'https://multiplayer-scenes-insights-service.decentraland.zone', '--json'],
+            args
+          ),
+          components
+        })
+      ).resolves.toMatchObject({ address })
+      expect(fetchSpy).toHaveBeenCalledWith(
+        new URL('https://rpc.decentraland.org/sepolia?project=sdk-commands'),
+        expect.any(Object)
+      )
     })
   })
 

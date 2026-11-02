@@ -1,10 +1,13 @@
 import { randomBytes } from 'crypto'
+import type { AuthChainProvider } from '@dcl/crypto-middleware'
+import { validateInsightsSignature } from './signature-validation'
 import {
   AuthChain,
   AuthIdentity,
   AuthLinkType,
   Authenticator,
   ScopedAuthLinkType,
+  ScopedLoginScope,
   getScopedEphemeralMessage
 } from '@dcl/crypto'
 import { ethSign } from '@dcl/crypto/dist/crypto'
@@ -94,6 +97,11 @@ export function createSessionFromPrivateKey(privateKey: string, now: number = Da
   return createSessionFromChain(ephemeralIdentity, expiration, authChain)
 }
 
+export interface ValidatedInsightsDelegation {
+  authChain: AuthChain
+  scope: ScopedLoginScope
+}
+
 /**
  * Turns what the linker dApp returns into a delegation to our ephemeral key.
  *
@@ -102,22 +110,15 @@ export function createSessionFromPrivateKey(privateKey: string, now: number = Da
  * link a signature of the message by the dApp's key, which is exactly a scoped delegation, so
  * it is relabeled as one: wallet → dApp key → our key.
  *
- * @throws CliError when the chain does not sign the message, or comes from a contract wallet
- *   (scoped contract-wallet chains require a provider rather than Catalyst validation).
+ * @throws CliError when the chain does not sign the message or RPC validation is unavailable.
  */
 export async function delegationFromLinkerChain(
   authChain: AuthChain,
   ephemeralAddress: string,
   message: string,
-  now: number = Date.now()
-): Promise<AuthChain> {
-  if (authChain.some((link) => link.type === AuthLinkType.ECDSA_EIP_1654_EPHEMERAL)) {
-    throw new CliError(
-      'SCENE_INSIGHTS_UNSUPPORTED_WALLET',
-      'Smart contract wallets cannot sign insights sessions in the browser; set DCL_PRIVATE_KEY to an address with access instead'
-    )
-  }
-
+  now: number = Date.now(),
+  provider?: AuthChainProvider
+): Promise<ValidatedInsightsDelegation> {
   const last = authChain[authChain.length - 1]
   if (
     authChain.length < 2 ||
@@ -132,14 +133,12 @@ export async function delegationFromLinkerChain(
     ...authChain.slice(0, -1),
     { ...last, type: ScopedAuthLinkType.ECDSA_PERSONAL_SCOPED_EPHEMERAL as AuthLinkType }
   ]
-  const result = await Authenticator.validateSignature(ephemeralAddress.toLowerCase(), delegation, null, now, {
-    service: INSIGHTS_SERVICE
-  })
-  if (!result.ok) {
+  const result = await validateInsightsSignature(ephemeralAddress.toLowerCase(), delegation, now, provider)
+  if (!result.ok || !result.scope) {
     throw new CliError(
       'SCENE_INSIGHTS_INVALID_SIGNATURE',
       `The insights session signature is invalid: ${result.message}`
     )
   }
-  return delegation
+  return { authChain: delegation, scope: result.scope }
 }

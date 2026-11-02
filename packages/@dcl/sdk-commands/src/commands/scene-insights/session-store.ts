@@ -1,4 +1,6 @@
 import { homedir } from 'os'
+import type { AuthChainProvider } from '@dcl/crypto-middleware'
+import { validateInsightsSignature } from './signature-validation'
 import path from 'path'
 import { randomBytes } from 'crypto'
 import { execFile } from 'child_process'
@@ -6,7 +8,7 @@ import { AuthChain, AuthIdentity, Authenticator, isOperationGranted } from '@dcl
 
 import { CliComponents } from '../../components'
 import { CliError } from '../../logic/error'
-import { InsightsSession, createSessionFromChain, INSIGHTS_SERVICE, INSIGHTS_OPERATIONS } from './session'
+import { InsightsSession, createSessionFromChain, INSIGHTS_OPERATIONS } from './session'
 
 /** Environment variable naming the folder whose .dcl/ holds the session, e.g. a sandbox an agent can read. */
 export const SESSION_DIR_ENV = 'DCL_SCENE_INSIGHTS_SESSION_DIR'
@@ -44,7 +46,8 @@ export function getSessionFilePath(base: string = process.env[SESSION_DIR_ENV] |
 export async function loadSession(
   components: Pick<CliComponents, 'fs'>,
   file: string,
-  now: number = Date.now()
+  now: number = Date.now(),
+  provider?: AuthChainProvider
 ): Promise<{ session: InsightsSession; saved: SavedSession } | undefined> {
   const { fs } = components
   if (!(await fs.fileExists(file))) return undefined
@@ -68,12 +71,11 @@ export async function loadSession(
   const expiration = new Date(saved.expiration)
   if (!(expiration.getTime() - EXPIRY_MARGIN_MS > now)) return undefined
 
-  const check = await Authenticator.validateSignature(
+  const check = await validateInsightsSignature(
     saved.ephemeralIdentity.address.toLowerCase(),
     saved.authChain,
-    null,
     now,
-    { service: INSIGHTS_SERVICE }
+    provider
   )
   if (
     !check.ok ||

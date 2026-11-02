@@ -182,7 +182,7 @@ describe('when the linker dApp returns a signature of the session message', () =
     let delegation: AuthChain
 
     beforeEach(async () => {
-      delegation = await delegationFromLinkerChain(dappChain, ephemeral.address, message)
+      delegation = (await delegationFromLinkerChain(dappChain, ephemeral.address, message)).authChain
     })
 
     it('should relabel the last link as an ephemeral delegation to our key', () => {
@@ -241,19 +241,59 @@ describe('when the linker dApp returns a signature of the session message', () =
 
   describe('and the wallet is a smart contract wallet', () => {
     let contractChain: AuthChain
+    let provider: import('../../../../packages/@dcl/sdk-commands/node_modules/@dcl/crypto-middleware').AuthChainProvider
 
     beforeEach(() => {
       contractChain = dappChain.map((link) =>
         link.type === AuthLinkType.ECDSA_PERSONAL_EPHEMERAL
-          ? { ...link, type: AuthLinkType.ECDSA_EIP_1654_EPHEMERAL }
+          ? { ...link, type: AuthLinkType.ECDSA_EIP_1654_EPHEMERAL, signature: '0x1234' }
           : link
       )
+      provider = {
+        sendAsync: jest.fn((payload, callback) =>
+          callback(null, { jsonrpc: '2.0', id: payload.id, result: '0x1626ba7e' + '0'.repeat(56) })
+        )
+      }
     })
 
-    it('should throw an unsupported wallet error that points to DCL_PRIVATE_KEY', async () => {
-      await expect(delegationFromLinkerChain(contractChain, ephemeral.address, message)).rejects.toMatchObject({
-        name: 'SCENE_INSIGHTS_UNSUPPORTED_WALLET',
-        message: expect.stringContaining('DCL_PRIVATE_KEY')
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it('should validate the contract delegation and retain the wallet address', async () => {
+      await expect(
+        delegationFromLinkerChain(contractChain, ephemeral.address, message, Date.now(), provider)
+      ).resolves.toMatchObject({
+        authChain: [
+          ...contractChain.slice(0, -1),
+          { ...contractChain[contractChain.length - 1], type: 'ECDSA_SCOPED_EPHEMERAL' }
+        ],
+        scope: { service: 'insights' }
+      })
+    })
+
+    describe('and RPC is unavailable', () => {
+      beforeEach(() => {
+        provider.sendAsync = jest.fn((_payload, callback) => callback(new Error('private provider details')))
+      })
+      it('should report a retryable failure without suggesting another wallet or exposing details', async () => {
+        await expect(
+          delegationFromLinkerChain(contractChain, ephemeral.address, message, Date.now(), provider)
+        ).rejects.toMatchObject({
+          name: 'SCENE_INSIGHTS_UNAVAILABLE',
+          message: 'Contract-wallet signature verification unavailable; retry shortly'
+        })
+      })
+    })
+
+    describe('and the delegated key signs the wrong payload', () => {
+      beforeEach(() => {
+        contractChain[contractChain.length - 1].signature = ethSign(hexToBytes(walletKey), 'tampered')
+      })
+      it('should reject even when the contract delegation verifies', async () => {
+        await expect(
+          delegationFromLinkerChain(contractChain, ephemeral.address, message, Date.now(), provider)
+        ).rejects.toMatchObject({ name: 'SCENE_INSIGHTS_INVALID_SIGNATURE' })
       })
     })
   })
