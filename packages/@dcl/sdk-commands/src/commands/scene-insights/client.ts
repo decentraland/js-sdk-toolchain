@@ -114,7 +114,7 @@ const ERRORS_BY_STATUS: Record<number, { name: CliErrorName; hint?: string }> = 
   },
   403: {
     name: 'SCENE_INSIGHTS_FORBIDDEN',
-    hint: "the signed-in address is not in the scene's logsPermissions, and has neither World owner/deployment access covering the entire scene nor Genesis City owner/operator rights on the scene's base parcel"
+    hint: "check the server reason: the login must grant the requested Insights operation, and the wallet needs logsPermissions, World owner/deployment access covering the entire scene, or Genesis City owner or delegated LAND manager rights on the scene's base parcel"
   },
   404: { name: 'SCENE_INSIGHTS_NOT_FOUND', hint: 'no deployed scene matches the World or parcel' },
   429: { name: 'SCENE_INSIGHTS_UNAVAILABLE', hint: 'too many requests; try again shortly' },

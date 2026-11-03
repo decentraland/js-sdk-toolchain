@@ -108,9 +108,14 @@ export function help(options: Options) {
     delegated LAND manager (operator, updateOperator, updateManager, approvedForAll) of the
     deployed scene's base parcel also has access, without a logsPermissions edit or redeploy.
     Anyone currently authorized can read all retained history under that scene key.
+    Access changes are not immediate: defaults are 60-second permission caches and 5-minute
+    tail rechecks (roughly 6 minutes to observe revocation on an open tail). Configuration and
+    bounded capacity-failure grace periods can extend this; it is not a strict deadline.
 
     Sign in once with "login": it opens the browser for your wallet to sign, and the session is
-    saved for up to 12 hours (bounded by the parent session) in ${getSessionFilePath()} (or in the .dcl folder of ${SESSION_DIR_ENV}).
+    saved for up to 12 hours (bounded by the parent session) at:
+      ${getSessionFilePath()}
+    Override the parent directory with ${SESSION_DIR_ENV} (uses its .dcl folder).
     It grants read-only Insights access to logs, metrics and executions. Never share, commit
     or deploy the session file: it contains a temporary private signing key and delegation.
     "logout" deletes the local copy; leaked copies can remain usable until expiry.
