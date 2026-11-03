@@ -103,12 +103,24 @@ export function help(options: Options) {
   Usage: 'sdk-commands scene-insights <subcommand> [options]'
     Reads the persisted logs and metrics of an authoritative multiplayer scene (kept for 7 days)
     from multiplayer-scenes-insights-service. The signed-in address must be in the scene's
-    logsPermissions, or be the World's owner or a deployer.
+    logsPermissions, the World's owner, or a World deployment collaborator whose grant covers
+    the whole World or every deployed parcel of the scene. For Genesis City, the owner or
+    delegated LAND manager (operator, updateOperator, updateManager, approvedForAll) of the
+    deployed scene's base parcel also has access, without a logsPermissions edit or redeploy.
+    Anyone currently authorized can read all retained history under that scene key.
+    Access changes are not immediate: defaults are 60-second permission caches and 5-minute
+    tail rechecks (roughly 6 minutes to observe revocation on an open tail). Configuration and
+    bounded capacity-failure grace periods can extend this; it is not a strict deadline.
 
     Sign in once with "login": it opens the browser for your wallet to sign, and the session is
-    saved for 12 hours in ${getSessionFilePath()} (or in the .dcl folder of ${SESSION_DIR_ENV}).
-    Until it expires it can sign Decentraland requests as your address; "logout" removes it.
-    The .dcl folder is never deployed and ignores itself in git, so the session is never published.
+    saved for up to 12 hours (bounded by the parent session) at:
+      ${getSessionFilePath()}
+    Override the parent directory with ${SESSION_DIR_ENV} (uses its .dcl folder).
+    It grants read-only Insights access to logs, metrics and executions. Never share, commit
+    or deploy the session file: it contains a temporary private signing key and delegation.
+    "logout" deletes the local copy; leaked copies can remain usable until expiry.
+    The SDK excludes .dcl from deployment, adds a .gitignore in the session folder, and refuses
+    tracked session files. Custom upload/archive scripts must exclude credentials too.
     With DCL_PRIVATE_KEY set, requests are signed with that key and nothing is saved.
     Contract wallets use Ethereum RPC: Mainnet for .org, Sepolia for .zone. Use the same --target
     for login, session and reads. Set DCL_SCENE_INSIGHTS_RPC_URL for a custom target's network.

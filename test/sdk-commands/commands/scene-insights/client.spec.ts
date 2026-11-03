@@ -244,20 +244,23 @@ describe('when using the insights client', () => {
     })
   })
 
-  describe('and the signer has no access', () => {
-    beforeEach(() => {
-      fetchMock.mockResolvedValueOnce(new Response('{"error":"No access to this scene"}', { status: 403 }))
-    })
-
-    it('should throw a request error with the reason and what to check', async () => {
-      await expect(client.listMetrics({})).rejects.toMatchObject({
-        name: 'SCENE_INSIGHTS_FORBIDDEN',
-        message: expect.stringMatching(
-          /403: No access to this scene \(the signed-in address is not in the scene's logsPermissions/
-        )
+  describe.each(['No access to this scene', 'Scoped login does not grant access to this operation'])(
+    'and access is forbidden: %s',
+    (reason) => {
+      beforeEach(() => {
+        fetchMock.mockResolvedValueOnce(new Response(JSON.stringify({ error: reason }), { status: 403 }))
       })
-    })
-  })
+
+      it('should preserve the server reason and explain both scope and scene permissions', async () => {
+        await expect(client.listMetrics({})).rejects.toMatchObject({
+          name: 'SCENE_INSIGHTS_FORBIDDEN',
+          message: expect.stringContaining(
+            `403: ${reason} (check the server reason: the login must grant the requested Insights operation`
+          )
+        })
+      })
+    }
+  )
 
   describe('and the session is refused', () => {
     beforeEach(() => {
