@@ -2705,6 +2705,8 @@ export interface PBAvatarNametag {
     borderColor?: PBColor3 | undefined;
     label: string;
     labelColor?: PBColor3 | undefined;
+    // Warning: (tsdoc-malformed-html-name) Invalid HTML element: Expecting an HTML name
+    maxDistance?: number | undefined;
 }
 
 // @public (undocumented)
@@ -4429,6 +4431,8 @@ export interface PBVirtualCamera {
     fov?: number | undefined;
     // (undocumented)
     lookAtEntity?: number | undefined;
+    // Warning: (tsdoc-malformed-html-name) Invalid HTML element: Expecting an HTML name
+    nametagMaxDistance?: number | undefined;
 }
 
 // @public (undocumented)

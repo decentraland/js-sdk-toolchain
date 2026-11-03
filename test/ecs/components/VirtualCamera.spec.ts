@@ -12,7 +12,8 @@ describe('VirtualCamera component', () => {
         }
       },
       lookAtEntity: 35,
-      fov: 45
+      fov: 45,
+      nametagMaxDistance: 200
     })
   })
 
@@ -24,7 +25,8 @@ describe('VirtualCamera component', () => {
         transitionMode: vCamera.Transition.Time(6)
       },
       lookAtEntity: 86,
-      fov: 50
+      fov: 50,
+      nametagMaxDistance: undefined
     })
   })
 
@@ -38,7 +40,8 @@ describe('VirtualCamera component', () => {
         }
       },
       lookAtEntity: 86,
-      fov: 30
+      fov: 30,
+      nametagMaxDistance: 15.5
     })
   })
 
@@ -50,7 +53,8 @@ describe('VirtualCamera component', () => {
         transitionMode: vCamera.Transition.Speed(15)
       },
       lookAtEntity: 86,
-      fov: 48
+      fov: 48,
+      nametagMaxDistance: undefined
     })
   })
 })
