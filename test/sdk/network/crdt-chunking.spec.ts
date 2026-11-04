@@ -116,7 +116,7 @@ describe('CRDT Network Transport Chunking Tests', () => {
         { key: 'key3', value: 'value3'.repeat(100) }
       ]
     })
-    SyncComponents.create(entity2)
+    SyncComponents.create(entity2, { componentIds: [SmallComponent.componentId, LargeComponent.componentId] })
     entities.push(entity2)
 
     // Entity 3: All three components
@@ -138,7 +138,9 @@ describe('CRDT Network Transport Chunking Tests', () => {
         { key: 'meta4', value: 'data4'.repeat(80) }
       ]
     })
-    SyncComponents.create(entity3)
+    SyncComponents.create(entity3, {
+      componentIds: [SmallComponent.componentId, MediumComponent.componentId, LargeComponent.componentId]
+    })
     entities.push(entity3)
 
     // Update engine to process all changes and trigger network messages
