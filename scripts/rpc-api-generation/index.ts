@@ -33,6 +33,8 @@ export async function compileProtoApi() {
 }
 
 const NON_EXPOSED_LIST_NAMES: string[] = [
+  // `Badges.checkAwards` is the SDK's internal award hint, not a creator-facing API
+  'Badges',
   'SocialController',
   'DevTools',
   'Permissions',
