@@ -11,8 +11,7 @@ describe('Generated AvatarNametag ProtoBuf', () => {
       label: '',
       labelColor: undefined,
       backgroundColor: undefined,
-      borderColor: undefined,
-      maxDistance: undefined
+      borderColor: undefined
     })
   })
 
@@ -24,8 +23,7 @@ describe('Generated AvatarNametag ProtoBuf', () => {
       label: 'Club Owner',
       labelColor: Color3.Red(),
       backgroundColor: Color3.Black(),
-      borderColor: Color3.Yellow(),
-      maxDistance: 15
+      borderColor: Color3.Yellow()
     })
   })
 
@@ -37,8 +35,7 @@ describe('Generated AvatarNametag ProtoBuf', () => {
       label: 'boedo-casla',
       labelColor: undefined,
       backgroundColor: undefined,
-      borderColor: undefined,
-      maxDistance: undefined
+      borderColor: undefined
     })
   })
 })
