@@ -27,8 +27,12 @@ const {
   getFirstChild,
   isStateSyncronized,
   binaryMessageBus,
-  eventBus
+  eventBus,
+  messageBusRelay
 } = addSyncTransport(engine, sendBinary, getUserData, isServerApi, 'network')
+
+/** @internal */
+export { messageBusRelay }
 
 // Re-export the room messaging system
 export { registerMessages, getRoom } from './events'

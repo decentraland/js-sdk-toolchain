@@ -1,19 +1,22 @@
-import { Observer } from './internal/Observable'
-import { IEvents, onCommsMessage } from './observables'
-import * as communicationsController from '~system/CommunicationsController'
+import { Observable, Observer } from './internal/Observable'
+import { IEvents } from './observables'
+import { messageBusRelay } from './network'
+
+// Not the global onCommsMessage: raw comms text skips the server, so its sender can't be trusted.
+const onMessageBusMessage = new Observable<IEvents['comms']>()
+messageBusRelay.onMessage((message, sender) => onMessageBusMessage.notifyObservers({ message, sender }))
 
 /**
+ * Messages are relayed by the authoritative multiplayer server, so a scene using
+ * MessageBus needs one (`authoritativeMultiplayer` in scene.json).
  * @alpha
  * @deprecated this will only exist for a few releases in ECS7
  */
 export class MessageBus {
-  private messageQueue: string[] = []
-  private flushing = false
-
   constructor() {}
 
   on(message: string, callback: (value: any, sender: string) => void): Observer<IEvents['comms']> {
-    return onCommsMessage.add((e) => {
+    return onMessageBusMessage.add((e) => {
       try {
         const m = JSON.parse(e.message)
 
@@ -26,31 +29,11 @@ export class MessageBus {
 
   // @internal
   sendRaw(message: string) {
-    this.messageQueue.push(message)
-
-    this.flush()
+    messageBusRelay.send(message)
   }
   emit(message: string, payload: Record<any, any>) {
     const messageToSend = JSON.stringify({ message, payload })
     this.sendRaw(messageToSend)
-    onCommsMessage.notifyObservers({ message: messageToSend, sender: 'self' })
-  }
-
-  private flush() {
-    if (!this.messageQueue.length) return
-    if (this.flushing) return
-
-    const message = this.messageQueue.shift()!
-    this.flushing = true
-    communicationsController.send({ message }).then(
-      (_) => {
-        this.flushing = false
-        this.flush()
-      },
-      (_) => {
-        this.flushing = false
-        this.flush()
-      }
-    )
+    onMessageBusMessage.notifyObservers({ message: messageToSend, sender: 'self' })
   }
 }

@@ -2193,7 +2193,7 @@ export interface MeshRendererComponentDefinitionExtended extends LastWriteWinEle
     setSphere(entity: Entity): void;
 }
 
-// @alpha @deprecated (undocumented)
+// @alpha @deprecated
 export class MessageBus {
     constructor();
     // (undocumented)
