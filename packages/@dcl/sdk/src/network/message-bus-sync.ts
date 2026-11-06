@@ -1,4 +1,5 @@
-import { IEngine, Transport, RealmInfo, PlayerIdentityData } from '@dcl/ecs'
+import { IEngine, Transport } from '@dcl/ecs'
+import { RealmInfo as defineRealmInfo, PlayerIdentityData as definePlayerIdentityData } from '@dcl/ecs/dist/components'
 import { type SendBinaryRequest, type SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
@@ -22,6 +23,11 @@ export function addSyncTransport(
   const myProfile: IProfile = {} as IProfile
   fetchProfile(myProfile!, getUserData)
 
+  // Resolved from the engine we were handed rather than the global one, so the
+  // join flow belongs to that engine.
+  const RealmInfo = defineRealmInfo(engine)
+  const PlayerIdentityData = definePlayerIdentityData(engine)
+
   // Entity utils
   const entityDefinitions = entityUtils(engine, myProfile)
 
@@ -41,6 +47,9 @@ export function addSyncTransport(
 
   let stateIsSyncronized = false
   let transportInitialzed = false
+  // Whether a state request is outstanding. A snapshot only means anything as an
+  // answer to one; outside that window nobody asked for it.
+  let awaitingState = false
 
   // Add Sync Transport
   const transport: Transport = {
@@ -74,9 +83,18 @@ export function addSyncTransport(
 
   // Receive & Process CRDT_STATE
   binaryMessageBus.on(CommsMessage.RES_CRDT_STATE, (value) => {
-    const { sender, data } = decodeCRDTState(value)
-    if (sender !== myProfile.userId) return
+    // A snapshot nobody asked for is not state transfer, it is an injection, and
+    // this handler used to stay open for the life of the scene.
+    if (!awaitingState) return
+
+    const { addressee, data } = decodeCRDTState(value)
+    if (addressee !== myProfile.userId) return
+
     DEBUG_NETWORK_MESSAGES() && console.log('[Processing CRDT State]', data.byteLength / 1024, 'KB')
+    // Every peer answers the same broadcast and each relays the whole scene rather
+    // than only its own entities, so a snapshot cannot be attributed to whoever
+    // sent it and is deliberately not validated per message. Taking all of them
+    // keeps a peer that answers with nothing from deciding the scene is empty.
     transport.onmessage!(data)
     stateIsSyncronized = true
   })
@@ -103,9 +121,12 @@ export function addSyncTransport(
 
     if (!RealmInfo.getOrNull(engine.RootEntity)?.isConnectedSceneRoom) {
       DEBUG_NETWORK_MESSAGES() && console.log(`Aborting Requesting state?. Disconnected`)
+      awaitingState = false
       return
     }
 
+    // Open the window before asking; a retry reopens it.
+    awaitingState = true
     binaryMessageBus.emit(CommsMessage.REQ_CRDT_STATE, new Uint8Array())
 
     // Wait ~5s for the response.
@@ -121,7 +142,10 @@ export function addSyncTransport(
       } else {
         DEBUG_NETWORK_MESSAGES() && console.log('No active players. State syncronized')
         stateIsSyncronized = true
+        awaitingState = false
       }
+    } else {
+      awaitingState = false
     }
   }
 
@@ -134,6 +158,7 @@ export function addSyncTransport(
     if (!value?.isConnectedSceneRoom) {
       DEBUG_NETWORK_MESSAGES() && console.log('Disconnected from comms')
       stateIsSyncronized = false
+      awaitingState = false
     }
 
     if (value?.isConnectedSceneRoom) {
@@ -179,19 +204,22 @@ export function addSyncTransport(
  *
  * CRDT: Plain Uint8Array
  *
- * CRDT_STATE_RES { sender: string, data: Uint8Array}
+ * CRDT_STATE_RES { addressee: string, data: Uint8Array}
+ *
+ * The address in the payload is written by the responder and names who asked for
+ * the state, so it identifies the recipient and never the sender.
  */
 function decodeCRDTState(data: Uint8Array) {
   let offset = 0
   const r = new Uint8Array(data)
   const view = new DataView(r.buffer)
-  const senderLength = view.getUint8(offset)
+  const addresseeLength = view.getUint8(offset)
   offset += 1
-  const sender = decodeString(data.subarray(1, senderLength + 1))
-  offset += senderLength
+  const addressee = decodeString(data.subarray(1, addresseeLength + 1))
+  offset += addresseeLength
   const state = r.subarray(offset)
 
-  return { sender, data: state }
+  return { addressee, data: state }
 }
 
 function encodeCRDTState(address: string, data: Uint8Array) {
