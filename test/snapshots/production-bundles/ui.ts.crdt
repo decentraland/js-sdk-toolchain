@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=445.9k bytes
+SCENE_COMPILED_JS_SIZE_PROD=446.7k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -10,13 +10,14 @@ EVAL test/snapshots/production-bundles/ui.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
+  REQUIRE: ~system/Runtime
   OPCODES ~= 94k
-  MALLOC_COUNT = 24062
-  ALIVE_OBJS_DELTA ~= 4.92k
+  MALLOC_COUNT = 24176
+  ALIVE_OBJS_DELTA ~= 4.94k
 CALL onStart()
-  OPCODES ~= 0k
-  MALLOC_COUNT = -20
-  ALIVE_OBJS_DELTA ~= 0.00k
+  OPCODES ~= 1k
+  MALLOC_COUNT = -65
+  ALIVE_OBJS_DELTA ~= -0.01k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x200 c=1062 t=1 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":1,"hoverText":"Press E to spawn","maxDistance":100,"showFeedback":true}}]}
@@ -57,7 +58,7 @@ CALL onUpdate(0)
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
   OPCODES ~= 83k
-  MALLOC_COUNT = 279
+  MALLOC_COUNT = 276
   ALIVE_OBJS_DELTA ~= 0.14k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -69,4 +70,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 81k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 2036.75k bytes
+  MEMORY_USAGE_COUNT ~= 2041.22k bytes

@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=654.3k bytes
+SCENE_COMPILED_JS_SIZE_PROD=656.1k bytes
 THE BUNDLE HAS SOURCEMAPS
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
@@ -9,21 +9,22 @@ EVAL test/snapshots/development-bundles/testing-fw.test.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
+  REQUIRE: ~system/Runtime
   OPCODES ~= 87k
-  MALLOC_COUNT = 18343
-  ALIVE_OBJS_DELTA ~= 3.67k
+  MALLOC_COUNT = 18474
+  ALIVE_OBJS_DELTA ~= 3.69k
 CALL onStart()
   LOG: ["Adding one to position.y=0"]
   Renderer: PUT_COMPONENT e=0x0 c=1 t=1 data={"position":{"x":1,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":9,"y":9,"z":9},"parent":0}
   OPCODES ~= 3k
-  MALLOC_COUNT = 79
-  ALIVE_OBJS_DELTA ~= 0.03k
+  MALLOC_COUNT = 31
+  ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"two way communication"}]}
   Scene: PUT_COMPONENT e=0x0 c=1218 t=1 data={"touchInputs":[{"inputAction":2,"hide":true},{"inputAction":10,"hide":true},{"inputAction":11,"hide":true},{"inputAction":12,"hide":true},{"inputAction":13,"hide":true}],"hideJoystick":false,"hideCrosshair":false}
   LOG: ["Adding one to position.y=0"]
   OPCODES ~= 11k
-  MALLOC_COUNT = 32
+  MALLOC_COUNT = 30
   ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   LOG: ["🧪 Running test two way communication"]
@@ -62,4 +63,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 6k
   MALLOC_COUNT = -53
   ALIVE_OBJS_DELTA ~= -0.01k
-  MEMORY_USAGE_COUNT ~= 1640.36k bytes
+  MEMORY_USAGE_COUNT ~= 1646.80k bytes

@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=281.1k bytes
+SCENE_COMPILED_JS_SIZE_PROD=281.9k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -7,13 +7,14 @@ EVAL test/snapshots/production-bundles/pointer-events.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
+  REQUIRE: ~system/Runtime
   OPCODES ~= 82k
-  MALLOC_COUNT = 15977
-  ALIVE_OBJS_DELTA ~= 3.58k
+  MALLOC_COUNT = 16097
+  ALIVE_OBJS_DELTA ~= 3.60k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 37
-  ALIVE_OBJS_DELTA ~= 0.01k
+  MALLOC_COUNT = -9
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":15,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1 t=1 data={"position":{"x":13,"y":1,"z":15},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
@@ -29,7 +30,7 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x202 c=1018 t=1 data={"mesh":{"$case":"box","box":{"uvs":[]}}}
   Scene: PUT_COMPONENT e=0x0 c=1218 t=1 data={"touchInputs":[{"inputAction":2,"hide":true},{"inputAction":10,"hide":true},{"inputAction":11,"hide":true},{"inputAction":12,"hide":true},{"inputAction":13,"hide":true}],"hideJoystick":false,"hideCrosshair":false}
   OPCODES ~= 29k
-  MALLOC_COUNT = 133
+  MALLOC_COUNT = 131
   ALIVE_OBJS_DELTA ~= 0.04k
 CALL onUpdate(0.1)
   OPCODES ~= 3k
@@ -43,4 +44,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 3k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1162.77k bytes
+  MEMORY_USAGE_COUNT ~= 1167.47k bytes
