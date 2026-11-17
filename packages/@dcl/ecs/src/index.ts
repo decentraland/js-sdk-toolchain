@@ -43,6 +43,7 @@ import {
   LightSourceComponentDefinitionExtended,
   TriggerAreaComponentDefinitionExtended,
   ParticleSystemComponentDefinitionExtended,
+  ICreatedBy,
   TouchScreenControlsComponentDefinitionExtended
 } from './components/types'
 import { NameComponent } from './components/manual/Name'
@@ -85,6 +86,8 @@ export const NetworkEntity: INetowrkEntity = /* @__PURE__*/ components.NetworkEn
  * Tag a entity to be syncronized through comms
  */
 export const NetworkParent: INetowrkParent = /* @__PURE__*/ components.NetworkParent(engine)
+
+export const CreatedBy: ICreatedBy = /* @__PURE__*/ components.CreatedBy(engine)
 
 // export components for global engine
 export * from './components/generated/global.gen'

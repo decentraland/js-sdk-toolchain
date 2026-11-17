@@ -53,3 +53,26 @@ describe('utils/commands', () => {
     }
   })
 })
+
+describe('when a command run with --json returns nothing', () => {
+  let stdout: jest.SpyInstance
+  let result: unknown
+
+  beforeEach(async () => {
+    const components = await initComponents()
+    jest.spyOn(process.stderr, 'write').mockImplementation(() => true)
+    stdout = jest.spyOn(process.stdout, 'write').mockImplementation(() => true)
+    result = await runSdkCommand(components, 'scene-insights', ['nope', '--json'])
+  })
+
+  afterEach(() => {
+    process.exitCode = undefined
+  })
+
+  it('should print no JSON result', () => {
+    expect({ result, printed: stdout.mock.calls.some((call) => call[0] === undefined) }).toEqual({
+      result: undefined,
+      printed: false
+    })
+  })
+})
