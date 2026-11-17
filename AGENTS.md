@@ -115,6 +115,7 @@ This repo uses the **`/plan-plus:*` plugin** for multi-phase feature work. New d
 ## Learnings
 
 - [docs/agent-learnings/auth-server-reserved-entities.md](docs/agent-learnings/auth-server-reserved-entities.md) — tests that inject CRDT messages on `RootEntity` need `allowReservedEntities: true` on their transport, or they hang on the auth-server sync.
+- [docs/agent-learnings/auth-server-echoes-received-state.md](docs/agent-learnings/auth-server-echoes-received-state.md) — auth-server sends received component state back out; don't assert that nothing was sent after the engine received a value.
 
 ## Shell safety
 
