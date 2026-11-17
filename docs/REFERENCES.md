@@ -29,8 +29,6 @@ Curated map of every doc in this repo. Use this as the entry point when looking 
 | Doc | What it covers |
 | --- | --- |
 | [adding-or-modifying-a-component.md](adding-or-modifying-a-component.md) | Step-by-step recipe for introducing a new built-in component or evolving an existing one — schema definition, serialization, default values, tests. |
-| [agent-learnings/auth-server-reserved-entities.md](agent-learnings/auth-server-reserved-entities.md) | Why a test that injects CRDT messages on `RootEntity` hangs on the auth-server sync, and the transport flag that fixes it. |
-| [agent-learnings/auth-server-echoes-received-state.md](agent-learnings/auth-server-echoes-received-state.md) | Why a test asserting that received state is never sent back fails on the auth-server sync, and what to assert instead. |
 
 ## Specs
 

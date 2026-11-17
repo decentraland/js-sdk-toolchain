@@ -112,11 +112,6 @@ Asset-packs injection is gated behind `isEditorScene` (requires `assets/scene/ma
 
 This repo uses the **`/plan-plus:*` plugin** for multi-phase feature work. New designs land under `docs/specs/<feature>/` with `plan.md`, per-phase files, and a `learnings/` sidecar. Whether these directories ship as part of PR diffs is a per-PR judgment call — add `docs/specs/` to `.gitignore` if your team prefers keeping them as local-only audit trails.
 
-## Learnings
-
-- [docs/agent-learnings/auth-server-reserved-entities.md](docs/agent-learnings/auth-server-reserved-entities.md) — tests that inject CRDT messages on `RootEntity` need `allowReservedEntities: true` on their transport, or they hang on the auth-server sync.
-- [docs/agent-learnings/auth-server-echoes-received-state.md](docs/agent-learnings/auth-server-echoes-received-state.md) — auth-server sends received component state back out; don't assert that nothing was sent after the engine received a value.
-
 ## Shell safety
 
 Some shell environments alias destructive commands to interactive mode (`cp -i`, `mv -i`, `rm -i`), which causes long-running agent sessions to hang on confirmation prompts. Prefer explicit non-interactive flags:
