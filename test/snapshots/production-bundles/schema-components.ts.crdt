@@ -12,8 +12,8 @@ EVAL test/snapshots/production-bundles/schema-components.js
   ALIVE_OBJS_DELTA ~= 3.50k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 6
-  ALIVE_OBJS_DELTA ~= 0.00k
+  MALLOC_COUNT = 35
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0)
   OPCODES ~= 3k
   MALLOC_COUNT = 35

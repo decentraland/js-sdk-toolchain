@@ -20,6 +20,7 @@ CALL onStart()
   ALIVE_OBJS_DELTA ~= 0.02k
 CALL onUpdate(0)
    ~system/Testing: plan {"tests":[{"name":"two way communication"}]}
+  Scene: PUT_COMPONENT e=0x0 c=1218 t=1 data={"touchInputs":[{"inputAction":2,"hide":true},{"inputAction":10,"hide":true},{"inputAction":11,"hide":true},{"inputAction":12,"hide":true},{"inputAction":13,"hide":true}],"hideJoystick":false,"hideCrosshair":false}
   LOG: ["Adding one to position.y=0"]
   OPCODES ~= 5k
   MALLOC_COUNT = 4
