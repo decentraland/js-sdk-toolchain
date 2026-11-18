@@ -214,6 +214,9 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   }
 }
 
+/** Message names starting with this are reserved for the SDK's own exchanges. */
+export const RESERVED_MESSAGE_PREFIX = '__sdk'
+
 // Global registry for user-defined events
 const globalEventRegistry: EventSchemaRegistry = {}
 
@@ -243,6 +246,10 @@ export function setGlobalRoom(roomInstance: Room): void {
  * @returns Typed room instance for your registered messages
  */
 export function registerMessages<T extends EventSchemaRegistry>(messages: T): Room<T> {
+  const reserved = Object.keys(messages).filter((name) => name.startsWith(RESERVED_MESSAGE_PREFIX))
+  if (reserved.length) {
+    throw new Error(`Message names starting with '${RESERVED_MESSAGE_PREFIX}' are reserved: ${reserved.join(', ')}`)
+  }
   Object.assign(globalEventRegistry, messages)
   if (!globalRoom) {
     throw new Error('Room not initialized. Make sure the SDK network transport is initialized.')
