@@ -6,7 +6,7 @@ import QRCode from 'qrcode'
 import { CliComponents } from '../../components'
 import { buildScene } from '../build'
 import { declareArgs } from '../../logic/args'
-import { getBaseCoords } from '../../logic/scene-validations'
+import { getBaseCoords, SceneWithMultiplayer } from '../../logic/scene-validations'
 import { getPort } from '../../logic/get-free-port'
 import { PreviewComponents } from './types'
 import { createTestMetricsComponent } from '@well-known-components/metrics'
@@ -150,6 +150,9 @@ export async function main(options: Options) {
   if (workspace.projects.length > 1)
     printWarning(options.components.logger, 'Support for multiple projects is still experimental.')
 
+  // Assigned once the preview is up; rebuilds call it so a scene that starts using networking gets a server
+  let ensureMultiplayerServer = () => {}
+
   for (const project of workspace.projects) {
     if (project.kind === 'scene' || project.kind === 'smart-wearable') {
       printCurrentProjectStarting(options.components.logger, project, workspace)
@@ -157,7 +160,13 @@ export async function main(options: Options) {
       // first run `npm run build`, this can be disabled with --skip-build
       // then start the embedded compiler, this can be disabled with --no-watch
       if (watch || build) {
-        await buildScene({ ...options, args: { '--dir': project.workingDirectory, '--watch': watch, _: [] } }, project)
+        await buildScene(
+          { ...options, args: { '--dir': project.workingDirectory, '--watch': watch, _: [] } },
+          project,
+          {
+            onRebuild: project === workspace.projects[0] ? () => ensureMultiplayerServer() : undefined
+          }
+        )
         await startValidations(options.components, project.workingDirectory)
       }
 
@@ -230,8 +239,14 @@ export async function main(options: Options) {
       await startComponents()
 
       const project = workspace.projects[0]
-      const multiplayerServerReady =
-        project && !skipServer ? spawnAuthServer(components, project, `http://localhost:${port}`, dclenv) : undefined
+      let multiplayerServerReady: Promise<boolean> | undefined
+      ensureMultiplayerServer = () => {
+        if (!project || skipServer || multiplayerServerReady) return
+        // bundling keeps project.scene in sync with the flag it writes to scene.json
+        if (!(project.scene as SceneWithMultiplayer).authoritativeMultiplayer) return
+        multiplayerServerReady = spawnAuthServer(components, project, `http://localhost:${port}`, dclenv)
+      }
+      ensureMultiplayerServer()
 
       const networkInterfaces = os.networkInterfaces()
       const availableURLs: string[] = []

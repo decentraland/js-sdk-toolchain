@@ -1,92 +1,53 @@
 import type { MessageBus } from '../../packages/@dcl/sdk/src/message-bus'
 
-type Deferred = {
-  promise: Promise<unknown>
-  resolve: (value: unknown) => void
-  reject: (reason: Error) => void
-}
-
 describe('MessageBus', () => {
-  describe('when a message is still being sent', () => {
-    let MessageBusConstructor: typeof MessageBus
-    let sendMock: jest.Mock
-    let deferred: Deferred
-    let messageBus: MessageBus
+  let MessageBusConstructor: typeof MessageBus
+  let relay: { send: jest.Mock; onMessage: jest.Mock }
+  let deliverFromRelay: (message: string, sender: string) => void
 
-    beforeEach(() => {
-      let resolvePromise: (value: unknown) => void = () => undefined
-      let rejectPromise: (reason: Error) => void = () => undefined
-      const promise = new Promise<unknown>((resolve, reject) => {
-        resolvePromise = resolve
-        rejectPromise = reject
+  beforeEach(() => {
+    relay = {
+      send: jest.fn(),
+      onMessage: jest.fn((cb) => {
+        deliverFromRelay = cb
       })
-      deferred = { promise, resolve: resolvePromise, reject: rejectPromise }
-      sendMock = jest.fn().mockReturnValueOnce(deferred.promise).mockResolvedValueOnce(undefined)
-      jest.doMock('~system/CommunicationsController', () => ({ send: sendMock }), { virtual: true })
-      jest.doMock('../../packages/@dcl/sdk/src/observables', () => ({
-        onCommsMessage: { add: jest.fn(), notifyObservers: jest.fn() }
-      }))
-      jest.isolateModules(() => {
-        MessageBusConstructor = require('../../packages/@dcl/sdk/src/message-bus').MessageBus
-      })
-      messageBus = new MessageBusConstructor()
-    })
-
-    afterEach(async () => {
-      deferred.resolve(undefined)
-      await deferred.promise
-      await Promise.resolve()
-      jest.resetModules()
-      jest.restoreAllMocks()
-    })
-
-    it('should keep the next message queued', () => {
-      messageBus.sendRaw('first')
-      messageBus.sendRaw('second')
-
-      expect(sendMock.mock.calls.map(([request]) => request.message)).toEqual(['first'])
+    }
+    jest.doMock('../../packages/@dcl/sdk/src/network', () => ({ messageBusRelay: relay }))
+    jest.isolateModules(() => {
+      MessageBusConstructor = require('../../packages/@dcl/sdk/src/message-bus').MessageBus
     })
   })
 
-  describe('when sending a message fails', () => {
-    let MessageBusConstructor: typeof MessageBus
-    let sendMock: jest.Mock
-    let deferred: Deferred
-    let messageBus: MessageBus
+  afterEach(() => {
+    jest.resetModules()
+  })
 
-    beforeEach(() => {
-      let resolvePromise: (value: unknown) => void = () => undefined
-      let rejectPromise: (reason: Error) => void = () => undefined
-      const promise = new Promise<unknown>((resolve, reject) => {
-        resolvePromise = resolve
-        rejectPromise = reject
-      })
-      deferred = { promise, resolve: resolvePromise, reject: rejectPromise }
-      sendMock = jest.fn().mockReturnValueOnce(deferred.promise).mockResolvedValueOnce(undefined)
-      jest.doMock('~system/CommunicationsController', () => ({ send: sendMock }), { virtual: true })
-      jest.doMock('../../packages/@dcl/sdk/src/observables', () => ({
-        onCommsMessage: { add: jest.fn(), notifyObservers: jest.fn() }
-      }))
-      jest.isolateModules(() => {
-        MessageBusConstructor = require('../../packages/@dcl/sdk/src/message-bus').MessageBus
-      })
-      messageBus = new MessageBusConstructor()
-      messageBus.sendRaw('first')
-      messageBus.sendRaw('second')
+  describe('when a message is emitted', () => {
+    it('should send it through the server relay and deliver it locally as self', () => {
+      const bus = new MessageBusConstructor()
+      const callback = jest.fn()
+      bus.on('greet', callback)
+
+      bus.emit('greet', { hello: 'world' })
+
+      expect(relay.send).toHaveBeenCalledWith(JSON.stringify({ message: 'greet', payload: { hello: 'world' } }))
+      expect(callback).toHaveBeenCalledTimes(1)
+      expect(callback).toHaveBeenCalledWith({ hello: 'world' }, 'self')
     })
+  })
 
-    afterEach(async () => {
-      await Promise.resolve()
-      jest.resetModules()
-      jest.restoreAllMocks()
-    })
+  describe('when the relay delivers a message from another participant', () => {
+    it('should call only the listeners of that message with the sender', () => {
+      const bus = new MessageBusConstructor()
+      const greet = jest.fn()
+      const other = jest.fn()
+      bus.on('greet', greet)
+      bus.on('other', other)
 
-    it('should continue flushing the remaining messages', async () => {
-      deferred.reject(new Error('send failed'))
-      await deferred.promise.catch(() => undefined)
-      await Promise.resolve()
+      deliverFromRelay(JSON.stringify({ message: 'greet', payload: { n: 1 } }), '0xsender')
 
-      expect(sendMock.mock.calls.map(([request]) => request.message)).toEqual(['first', 'second'])
+      expect(greet).toHaveBeenCalledWith({ n: 1 }, '0xsender')
+      expect(other).not.toHaveBeenCalled()
     })
   })
 })

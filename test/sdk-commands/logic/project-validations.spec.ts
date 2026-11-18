@@ -1,5 +1,8 @@
 import path from 'path'
-import { isEditorScene } from '../../../packages/@dcl/sdk-commands/src/logic/project-validations'
+import {
+  isEditorScene,
+  usesNetworkedAssetPacks
+} from '../../../packages/@dcl/sdk-commands/src/logic/project-validations'
 
 const WORKING_DIR = '/test/project'
 const COMPOSITE_PATH = path.resolve(WORKING_DIR, 'assets', 'scene', 'main.composite')
@@ -105,5 +108,37 @@ describe('isEditorScene', () => {
     })
     const result = await isEditorScene({ fs } as any, WORKING_DIR)
     expect(result).toBe(true)
+  })
+})
+
+describe('usesNetworkedAssetPacks', () => {
+  const withEntity = (name: string) => ({ name, data: { '512': { json: {} } } })
+
+  it('returns true when an entity has Sync-Components', async () => {
+    const fs = makeMockFs(true, { version: 1, components: [withEntity('core-schema::Sync-Components')] })
+    expect(await usesNetworkedAssetPacks({ fs } as any, WORKING_DIR)).toBe(true)
+  })
+
+  it('returns true when an entity has a versioned AdminTools component', async () => {
+    const fs = makeMockFs(true, { version: 1, components: [withEntity('asset-packs::AdminTools-v2')] })
+    expect(await usesNetworkedAssetPacks({ fs } as any, WORKING_DIR)).toBe(true)
+  })
+
+  it('returns false for an editor scene with only non-network asset-packs components', async () => {
+    const fs = makeMockFs(true, {
+      version: 1,
+      components: [withEntity('asset-packs::Actions'), withEntity('asset-packs::Triggers')]
+    })
+    expect(await usesNetworkedAssetPacks({ fs } as any, WORKING_DIR)).toBe(false)
+  })
+
+  it('returns false when Sync-Components is declared but no entity has it', async () => {
+    const fs = makeMockFs(true, { version: 1, components: [{ name: 'core-schema::Sync-Components', data: {} }] })
+    expect(await usesNetworkedAssetPacks({ fs } as any, WORKING_DIR)).toBe(false)
+  })
+
+  it('returns false when main.composite does not exist or is malformed', async () => {
+    expect(await usesNetworkedAssetPacks({ fs: makeMockFs(false) } as any, WORKING_DIR)).toBe(false)
+    expect(await usesNetworkedAssetPacks({ fs: makeMockFs(true, '{not json') } as any, WORKING_DIR)).toBe(false)
   })
 })
