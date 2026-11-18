@@ -11,6 +11,7 @@ import { setupStorageEndpoints } from './storage-service'
 import { setupRealmAndComms } from './realm'
 import { getLanUrl } from '../utils'
 import { lsdDeepLinkPulseParams } from '../dcl-env'
+import { getBadgesServerUrl } from '../badges-server-url'
 
 export const sceneUpdateClients = new Set<WebSocket>()
 export async function wireRouter(
@@ -79,11 +80,53 @@ export async function wireRouter(
 
   setupRealmAndComms(components, router, localSceneParcels)
   setupStorageEndpoints(components, router, workspace)
+  setupBadgesProxy(components, router)
   await setupEcs6Endpoints(components, router, workspace)
 
   components.server.setContext(components)
   components.server.use(router.allowedMethods())
   components.server.use(router.middleware())
+}
+
+// Only what the badges service needs to verify the award: the ADR-44 signature headers,
+// the delegation claim and the body type. Nothing else from the engine's request (cookies,
+// origin, user agent) crosses the proxy.
+const FORWARDED_HEADER_PREFIX = 'x-identity-'
+const FORWARDED_HEADERS = new Set(['x-authoritative-scope', 'content-type'])
+
+// The award is ADR-44 signed over method + path, so the path is forwarded byte-identical.
+function setupBadgesProxy(components: PreviewComponents, router: Router<PreviewComponents>) {
+  const badgesServerUrl = getBadgesServerUrl()
+
+  router.put('/badges/:badgeId/awards/:player', async (ctx) => {
+    if (!badgesServerUrl) {
+      return {
+        status: 501,
+        body: { ok: false, error: 'Badge awards are not proxied in this preview: set BADGES_SERVER_URL to a badges service' }
+      }
+    }
+
+    const headers: Record<string, string> = {}
+    ctx.request.headers.forEach((value, key) => {
+      const name = key.toLowerCase()
+      if (name.startsWith(FORWARDED_HEADER_PREFIX) || FORWARDED_HEADERS.has(name)) headers[name] = value
+    })
+    try {
+      const res = await components.fetch.fetch(`${badgesServerUrl}${ctx.url.pathname}${ctx.url.search}`, {
+        method: 'PUT',
+        headers,
+        body: Buffer.from(await ctx.request.arrayBuffer())
+      })
+      return {
+        status: res.status,
+        headers: { 'content-type': res.headers.get('content-type') || 'application/json' },
+        body: Buffer.from(await res.arrayBuffer())
+      }
+    } catch (err) {
+      components.logger.error(`Badges proxy to ${badgesServerUrl} failed: ${err instanceof Error ? err.message : String(err)}`)
+      return { status: 502, body: { ok: false, error: 'Badges server unreachable' } }
+    }
+  })
 }
 
 const initWsConnection = (ws: WebSocket, clients: Set<WebSocket>) => {
