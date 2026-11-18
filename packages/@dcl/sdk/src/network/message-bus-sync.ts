@@ -1,4 +1,4 @@
-import { IEngine, Transport, RealmInfo } from '@dcl/ecs'
+import { IEngine, Entity, Transport, RealmInfo } from '@dcl/ecs'
 import type { SendBinaryRequest, SendBinaryResponse } from '~system/CommunicationsController'
 
 import { syncFilter } from './filter'
@@ -49,7 +49,10 @@ export function addSyncTransport(
   })
 
   // Entity utils
-  const entityDefinitions = entityUtils(engine, myProfile)
+  // Entities this peer synced whose creation tick has not been sent yet (see syncFilter)
+  const createdEntities = new Set<Entity>()
+  const flushedEntities = new Set<Entity>()
+  const entityDefinitions = entityUtils(engine, myProfile, createdEntities)
 
   // List of MessageBuss messsages to be sent on every frame to comms
   const pendingMessageBusMessagesToSend: { data: Uint8Array[]; address: string[] }[] = []
@@ -77,7 +80,7 @@ export function addSyncTransport(
   const TRANSPORT_INITIALIZED_NUMBER = isTestEnvironment() ? 0 : 2
   // Add Sync Transport
   const transport: Transport = {
-    filter: syncFilter(engine),
+    filter: syncFilter(engine, createdEntities, flushedEntities),
     send: async (messages) => {
       if (tick <= TRANSPORT_INITIALIZED_NUMBER) tick++
       for (const message of tick > TRANSPORT_INITIALIZED_NUMBER ? [messages].flat() : []) {
@@ -91,6 +94,9 @@ export function addSyncTransport(
           }
         }
       }
+      // An entity synced mid-flush (e.g. from a promise resolving during another transport's send) keeps its mark for the next tick
+      for (const entity of flushedEntities) createdEntities.delete(entity)
+      flushedEntities.clear()
       const peerMessages = getMessagesToSend()
       const response = await sendBinary({ data: [], peerData: peerMessages })
       binaryMessageBus.__processMessages(response.data)

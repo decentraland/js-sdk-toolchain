@@ -15,7 +15,7 @@ import { getDesyncedComponents } from './state'
 
 export type SyncEntity = (entityId: Entity, componentIds: number[], entityEnumId?: number) => void
 
-export function entityUtils(engine: IEngine, profile: IProfile) {
+export function entityUtils(engine: IEngine, profile: IProfile, createdEntities: Set<Entity>) {
   const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as INetowrkEntity
   const NetworkParent = engine.getComponent(_NetworkParent.componentId) as INetowrkParent
   const Transform = engine.getComponent(_Transform.componentId) as TransformComponent
@@ -59,6 +59,8 @@ export function entityUtils(engine: IEngine, profile: IProfile) {
     // If is not defined, then is a entity created in runtime (what we called dynamic/runtime entities).
     NetworkEntity.createOrReplace(entityId, networkValue)
     SyncComponents.createOrReplace(entityId, { componentIds: componentsIdsMutable })
+    // Every peer creates enum entities itself in main(), so there is no initial state to send
+    if (entityEnumId === undefined) createdEntities.add(entityId)
   }
 
   /**

@@ -6,11 +6,12 @@ import {
   SyncComponents as _SyncComponents,
   NetworkEntity as _NetworkEntity,
   NetworkParent as _NetworkParent,
-  IEngine
+  IEngine,
+  Entity
 } from '@dcl/ecs'
 import { shouldSyncComponent } from './state'
 
-export function syncFilter(engine: IEngine) {
+export function syncFilter(engine: IEngine, createdEntities: Set<Entity>, flushedEntities: Set<Entity>) {
   const NetworkEntity = engine.getComponent(_NetworkEntity.componentId) as typeof _NetworkEntity
   const SyncComponents = engine.getComponent(_SyncComponents.componentId) as typeof _SyncComponents
 
@@ -40,8 +41,9 @@ export function syncFilter(engine: IEngine) {
     const sync = SyncComponents.getOrNull(message.entityId)
     if (!sync) return false
 
-    // First component
-    if ((message as any).timestamp <= 1) {
+    // In the tick it calls syncEntity, the creator sends every component so peers get the full initial state
+    if (createdEntities.has(message.entityId)) {
+      flushedEntities.add(message.entityId)
       return true
     }
 
