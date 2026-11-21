@@ -1,0 +1,123 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`wire format characterization events protocol envelope pins the encoded event bytes and the decoded envelope 1`] = `"0400000070696e670068e5cf8b010000020000006869"`;
+
+exports[`wire format characterization server/utils codec conversions localMessageToNetwork pins the network encoding of every regular message 1`] = `
+[
+  {
+    "bytes": "200000000500000000020000d2040000010000000700000004000000deadbeef",
+    "from": "PUT_COMPONENT",
+  },
+  {
+    "bytes": "",
+    "from": "AUTHORITATIVE_PUT_COMPONENT",
+  },
+  {
+    "bytes": "180000000600000000020000d20400000300000007000000",
+    "from": "DELETE_COMPONENT",
+  },
+  {
+    "bytes": "0c000000070000000002000007000000",
+    "from": "DELETE_ENTITY",
+  },
+]
+`;
+
+exports[`wire format characterization server/utils codec conversions networkMessageToLocal pins the local encoding of every network message 1`] = `
+[
+  {
+    "bytes": "1c0000000100000001020000d20400000400000004000000deadbeef",
+    "from": "PUT_COMPONENT_NETWORK",
+    "to": "PUT_COMPONENT",
+  },
+  {
+    "bytes": "140000000200000001020000d204000005000000",
+    "from": "DELETE_COMPONENT_NETWORK",
+    "to": "DELETE_COMPONENT",
+  },
+  {
+    "bytes": "0c0000000300000001020000",
+    "from": "DELETE_ENTITY_NETWORK",
+    "to": "DELETE_ENTITY",
+  },
+]
+`;
+
+exports[`wire format characterization server/utils codec conversions networkMessageToLocal rewrites the Transform parent from NetworkParent 1`] = `
+{
+  "withParent": "44000000010000000102000001000000010000002c0000000000803f00000040000040400000000000000000000000000000803f0000803f0000803f0000803f58020000",
+  "withoutParent": "44000000010000000102000001000000010000002c0000000000803f00000040000040400000000000000000000000000000803f0000803f0000803f0000803f00000000",
+}
+`;
+
+exports[`wire format characterization server/utils codec conversions networkMessageToLocal with forceCorrections emits AUTHORITATIVE_PUT_COMPONENT 1`] = `"1c0000000800000001020000d20400000400000004000000deadbeef"`;
+
+exports[`wire format characterization server/utils readMessages parses every supported message shape and slices the exact source bytes 1`] = `
+[
+  {
+    "bytes": "1c0000000100000000020000d20400000100000004000000deadbeef",
+    "componentId": 1234,
+    "data": "deadbeef",
+    "entityId": 512,
+    "networkId": undefined,
+    "timestamp": 1,
+    "type": "PUT_COMPONENT",
+  },
+  {
+    "bytes": "1c0000000800000000020000d20400000200000004000000deadbeef",
+    "componentId": 1234,
+    "data": "deadbeef",
+    "entityId": 512,
+    "networkId": undefined,
+    "timestamp": 2,
+    "type": "AUTHORITATIVE_PUT_COMPONENT",
+  },
+  {
+    "bytes": "140000000200000000020000d204000003000000",
+    "componentId": 1234,
+    "data": undefined,
+    "entityId": 512,
+    "networkId": undefined,
+    "timestamp": 3,
+    "type": "DELETE_COMPONENT",
+  },
+  {
+    "bytes": "0c0000000300000000020000",
+    "componentId": undefined,
+    "data": undefined,
+    "entityId": 512,
+    "networkId": undefined,
+    "timestamp": undefined,
+    "type": "DELETE_ENTITY",
+  },
+  {
+    "bytes": "200000000500000000020000d2040000040000000700000004000000deadbeef",
+    "componentId": 1234,
+    "data": "deadbeef",
+    "entityId": 512,
+    "networkId": 7,
+    "timestamp": 4,
+    "type": "PUT_COMPONENT_NETWORK",
+  },
+  {
+    "bytes": "180000000600000000020000d20400000500000007000000",
+    "componentId": 1234,
+    "data": undefined,
+    "entityId": 512,
+    "networkId": 7,
+    "timestamp": 5,
+    "type": "DELETE_COMPONENT_NETWORK",
+  },
+  {
+    "bytes": "0c000000070000000002000007000000",
+    "componentId": undefined,
+    "data": undefined,
+    "entityId": 512,
+    "networkId": 7,
+    "timestamp": undefined,
+    "type": "DELETE_ENTITY_NETWORK",
+  },
+]
+`;
+
+exports[`wire format characterization state engineToCrdt dumps only NetworkEntity-tagged entities, as network messages 1`] = `"2800000005000000000200007e0a1d4001000000070000000c0000000700000000000000000200002800000005000000010200007e0a1d4001000000070000000c00000007000000000000000102000028000000050000000002000049d39d8501000000070000000c00000001000000c33771ef0000000028000000050000000102000049d39d8501000000070000000c00000001000000c33771ef00000000250000000500000000020000c33771ef010000000700000009000000050000006669727374260000000500000001020000c33771ef01000000070000000a000000060000007365636f6e64"`;
