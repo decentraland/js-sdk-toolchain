@@ -165,10 +165,13 @@ export function createTriggerAreaEventsSystem(engine: IEngine): TriggerAreaEvent
     const triggerCallbackMap = entitiesMap.get(entity)!.triggerCallbackMap
     triggerCallbackMap.delete(triggerType)
 
-    // Remove entity if no more trigger callbacks are registered.
-    // insideTriggerers is intentionally left populated so that re-subscription picks up
-    // in-flight sessions without missing the first synthesized onStay.
-    if (triggerCallbackMap.size === 0) entitiesMap.delete(entity)
+    // The entry stays even with no callbacks left, which is what keeps
+    // insideTriggerers and the consumed-events cursor alive for a later
+    // re-subscription. Dropping it rewound the cursor to -1, so the next
+    // callback registered was handed the entity's whole event history again.
+    // The system loop only fires callbacks that exist, so an entry with none
+    // just keeps its bookkeeping current. Entries are cleaned up when the
+    // entity is removed.
   }
 
   function onTriggerEnter(entity: Entity, cb: TriggerAreaEventSystemCallback) {
