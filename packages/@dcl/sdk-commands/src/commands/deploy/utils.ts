@@ -186,6 +186,7 @@ export async function getAddressAndSignature(
   deployment: IDeploymentComponent,
   deployToken: string,
   deleteScenesFromWorldPayload?: string,
+  target?: string,
   targetContent?: string,
   multiScene?: boolean
 ): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
@@ -217,6 +218,7 @@ export async function getAddressAndSignature(
     messageToSign,
     skipValidations,
     deleteScenesFromWorldPayload,
+    target,
     targetContent,
     multiScene
   )
@@ -362,6 +364,7 @@ export interface SceneInfo {
   isWorld: boolean
   world?: string
   deleteScenesFromWorldPayload?: string
+  target?: string
   targetContent?: string
   multiScene?: boolean
 }
@@ -372,6 +375,7 @@ export async function getSceneInfo(
   rootCID: string,
   skipValidations: boolean,
   deleteScenesFromWorldPayload?: string,
+  target?: string,
   targetContent?: string,
   multiScene?: boolean
 ) {
@@ -395,6 +399,7 @@ export async function getSceneInfo(
     isWorld: sceneHasWorldCfg(scene),
     world: scene.worldConfiguration?.name,
     deleteScenesFromWorldPayload,
+    target,
     targetContent,
     multiScene
   }
