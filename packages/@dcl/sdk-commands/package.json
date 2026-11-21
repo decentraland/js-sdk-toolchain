@@ -34,6 +34,7 @@
     "i18next-fs-backend": "^2.6.1",
     "ignore": "^5.2.4",
     "qrcode": "^1.5.4",
+    "sharp": "^0.34.0",
     "typescript": "^5.0.2",
     "undici": "^7.16.0"
   },
@@ -51,7 +52,8 @@
   "files": [
     "dist",
     ".dclrc",
-    "scripts"
+    "scripts",
+    "NOTICE"
   ],
   "keywords": [],
   "license": "Apache-2.0",
