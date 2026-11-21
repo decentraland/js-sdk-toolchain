@@ -281,27 +281,21 @@ export class Observable<T> {
 
     // execute one callback after another (not using Promise.all, the order is important)
     this._observers.forEach((obs) => {
-      if (state.skipNextObservers) {
-        return
-      }
-      if (obs._willBeUnregistered) {
-        return
-      }
       if (obs.mask & mask) {
-        if (obs.scope) {
-          p = p.then((lastReturnedValue) => {
-            state.lastReturnValue = lastReturnedValue
-            return obs.callback.apply(obs.scope, [eventData, state])
-          })
-        } else {
-          p = p.then((lastReturnedValue) => {
-            state.lastReturnValue = lastReturnedValue
-            return obs.callback(eventData, state)
-          })
-        }
-        if (obs.unregisterOnNextCall) {
-          this._deferUnregister(obs)
-        }
+        p = p.then((lastReturnedValue) => {
+          if (state.skipNextObservers || obs._willBeUnregistered) {
+            return lastReturnedValue
+          }
+
+          state.lastReturnValue = lastReturnedValue
+          const result = obs.scope ? obs.callback.apply(obs.scope, [eventData, state]) : obs.callback(eventData, state)
+
+          if (obs.unregisterOnNextCall) {
+            this._deferUnregister(obs)
+          }
+
+          return result
+        })
       }
     })
 
