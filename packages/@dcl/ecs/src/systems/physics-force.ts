@@ -76,6 +76,10 @@ export function createPhysicsForceHelper(engine: IEngine): PhysicsForceHelper {
       finalVector = vector
     }
 
+    // A source holds one force. Leaving a repulsion registered for it would let
+    // the per-tick recalculation overwrite this vector on the very next frame.
+    repulsionSources.delete(source)
+
     forceSources.set(source, finalVector)
     recalcForce()
   }
