@@ -120,3 +120,86 @@ Solution 1:
 I think this will work but there are some developer experience issues, like using the `parentEntity(child, parent)` function instead of the transform.parent.
 This could end up with a lot of unexepcted issues/bugs. Maybe we can have a system that iterates over every syncronized entity and when the transform.parent changes, add the parentEntity function automatically.
 First I wanna try to implement all of this and then came up with this approach to avoid inconsistencies
+
+## Request/response messaging (`registerRequests`)
+
+`room.send` / `room.onMessage` are fire-and-forget. When a client needs an *answer* —
+"load my save", "buy this item, tell me the new balance" — the correlation has to be built
+by hand: a `requestId` threaded through both payloads, a `requester` field so each client
+can tell whether a broadcast reply was meant for it, and a retry loop for when no answer
+arrives. Getting any of that slightly wrong is how replies end up broadcast to every peer,
+or how a client waits forever because the handler threw.
+
+`registerRequests` owns the correlation id, the addressing, the timeout and the error
+channel. It is a thin layer over the same wire mechanism: each method becomes two
+registered events, so nothing about the protocol changes.
+
+```ts
+// shared/rpc.ts — imported by both sides
+import { Schemas } from '@dcl/sdk/ecs'
+import { registerRequests } from '@dcl/sdk/network'
+
+export const rpc = registerRequests({
+  loadFarm: {
+    request: Schemas.Map({}),
+    response: Schemas.Map({ coins: Schemas.Int, level: Schemas.Int })
+  },
+  buySeed: {
+    request: Schemas.Map({ cropType: Schemas.Int }),
+    response: Schemas.Map({ coins: Schemas.Int })
+  }
+})
+```
+
+```ts
+// server — the reply is addressed to the caller automatically
+import { RequestError } from '@dcl/sdk/network'
+import { rpc } from './shared/rpc'
+
+rpc.handle('loadFarm', async (_data, context) => {
+  const farm = await store.load(context.from)
+  return { coins: farm.coins, level: farm.level }
+})
+
+rpc.handle('buySeed', async (data, context) => {
+  const farm = await store.load(context.from)
+  if (farm.coins < priceOf(data.cropType)) throw new RequestError('insufficient_funds')
+  farm.coins -= priceOf(data.cropType)
+  return { coins: farm.coins }
+})
+```
+
+```ts
+// client
+import { RequestTimeoutError } from '@dcl/sdk/network'
+import { rpc } from './shared/rpc'
+
+const farm = await rpc.request('loadFarm', {})
+applySave(farm)
+
+try {
+  const { coins } = await rpc.request('buySeed', { cropType: 3 })
+  updateHud(coins)
+} catch (error) {
+  if (error instanceof RequestTimeoutError) retryLater()
+  else showToast(error.message) // 'insufficient_funds'
+}
+```
+
+Notes:
+
+- **Replies go only to the caller.** The server answers with `{ to: [context.from] }`, so
+  one player's save never lands in another player's client.
+- **Errors have two shapes.** Throw `RequestError` for anything the caller should read;
+  its message is forwarded verbatim. Any *other* throw is reported as `internal_error` and
+  logged server-side, so a crash can't leak storage keys or stack traces over the wire.
+  A missing reply rejects with `RequestTimeoutError`, which is worth retrying.
+- **Timeouts are engine-driven**, not `setTimeout` (which the server runtime does not
+  guarantee). Default 20s; override per call with `{ timeoutMs }`.
+- **Requests issued before the room connects** are queued by `room.send`, and their
+  deadline is re-based from the moment the room is ready — a request made at boot does not
+  burn its budget waiting for the connection.
+- **Register each method once.** `handle` warns if a second live handler is installed for
+  the same method, because the caller would settle on whichever reply arrived first.
+- The server can also ask a client: `rpc.request('method', data, { to: address })`, with
+  the client calling `rpc.handle` for it.

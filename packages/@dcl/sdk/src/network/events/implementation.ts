@@ -35,6 +35,7 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   private listeners = new Map<keyof T, Set<EventCallback<any>>>()
   private binaryMessageBus: any
   private isServerFuture: IFuture<boolean> = future()
+  private isServerAtom: Atom<boolean>
   private isRoomReadyAtom: Atom<boolean>
   private messageQueue: QueuedMessage<T>[] = []
   private isProcessingQueue = false
@@ -42,6 +43,7 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
   constructor(_engine: IEngine, binaryMessageBus: any, isServerFn: Atom<boolean>, isRoomReadyAtom: Atom<boolean>) {
     void isServerFn.deref().then(($) => this.isServerFuture.resolve($))
 
+    this.isServerAtom = isServerFn
     this.binaryMessageBus = binaryMessageBus
     this.isRoomReadyAtom = isRoomReadyAtom
 
@@ -173,6 +175,16 @@ export class Room<T extends EventSchemaRegistry = EventSchemaRegistry> {
    */
   listenerCount<K extends keyof T>(eventType: K): number {
     return this.listeners.get(eventType)?.size ?? 0
+  }
+
+  /**
+   * Whether this room is the authoritative server.
+   *
+   * The runtime answers asynchronously at startup, so this reports false until it does —
+   * treat it as "known to be the server", not as "known to be a client".
+   */
+  isServer(): boolean {
+    return this.isServerAtom.getOrNull() ?? false
   }
 
   /**

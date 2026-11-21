@@ -40,9 +40,19 @@
 // Import public API and types
 import { registerMessages, getRoom, EventContext } from './implementation'
 import { EventSchemaRegistry } from './registry'
+import { registerRequests, createRequests, RequestError, RequestTimeoutError } from './requests'
+import type {
+  RequestDefinition,
+  RequestSchemaRegistry,
+  RequestHandler,
+  RequestOptions,
+  RequestsOptions,
+  Requests
+} from './requests'
 
 // Re-export public API - only what users need
-export { registerMessages, getRoom }
+export { registerMessages, getRoom, registerRequests, createRequests, RequestError, RequestTimeoutError }
 
 // Re-export types that users need
 export type { EventContext, EventSchemaRegistry }
+export type { RequestDefinition, RequestSchemaRegistry, RequestHandler, RequestOptions, RequestsOptions, Requests }
