@@ -234,14 +234,17 @@ export class Observable<T> {
       }
 
       if (obs.mask & mask) {
+        // Marked before the call, not after: a callback that notifies this same
+        // observable would otherwise still see a once-observer as live and run
+        // it a second time.
+        if (obs.unregisterOnNextCall) {
+          this._deferUnregister(obs)
+        }
+
         if (obs.scope) {
           state.lastReturnValue = obs.callback.apply(obs.scope, [eventData, state])
         } else {
           state.lastReturnValue = obs.callback(eventData, state)
-        }
-
-        if (obs.unregisterOnNextCall) {
-          this._deferUnregister(obs)
         }
       }
       if (state.skipNextObservers) {
