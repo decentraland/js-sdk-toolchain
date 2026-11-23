@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=280.7k bytes
+SCENE_COMPILED_JS_SIZE_PROD=281.8k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -7,18 +7,19 @@ EVAL test/snapshots/production-bundles/schema-components.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
+  REQUIRE: ~system/Runtime
   OPCODES ~= 77k
-  MALLOC_COUNT = 16081
-  ALIVE_OBJS_DELTA ~= 3.56k
+  MALLOC_COUNT = 16211
+  ALIVE_OBJS_DELTA ~= 3.58k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 35
-  ALIVE_OBJS_DELTA ~= 0.01k
+  MALLOC_COUNT = -16
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x0 c=1218 t=1 data={"touchInputs":[{"inputAction":2,"hide":true},{"inputAction":10,"hide":true},{"inputAction":11,"hide":true},{"inputAction":12,"hide":true},{"inputAction":13,"hide":true}],"hideJoystick":false,"hideCrosshair":false}
   OPCODES ~= 7k
-  MALLOC_COUNT = 45
-  ALIVE_OBJS_DELTA ~= 0.02k
+  MALLOC_COUNT = 43
+  ALIVE_OBJS_DELTA ~= 0.01k
 CALL onUpdate(0.1)
   OPCODES ~= 3k
   MALLOC_COUNT = 0
@@ -31,4 +32,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 3k
   MALLOC_COUNT = 0
   ALIVE_OBJS_DELTA ~= 0.00k
-  MEMORY_USAGE_COUNT ~= 1147.41k bytes
+  MEMORY_USAGE_COUNT ~= 1152.85k bytes
