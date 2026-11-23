@@ -1,20 +1,11 @@
 import { resolve } from 'path'
 import { Result } from 'arg'
-import future, { IFuture } from 'fp-future'
-import { Authenticator } from '@dcl/crypto'
-import { ethSign } from '@dcl/crypto/dist/crypto'
-import { hexToBytes } from 'eth-connect'
-import { Lifecycle } from '@well-known-components/interfaces'
-import { Router } from '@well-known-components/http-server'
 
 import { declareArgs } from '../../logic/args'
 import { CliComponents } from '../../components'
 import { CliError } from '../../logic/error'
 import { printError } from '../../logic/beautiful-logs'
-import { createWallet } from '../../logic/account'
-import { createAuthChainHeaders } from '../../logic/auth-chain-headers'
-import { setRoutes, LinkerResponse } from '../../linker-dapp/routes'
-import { dAppOptions, runDapp } from '../../run-dapp'
+import { signMultiplayerServerRequest } from '../../logic/multiplayer-server-auth'
 import { getValidWorkspace } from '../../logic/workspace-validations'
 import { getValidSceneJson } from '../../logic/scene-validations'
 
@@ -80,83 +71,6 @@ export function help(options: Options) {
     - Use private key for authentication (no browser):
       $ DCL_PRIVATE_KEY=0x... sdk-commands sdk-server-logs --world myworld
 `)
-}
-
-function setServerLogsRoutes(
-  router: Router<object>,
-  components: CliComponents,
-  awaitResponse: IFuture<void>,
-  signCallback: (response: LinkerResponse) => Promise<void>
-): Router<object> {
-  const { logger } = components
-
-  const resolveLinkerPromise = () => setTimeout(() => awaitResponse.resolve(), 100)
-  const rejectLinkerPromise = (e: Error) => setTimeout(() => awaitResponse.reject(e), 100)
-
-  router.post('/api/logs', async (ctx) => {
-    const value = (await ctx.request.json()) as LinkerResponse
-
-    if (!value.address || !value.authChain) {
-      const errorMessage = `Invalid payload: ${Object.keys(value).join(' - ')}`
-      logger.error(errorMessage)
-      resolveLinkerPromise()
-      return { status: 400, body: { success: false, error: errorMessage } }
-    }
-
-    try {
-      await signCallback(value)
-      resolveLinkerPromise()
-      return { body: { success: true } }
-    } catch (e) {
-      rejectLinkerPromise(e as Error)
-      return { status: 400, body: { success: false, error: (e as Error).message } }
-    }
-  })
-
-  return router
-}
-
-async function getAddressAndSignature(
-  components: CliComponents,
-  awaitResponse: IFuture<void>,
-  payload: string,
-  displayLabel: string,
-  targetUrl: string,
-  linkOptions: Omit<dAppOptions, 'uri'>,
-  signCallback: (response: LinkerResponse) => Promise<void>
-): Promise<{ program?: Lifecycle.ComponentBasedProgram<unknown> }> {
-  // If DCL_PRIVATE_KEY is set, sign directly without the linker dapp
-  if (process.env.DCL_PRIVATE_KEY) {
-    const wallet = createWallet(process.env.DCL_PRIVATE_KEY)
-    const authChain = Authenticator.createSimpleAuthChain(
-      payload,
-      wallet.address,
-      ethSign(hexToBytes(wallet.privateKey), payload)
-    )
-    const linkerResponse = { authChain, address: wallet.address }
-    await signCallback(linkerResponse)
-    awaitResponse.resolve()
-    return {}
-  }
-
-  // Use linker dapp for signing - pass the payload as the rootCID
-  const { router: commonRouter } = setRoutes(components, {
-    rootCID: payload,
-    baseParcel: '0,0',
-    parcels: ['0,0'],
-    skipValidations: true,
-    debug: !!process.env.DEBUG,
-    isWorld: true,
-    world: displayLabel,
-    targetUrl,
-    action: 'view-logs'
-  })
-  const router = setServerLogsRoutes(commonRouter, components, awaitResponse, signCallback)
-
-  components.logger.info('You need to sign to access server logs')
-  const { program } = await runDapp(components, router, { ...linkOptions, uri: `/` })
-
-  return { program }
 }
 
 async function streamLogs(
@@ -359,43 +273,27 @@ export async function main(options: Options) {
   const isHttps = !!options.args['--https']
   const linkOptions = { linkerPort, openBrowser, isHttps }
 
-  const awaitResponse = future<void>()
   const timestamp = String(Date.now())
 
   // Build the payload to sign: method:path:timestamp:metadata
   const payload = ['get', pathname, timestamp, metadata].join(':').toLowerCase()
 
-  let authHeaders: Record<string, string> = {}
-
-  const { program } = await getAddressAndSignature(
-    options.components,
-    awaitResponse,
-    payload,
-    displayLabel,
-    baseURL,
-    linkOptions,
-    async (linkerResponse) => {
-      authHeaders = createAuthChainHeaders(linkerResponse.authChain, timestamp, metadata)
-    }
-  )
-
+  let authHeaders: Record<string, string>
   try {
-    await awaitResponse
+    authHeaders = await signMultiplayerServerRequest(options.components, {
+      payload,
+      timestamp,
+      metadata,
+      displayLabel,
+      targetUrl: baseURL,
+      linkOptions,
+      prompt: 'You need to sign to access server logs'
+    })
     logger.info('Authentication successful!')
-
-    // Close the browser window
-    if (program) {
-      await program.stop()
-    }
-
-    // Start streaming logs
-    await streamLogs(options.components, logsUrl, authHeaders)
   } catch (e) {
     printError(logger, 'Failed to authenticate:', e as Error)
     throw e
-  } finally {
-    if (program) {
-      void program.stop()
-    }
   }
+
+  await streamLogs(options.components, logsUrl, authHeaders)
 }
