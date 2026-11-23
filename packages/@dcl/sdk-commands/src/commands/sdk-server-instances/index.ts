@@ -42,7 +42,7 @@ export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands sdk-server-instances [options]'
     Lists the multiplayer server instances running for a world, or stops one.
-    Only the world owner and its deployment collaborators can use it.
+    Only the world owner and collaborators allowed to deploy anywhere in it can use it.
     Falls back to scene.json (worldConfiguration.name) when --world is not passed.
 
     Options:
