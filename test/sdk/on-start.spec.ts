@@ -41,6 +41,12 @@ describe('SDK onStart default on-screen buttons', () => {
     return messages
   }
 
+  function sentTouchScreenControlsValues(): PBTouchScreenControls[] {
+    return sentTouchScreenControls().map((message) =>
+      ecs.TouchScreenControls.schema.deserialize(new ReadWriteByteBuffer((message as { data: Uint8Array }).data))
+    )
+  }
+
   beforeEach(() => {
     sentToRenderer = []
     mainComposite = null
@@ -183,7 +189,9 @@ describe('SDK onStart default on-screen buttons', () => {
       await sdk.onUpdate(0)
 
       expect(ecs.TouchScreenControls.getOrNull(ecs.engine.RootEntity)).toEqual(preloaded)
-      expect(sentTouchScreenControls()).toEqual([])
+      // auth-server echoes state received from the renderer back to it, so the preloaded value may be
+      // sent; main does not. Either way the default must never reach the renderer.
+      sentTouchScreenControlsValues().forEach((value) => expect(value).toEqual(preloaded))
     })
   })
 
