@@ -1,4 +1,4 @@
-SCENE_COMPILED_JS_SIZE_PROD=284.7k bytes
+SCENE_COMPILED_JS_SIZE_PROD=285.7k bytes
 (start empty vm 0.21.0-3680274614.commit-1808aa1)
   OPCODES ~= 0k
   MALLOC_COUNT = 1005
@@ -7,14 +7,15 @@ EVAL test/snapshots/production-bundles/append-value-crdt.js
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/EngineApi
   REQUIRE: ~system/Runtime
+  REQUIRE: ~system/Runtime
   OPCODES ~= 91k
-  MALLOC_COUNT = 16610
-  ALIVE_OBJS_DELTA ~= 3.74k
+  MALLOC_COUNT = 16740
+  ALIVE_OBJS_DELTA ~= 3.76k
 CALL onStart()
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}
   OPCODES ~= 9k
-  MALLOC_COUNT = 109
-  ALIVE_OBJS_DELTA ~= 0.04k
+  MALLOC_COUNT = 58
+  ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0)
   LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0}]]
   LOG: ["✅ First state is pressed"]
@@ -24,8 +25,8 @@ CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x0 c=1218 t=1 data={"touchInputs":[{"inputAction":2,"hide":true},{"inputAction":10,"hide":true},{"inputAction":11,"hide":true},{"inputAction":12,"hide":true},{"inputAction":13,"hide":true}],"hideJoystick":false,"hideCrosshair":false}
   Renderer: APPEND_VALUE e=0x200 c=1063 t=0 data={"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5,"tickNumber":0}
   OPCODES ~= 23k
-  MALLOC_COUNT = 103
-  ALIVE_OBJS_DELTA ~= 0.04k
+  MALLOC_COUNT = 101
+  ALIVE_OBJS_DELTA ~= 0.03k
 CALL onUpdate(0.1)
   LOG: ["PointerEventsResult",[{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":1,"timestamp":1,"analog":5,"tickNumber":0},{"button":0,"hit":{"position":{"x":1,"y":2,"z":3},"globalOrigin":{"x":1,"y":2,"z":3},"direction":{"x":1,"y":2,"z":3},"normalHit":{"x":1,"y":2,"z":3},"length":10,"meshName":"mesh","entityId":512},"state":0,"timestamp":2,"analog":5,"tickNumber":0}]]
   LOG: ["✅ Second state is not pressed"]
@@ -55,4 +56,4 @@ CALL onUpdate(0.1)
   OPCODES ~= 15k
   MALLOC_COUNT = 31
   ALIVE_OBJS_DELTA ~= 0.01k
-  MEMORY_USAGE_COUNT ~= 1193.02k bytes
+  MEMORY_USAGE_COUNT ~= 1198.49k bytes
