@@ -24,6 +24,7 @@ type GetPlayerDataRes = {
 }
 
 const PARCEL_SIZE = 16
+const SCENE_PARCELS_TIMEOUT_SECONDS = 10
 
 type SceneParcels = {
   baseX: number
@@ -54,7 +55,9 @@ let sceneParcelsPromise: Promise<SceneParcels | null> | undefined
 
 function loadSceneParcels(): Promise<SceneParcels | null> {
   if (!sceneParcelsPromise) {
-    sceneParcelsPromise = getSceneInformation({}).then(({ metadataJson }) => parseSceneParcels(metadataJson))
+    sceneParcelsPromise = Promise.resolve()
+      .then(() => getSceneInformation({}))
+      .then(({ metadataJson }) => parseSceneParcels(metadataJson))
   }
   return sceneParcelsPromise
 }
@@ -106,12 +109,13 @@ export function definePlayerHelper(engine: IEngine) {
 
   // undefined while loading, null when the scene metadata has no usable parcels
   let sceneParcels: SceneParcels | null | undefined = undefined
+  let sceneParcelsWait = 0
   loadSceneParcels()
     .then((parcels) => {
-      sceneParcels = parcels
+      if (sceneParcels === undefined) sceneParcels = parcels
     })
     .catch(() => {
-      sceneParcels = null
+      if (sceneParcels === undefined) sceneParcels = null
     })
   let localPlayerInside = false
   let localPlayerAddress = ''
@@ -132,8 +136,16 @@ export function definePlayerHelper(engine: IEngine) {
     }
   }
 
-  engine.addSystem(() => {
-    if (sceneParcels) updateLocalPlayer(sceneParcels)
+  engine.addSystem((dt) => {
+    if (sceneParcels === undefined) {
+      sceneParcelsWait += dt
+      if (sceneParcelsWait >= SCENE_PARCELS_TIMEOUT_SECONDS) {
+        sceneParcels = null
+        console.log('[players] getSceneInformation did not answer, tracking the local player by its components')
+      }
+    } else if (sceneParcels) {
+      updateLocalPlayer(sceneParcels)
+    }
 
     for (const [entity, identity] of engine.getEntitiesWith(PlayerIdentityData, AvatarBase)) {
       if (entity === engine.PlayerEntity && sceneParcels !== null) continue
