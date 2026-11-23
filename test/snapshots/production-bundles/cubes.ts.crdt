@@ -12,8 +12,8 @@ EVAL test/snapshots/production-bundles/cubes.js
   ALIVE_OBJS_DELTA ~= 5.54k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 35
-  ALIVE_OBJS_DELTA ~= 0.01k
+  MALLOC_COUNT = -16
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":-3,"y":2.4741439819335938,"z":-3},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}
   Scene: PUT_COMPONENT e=0x201 c=1 t=1 data={"position":{"x":-4,"y":3.2723166942596436,"z":-4},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":0.5,"y":0.5,"z":0.5},"parent":0}

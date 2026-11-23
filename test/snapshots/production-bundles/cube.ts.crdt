@@ -12,8 +12,8 @@ EVAL test/snapshots/production-bundles/cube.js
   ALIVE_OBJS_DELTA ~= 3.51k
 CALL onStart()
   OPCODES ~= 0k
-  MALLOC_COUNT = 37
-  ALIVE_OBJS_DELTA ~= 0.01k
+  MALLOC_COUNT = -14
+  ALIVE_OBJS_DELTA ~= 0.00k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":0,"y":0,"z":0},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x0 c=1218 t=1 data={"touchInputs":[{"inputAction":2,"hide":true},{"inputAction":10,"hide":true},{"inputAction":11,"hide":true},{"inputAction":12,"hide":true},{"inputAction":13,"hide":true}],"hideJoystick":false,"hideCrosshair":false}

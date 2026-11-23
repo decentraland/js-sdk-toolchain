@@ -14,9 +14,9 @@ EVAL test/snapshots/production-bundles/ui.js
   MALLOC_COUNT = 24567
   ALIVE_OBJS_DELTA ~= 4.99k
 CALL onStart()
-  OPCODES ~= 0k
-  MALLOC_COUNT = -20
-  ALIVE_OBJS_DELTA ~= 0.00k
+  OPCODES ~= 1k
+  MALLOC_COUNT = -70
+  ALIVE_OBJS_DELTA ~= -0.01k
 CALL onUpdate(0)
   Scene: PUT_COMPONENT e=0x200 c=1 t=1 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0,"z":0,"w":1},"scale":{"x":1,"y":1,"z":1},"parent":0}
   Scene: PUT_COMPONENT e=0x200 c=1062 t=1 data={"pointerEvents":[{"eventType":1,"eventInfo":{"button":1,"hoverText":"Press E to spawn","maxDistance":100,"showFeedback":true}}]}
@@ -57,7 +57,7 @@ CALL onUpdate(0)
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=2 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.008726535364985466,"z":0,"w":0.9999619126319885},"scale":{"x":1,"y":1,"z":1},"parent":0}
   OPCODES ~= 83k
-  MALLOC_COUNT = 279
+  MALLOC_COUNT = 276
   ALIVE_OBJS_DELTA ~= 0.14k
 CALL onUpdate(0.1)
   Scene: PUT_COMPONENT e=0x200 c=1 t=3 data={"position":{"x":8,"y":1,"z":8},"rotation":{"x":0,"y":0.017452405765652657,"z":0,"w":0.9998477101325989},"scale":{"x":1,"y":1,"z":1},"parent":0}
