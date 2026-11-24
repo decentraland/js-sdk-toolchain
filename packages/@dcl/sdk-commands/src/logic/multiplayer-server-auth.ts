@@ -9,6 +9,7 @@ import { createWallet } from './account'
 import { createAuthChainHeaders } from './auth-chain-headers'
 import { setRoutes, LinkerResponse } from '../linker-dapp/routes'
 import { dAppOptions, runDapp } from '../run-dapp'
+import { isLinkerOrigin } from '../commands/scene-insights/sign-in'
 
 export interface MultiplayerServerSignRequest {
   /** Exact string the auth chain signs. */
@@ -71,13 +72,19 @@ export async function signMultiplayerServerRequest(
   }
 }
 
-/** The linker dApp's server-logs page posts the signature to `/api/logs`. */
-function addSignatureRoute(
+/**
+ * The linker dApp's server-logs page posts the signature to `/api/logs`. Only that page, served by
+ * the CLI on localhost, is accepted: another page open in the browser can't hand in a signature.
+ */
+export function addSignatureRoute(
   router: Router<object>,
   components: CliComponents,
   onSigned: (response: LinkerResponse) => void
 ): void {
   router.post('/api/logs', async (ctx) => {
+    if (!isLinkerOrigin(ctx.request.headers.get('origin'), ctx.request.headers.get('host'))) {
+      return { status: 403, body: { success: false, error: 'Sign from the page the CLI opened on localhost' } }
+    }
     const value = (await ctx.request.json()) as LinkerResponse
 
     if (!value.address || !value.authChain) {
