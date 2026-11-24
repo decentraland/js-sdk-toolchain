@@ -56,7 +56,11 @@ describe('when running sdk-server-instances', () => {
     beforeEach(async () => {
       fetchMock.mockResolvedValueOnce(
         jsonResponse(200, {
-          instances: [{ sceneId: SCENE_ID, baseParcel: '0,0', status: 'restarting', participants: 2 }]
+          instances: [
+            { sceneId: SCENE_ID, baseParcel: '0,0', status: 'restarting', current: true, participants: 2 },
+            { sceneId: 'bafkreiold', baseParcel: '0,0', status: 'running', current: false, participants: 1 },
+            { sceneId: 'bafkreiunknown', baseParcel: '0,0', status: 'running', participants: 0 }
+          ]
         })
       )
       await run(['--world', 'MyWorld', '--target', `${TARGET}/`])
@@ -70,8 +74,12 @@ describe('when running sdk-server-instances', () => {
       expect(signedPayload()).toBe(`get:/worlds/myworld.dcl.eth/instances:${timestamp()}:{}`)
     })
 
-    it('should print each instance with its parcel, status and players', () => {
-      expect(logMock).toHaveBeenCalledWith(`  ${SCENE_ID}  parcel 0,0  restarting  2 player(s)`)
+    it('should print each instance with its parcel, status, players and whether it runs the current deployment', () => {
+      expect(logMock.mock.calls).toEqual([
+        [`  ${SCENE_ID}  parcel 0,0  restarting  2 player(s)  (current)`],
+        ['  bafkreiold  parcel 0,0  running  1 player(s)  (previous deployment)'],
+        ['  bafkreiunknown  parcel 0,0  running  0 player(s)']
+      ])
     })
   })
 

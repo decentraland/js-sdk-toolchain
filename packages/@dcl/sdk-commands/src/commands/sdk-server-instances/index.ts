@@ -44,6 +44,8 @@ interface ServerInstance {
   sceneId: string
   baseParcel?: string
   status?: string
+  /** Runs the deployment the content server serves now; absent when the server couldn't tell. */
+  current?: boolean
   participants?: number
 }
 
@@ -53,6 +55,8 @@ export function help(options: Options) {
   options.components.logger.log(`
   Usage: 'sdk-commands sdk-server-instances [options]'
     Lists the multiplayer server instances running for a scene or a world, or stops them.
+    The list marks the instance running the current deployment, the one joining players get;
+    the others run previous deployments still serving players.
     Genesis City: needs LAND deploy rights on every parcel of the scene.
     Worlds: only the world owner and collaborators allowed to deploy anywhere in it.
     Without --world or --position, uses scene.json: the world in worldConfiguration.name,
@@ -253,10 +257,12 @@ export async function main(options: Options) {
 
   logger.info(`Server instances running for ${label}:`)
   for (const instance of instances) {
+    const current =
+      instance.current === true ? '  (current)' : instance.current === false ? '  (previous deployment)' : ''
     logger.log(
       `  ${instance.sceneId}  parcel ${instance.baseParcel ?? '-'}  ${instance.status ?? 'running'}  ${
         instance.participants ?? 0
-      } player(s)`
+      } player(s)${current}`
     )
   }
 }
