@@ -23,7 +23,8 @@ export function defineAvatarEquippedDataComponent(
   const patchedSchema = { ...AvatarEquippedDataSchema }
   const origSerialize = patchedSchema.serialize
   patchedSchema.serialize = (value: any, builder: any) => {
-    origSerialize(value.forceRender === undefined ? { ...value, forceRender: [] } : value, builder)
+    // a composite written before `wearables` existed carries none
+    origSerialize({ ...value, wearables: value.wearables ?? [], forceRender: value.forceRender ?? [] }, builder)
   }
 
   const theComponent = engine.defineComponentFromSchema('core::AvatarEquippedData', patchedSchema)

@@ -2738,6 +2738,7 @@ export interface PBAvatarEquippedData {
     // (undocumented)
     emoteUrns: string[];
     forceRender: string[];
+    wearables: PBAvatarEquippedData_EquippedWearable[];
     // (undocumented)
     wearableUrns: string[];
 }
@@ -2748,6 +2749,21 @@ export namespace PBAvatarEquippedData {
     export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEquippedData;
     // (undocumented)
     export function encode(message: PBAvatarEquippedData, writer?: _m0.Writer): _m0.Writer;
+}
+
+// @public (undocumented)
+export interface PBAvatarEquippedData_EquippedWearable {
+    // (undocumented)
+    urn: string;
+    visible?: boolean | undefined;
+}
+
+// @public (undocumented)
+export namespace PBAvatarEquippedData_EquippedWearable {
+    // (undocumented)
+    export function decode(input: _m0.Reader | Uint8Array, length?: number): PBAvatarEquippedData_EquippedWearable;
+    // (undocumented)
+    export function encode(message: PBAvatarEquippedData_EquippedWearable, writer?: _m0.Writer): _m0.Writer;
 }
 
 // @public (undocumented)
